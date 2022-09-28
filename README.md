@@ -1,10 +1,23 @@
 # Overview
 
-**Busrpc** project is an API design intended for systems relying on microservice architecture (MA) principles. The project consists of the following components:
-* API [specification](./busrpc.md) defining the rules to be followed by particular implementations
-* Example [specialization](./busrpc-nats.md) of the specification for [NATS](https://nats.io/) message broker
-* Command-line [tool](./busrpc-tool.md) for performing common tasks (checking implementations for conformance, generating documentation, etc.)
+**Busrpc** is an RPC framework which relies on a generalized message bus/queue/broker (for example, [NATS](https://nats.io/) or [RabbitMQ](https://rabbitmq.com/)) as a transport layer and [protocol buffers](https://developers.google.com/protocol-buffers) as message format.
 
-As appears from the name, busrpc-conforming API stands on two pillars:
-* First of all, it's a form of RPC meaning that logical unit of busrpc API is a *method* (like in [grpc](https://grpc.io/), [json-rpc](https://www.jsonrpc.org/) and similar). To *call* it, client sends a message containing call information (method *name*, values of method *parameters*, etc.) to a service. Service in it's turn performs necessary work (*implements* a method) and then optionally sends message containing method *result* back to the caller.
-* Secondly, it relies on a message bus/queue/broker component as a transport layer. Usual RPC implementations mostly operate in a peer-to-peer manner meaning that caller needs to connect directly to the service implementing the method. This is probably ok for the systems where API is implemented by a small number (1-5) of services. However, microservice architecture implies that API parts are scattered among large number of small services (can be more than 100) additionally duplicating each other for high-availability and load-balancing. For such architecture, peer-to-peer communication leads to a configuration burden and complex service interconnections which in turn greatly complicates system deployment and management. Instead, MA-based systems utilize a dedicated component (called message bus/queue/broker) responsible for inter-service message delivery and routing. Examples of this component are [NATS](https://nats.io/) and [RabbitMQ](https://rabbitmq.com/). Caller sends a message with call information to the message bus which in turn routes it to an appropriate service(s). Note that caller and service become loosely coupled in this scheme: both only need to connect to a message bus component at a well-known location.
+The project consists of the following components:
+* API [specification](./docs/busrpc.md) defining general rules to be followed by busrpc backends
+* API [specializations](Specializations) defining bus-dependent rules which can not be placed to common specification
+* Command-line [tool](./tools/busrpc-tool.md) providing useful commands for busrpc backends developers (checking protocol for conformance, generating documentation, etc.)
+* Bus-dependent [clients](Clients) for testing/tracing running busrpc backends
+* Bus-dependent [libraries](Libraries) for busrpc backends development
+
+# Specializations
+
+Busrpc [specification](./busrpc.md) tries to stay as general as possible and leaves some aspects of API design unspecified, because otherwise specification may depend on specific message bus/queue/broker technology. This unspecified aspects are defined in a seperate bus-dependent documents called *specializations*.
+
+Currently the project provides the following specializations:
+* NATS [specialization](./docs/specializations/nats-busrpc.md)
+
+# Clients
+
+# Libraries
+
+Currently there are no ready libraries providing easy-to-use APIs for accessing busprc backends. Note, that such libraries (when created) will differ in 2 dimensions: language (C++, Go, Rust, ...) and targeted message bus/queue/broker.  
