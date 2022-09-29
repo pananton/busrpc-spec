@@ -43,4 +43,4 @@ If you want to discuss/suggest some feature, create an issue.
 
 If you want to contribute code to busprc development tool, fork this repository, make your changes and create a pull request.
 
-If you have implemented new busrpc client or library, create an issue with a link to it and I will add it to the list.
+If you have implemented new busrpc client or library, create an issue with a link to it and I will add your client/library to the list.
