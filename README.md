@@ -15,7 +15,7 @@ The project consists of the following components:
 Busrpc [specification](./busrpc.md) tries to stay as general as possible and leaves some aspects of API design unspecified, because otherwise specification may depend on specific message bus/queue/broker technology. This unspecified aspects are defined in a seperate bus-dependent documents called *specializations*.
 
 Currently the project provides the following specializations:
-* NATS [specialization](./docs/specializations/nats-busrpc.md)
+* [NATS](./docs/specializations/nats-busrpc.md) specialization
 
 # Clients
 
@@ -25,7 +25,7 @@ Clients allow developers to test and trace running busprc backends and usually p
 * `trace` - to trace calls of busrpc methods
 
 Currently the project provides the following cliens:
-* NATS busrpc [client](https://github.com/pananton/nats-busrpc-cli)
+* [NATS](https://github.com/pananton/nats-busrpc-cli) busrpc client
 
 # Libraries
 
