@@ -4,15 +4,15 @@
 
 The project consists of the following components:
 * API [specification](./docs/busrpc.md) defining general rules to be followed by busrpc backends
-* API [specializations](Specializations) defining bus-dependent rules which can not be placed to common specification
+* API [specializations](./README.md#specializations) defining bus-dependent rules which can not be placed to common specification
 * Busrpc protobuf [style guide](./docs/style.md)
-* Command-line [tool](./docs/tools/busrpc-tool.md) providing useful commands for busrpc backends developers (checking protocol for conformance, generating documentation, etc.)
+* Command-line [tool](./tool/README.md) providing useful commands for busrpc backends developers (checking protocol for conformance, generating documentation, etc.)
 * Bus-dependent [clients](./README.md#clients) for testing/tracing running busrpc backends
 * Bus-dependent [libraries](./README.md#libraries) for busrpc backends development (to be done)
 
 # Specializations
 
-Busrpc [specification](./busrpc.md) tries to stay as general as possible and leaves some aspects of API design unspecified, because otherwise specification may depend on specific message bus/queue/broker technology. This unspecified aspects are defined in a seperate bus-dependent documents called *specializations*.
+Busrpc [specification](./docs/busrpc.md) tries to stay as general as possible and leaves some aspects of API design unspecified, because otherwise specification may depend on specific message bus/queue/broker technology. This unspecified aspects are defined in a seperate bus-dependent documents called *specializations*.
 
 Currently the project provides the following specializations:
 * [NATS](./docs/specializations/nats-busrpc.md) specialization
@@ -29,14 +29,14 @@ Currently the project provides the following cliens:
 
 # Libraries
 
-Currently no client libraries designed specifically for busrpc-based APIs exist, which means that you will probably implement one for your platform (combination of programming language and particular message bus/queue/broker). It's usually not a big deal, because you will probably use some client library from message bus/queue/broker developer (for example, see [here](https://nats.io/download/#nats-clients) for NATS client libraries, or [here](https://www.rabbitmq.com/devtools.html) for RabbitMQ client libraries) and implement busrpc-specific wrappers over it. Contributions of such busrpc client libraries are highly appreciated!
+Currently no client libraries designed specifically for busrpc-based APIs exist, which means that you will probably implement one for your platform (combination of programming language and particular message bus/queue/broker). It's usually not a big deal, because you will probably use some client library from message bus/queue/broker developer (for example, see [here](https://nats.io/download/#nats-clients) for NATS client libraries or [here](https://www.rabbitmq.com/devtools.html) for RabbitMQ client libraries) and implement busrpc-specific wrappers over it. Contributions of such busrpc client libraries are highly appreciated!
 
 # Contributing
 
 Any contributions are highly appreciated:
 * suggestions to specification
 * specializations for different message bus/queue/broker techonologies
-* new commands for busrpc development [tool](./tools/busrpc-tool.md)
+* new commands for busrpc development tool
 * clients for testing/tracing busrpc backends
 * busrpc client libraries
 
