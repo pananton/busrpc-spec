@@ -20,8 +20,8 @@ Busrpc *proto* file style is very similar to the one suggested in the protocol b
 All *proto** files must be structured in the following way:
 * Line `syntax  =  "proto3";`
 * Package name
-* Imports (ordered, see [this](./style.md#imports) section)
-* [File options](https://developers.google.com/protocol-buffers/docs/proto3#options) if any
+* Imports (ordered, see [this](#imports) section)
+* [File options](https://developers.google.com/protocol-buffers/docs/proto3#options)
 * Type definitions
 
 ## Naming
@@ -47,18 +47,14 @@ message SomeMessage {
 
 * Use CamelCase for `enum` name and upper case underscore-separated names for enum values
 * Add enum name as a prefix to all value names
-* Do not use zero value as indication that value is not set (as speficied by the official style guide), prefer `optional` instead
+* Each enum must contain a zero value enum (required by protobuf), however busrpc style guide do not recommend to use it as indication that value is not set (prefer `optional` instead) and do not require it to have `UNSPECIFIED` suffix (as official style guide does)
 
 Example:
 ```
-enum Weekday {
-  WEEKDAY_MONDAY = 0;
-  WEEKDAY_TUESDAY = 1;
-  WEEKDAY_WEDNESDAY = 2;
-  WEEKDAY_THURSDAY = 3;
-  WEEKDAY_FRIDAY = 4;
-  WEEKDAY_SATURDAY = 5;
-  WEEKDAY_SUNDAY = 6;
+enum Status {
+  STATUS_OK = 0;
+  STATUS_INTERNAL_ERROR = 1;
+  STATUS_INVALID_INPUT = 2;
 }
 ```
 
