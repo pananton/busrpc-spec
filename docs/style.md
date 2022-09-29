@@ -2,7 +2,7 @@
 
 Busrpc *proto* file style is very similar to the one suggested in the protocol buffer's official [documentation](https://developers.google.com/protocol-buffers/docs/style) (with some additions related to busrpc semantics). All places where busprc style guide violates the official one are explicitly stated.
 
-[[_TOC_]]
+[TOC]
 
 ## Basic rules
 
@@ -16,7 +16,7 @@ Busrpc *proto* file style is very similar to the one suggested in the protocol b
 All *proto** files must be structured in the following way:
 * Line `syntax  =  "proto3";`
 * Package name
-* Imports (ordered, see [this](./docs/style.md#imports) section)
+* Imports (ordered, see [this](./style.md#imports) section)
 * [File options](https://developers.google.com/protocol-buffers/docs/proto3#options) if any
 * Type definitions
 
