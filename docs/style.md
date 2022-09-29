@@ -2,11 +2,11 @@
 
 Busrpc *proto* file style is very similar to the one suggested in the protocol buffer's official [documentation](https://developers.google.com/protocol-buffers/docs/style) (with some additions related to busrpc specifics). All places where busprc style guide violates the official one are explicitly stated.
 
-- [Basic rules](#basic-rules)
-- [File structure](#file-structure)
-- [Naming](#naming)
-- [Enums naming](#enums-naming)
-- [Busrpc entities naming](#busrpc-entities-naming)
+* [Basic rules](#basic-rules)
+* [File structure](#file-structure)
+* [Naming](#naming)
+  * [Enums naming](#enums-naming)
+  * [Busrpc entities naming](#busrpc-entities-naming)
 
 ## Basic rules
 
@@ -43,7 +43,7 @@ message SomeMessage {
 }
 ```
 
-## Enums naming
+### Enums naming
 
 * Use CamelCase for `enum` name and upper case underscore-separated value names
 * Add `enum` name as a prefix to all value names
@@ -58,7 +58,7 @@ enum Status {
 }
 ```
 
-## Busrpc entities naming
+### Busrpc entities naming
 
 * Use lower case underscore-separated names for busrpc services, classes and methods
 * Methods that do not have a `Retval` usually can be considered as event sinks and may be prefixed with *on* (for example *on_signed_in*, *on_signed_out*, etc.)
