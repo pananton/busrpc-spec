@@ -17,7 +17,7 @@ Busrpc *proto* file style is very similar to the one suggested in the protocol b
 
 ## File structure
 
-All *proto** files must be structured in the following way:
+All *proto* files must be structured in the following way:
 * Line `syntax  =  "proto3";`
 * Package name
 * Imports (ordered, see [this](#imports) section)
