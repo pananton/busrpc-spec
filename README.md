@@ -5,9 +5,9 @@
 The project consists of the following components:
 * API [specification](./docs/busrpc.md) defining general rules to be followed by busrpc backends
 * API [specializations](Specializations) defining bus-dependent rules which can not be placed to common specification
-* Command-line [tool](./tools/busrpc-tool.md) providing useful commands for busrpc backends developers (checking protocol for conformance, generating documentation, etc.)
+* Command-line [tool](./docs/tools/busrpc-tool.md) providing useful commands for busrpc backends developers (checking protocol for conformance, generating documentation, etc.)
 * Bus-dependent [clients](Clients) for testing/tracing running busrpc backends
-* Bus-dependent [libraries](Libraries) for busrpc backends development
+* Bus-dependent [libraries](Libraries) for busrpc backends development (to be done)
 
 # Specializations
 
@@ -18,6 +18,27 @@ Currently the project provides the following specializations:
 
 # Clients
 
+Clients allow developers to test and trace running busprc backends and usually provide at least the following commands:
+* `call` - to call a busrpc method
+* `impl` - to implement a busrpc method
+* `trace` - to trace calls of busrpc methods
+
+Currently the project provides the following cliens:
+* NATS busrpc [client](https://github.com/pananton/nats-busrpc-cli)
+
 # Libraries
 
-Currently there are no ready libraries providing easy-to-use APIs for accessing busprc backends. Note, that such libraries (when created) will differ in 2 dimensions: language (C++, Go, Rust, ...) and targeted message bus/queue/broker.  
+Currently no client libraries designed specifically for busrpc-based APIs exist, which means that you will probably implement one for your platform (combination of programming language and particular message bus/queue/broker). It's usually not a big deal, because you will probably use some client library from message bus/queue/broker developer (for example, see [here](https://nats.io/download/#nats-clients) for NATS client libraries, or [here](https://www.rabbitmq.com/devtools.html) for RabbitMQ client libraries) and implement busrpc-specific wrappers over it. Contributions of such busrpc client libraries are highly appreciated!
+
+# Contributing
+
+Any contributions are highly appreciated:
+* suggestions to specification
+* specializations for different message bus/queue/broker techonologies
+* new commands for busrpc development [tool](./tools/busrpc-tool.md)
+* clients for testing/tracing busrpc backends
+* busrpc client libraries
+
+If you want to discuss/suggest some feature, [create](https://github.com/pananton/busrpc/issues) an issue.
+If you want to contribute code to busprc development tool, fork this repository, make your changes and create a pull request.
+Finally, if you have implemented new busrpc client or library, create an issue with a link to it and I will add it to the list.
