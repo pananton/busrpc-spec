@@ -77,6 +77,6 @@ Inside the method descritpion file *method.proto* always import class descriptio
 * class private types from the class directory
 * global types from namespace directory
 
-Inside the service description file *service.proto* order imported method description files *method.proto* in the following way:
+Inside the service description file *service.proto* order imported method description files in the following way:
 * description files for methods, implemented by the service
 * description files for methods, invoked by the service
