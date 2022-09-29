@@ -4,11 +4,11 @@
 
 The project consists of the following components:
 * API [specification](./docs/busrpc.md) defining general rules to be followed by busrpc backends
-* API [specializations](./README.md#specializations) defining bus-dependent rules which can not be placed to common specification
+* API [specializations](#specializations) defining bus-dependent rules which can not be placed to common specification
 * Busrpc protobuf [style guide](./docs/style.md)
 * Command-line [tool](./tool/README.md) providing useful commands for busrpc backends developers (checking protocol for conformance, generating documentation, etc.)
-* Bus-dependent [clients](./README.md#clients) for testing/tracing running busrpc backends
-* Bus-dependent [libraries](./README.md#libraries) for busrpc backends development (to be done)
+* Bus-dependent [clients](#clients) for testing/tracing running busrpc backends
+* Bus-dependent [libraries](#libraries) for busrpc backends development (to be done)
 
 # Specializations
 
