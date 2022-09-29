@@ -2,7 +2,7 @@
 
 Busrpc *proto* file style is very similar to the one suggested in the protocol buffer's official [documentation](https://developers.google.com/protocol-buffers/docs/style) (with some additions related to busrpc semantics). All places where busprc style guide violates the official one are explicitly stated.
 
-[TOC]
+[[TOC]]
 
 ## Basic rules
 
