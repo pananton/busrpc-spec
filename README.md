@@ -40,5 +40,7 @@ Any contributions are highly appreciated:
 * busrpc client libraries
 
 If you want to discuss/suggest some feature, [create](https://github.com/pananton/busrpc/issues) an issue.
+
 If you want to contribute code to busprc development tool, fork this repository, make your changes and create a pull request.
+
 Finally, if you have implemented new busrpc client or library, create an issue with a link to it and I will add it to the list.
