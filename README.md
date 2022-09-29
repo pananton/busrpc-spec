@@ -12,7 +12,7 @@ The project consists of the following components:
 
 # Specializations
 
-Busrpc [specification](./docs/busrpc.md) tries to stay as general as possible and leaves some aspects of API design unspecified, because otherwise specification may depend on specific message bus/queue/broker technology. This unspecified aspects are defined in a seperate bus-dependent documents called *specializations*.
+Busrpc specification tries to stay as general as possible and leaves some aspects of API design unspecified to avoid dependency on a specific message bus/queue/broker implementation. This unspecified aspects are defined in a seperate bus-dependent documents called *specializations*.
 
 Currently the project provides the following specializations:
 * [NATS](./docs/specializations/nats-busrpc.md) specialization
