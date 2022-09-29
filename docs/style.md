@@ -45,9 +45,9 @@ message SomeMessage {
 
 ## Enums naming
 
-* Use CamelCase for `enum` name and upper case underscore-separated names for enum values
-* Add enum name as a prefix to all value names
-* Each enum must contain a zero value enum (required by protobuf), however busrpc style guide do not recommend to use it as indication that value is not set (prefer `optional` instead) and do not require it to have `UNSPECIFIED` suffix (as official style guide does)
+* Use CamelCase for `enum` name and upper case underscore-separated names for values
+* Add `enum` name as a prefix to all value names
+* Each `enum` must contain a zero value (required by protobuf), however busrpc style guide do not recommend to use it as indication that value is not set (prefer `optional` instead) and do not require it to have `UNSPECIFIED` suffix (as official style guide does)
 
 Example:
 ```
