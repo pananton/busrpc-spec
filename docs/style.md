@@ -7,6 +7,7 @@ Busrpc *proto* file style is very similar to the one suggested in the protocol b
 * [Naming](#naming)
   * [Enums naming](#enums-naming)
   * [Busrpc entities naming](#busrpc-entities-naming)
+* [Imports](#imports)
 
 ## Basic rules
 
@@ -66,68 +67,16 @@ enum Status {
 ## Imports
 
 * Always use `import public` 
-* Use path relative to repository root when importing *proto* files (for example, if file *dir1/dir2/some.proto* should be imported to any other file (even in the same directory) do this with `import public "dir1/dir2/some.proto"`)
-* Files in *csmq* directory **can** be imported from everywhere
-* Files in *csmq/<class_name>* (except for *class.proto*) **must not** be imported from files outside class directory
-* Files in *csmq/<class_name>/<method_name>* (except for *method.proto*) **must not** be imported from files outside method directory
+* Use path relative to busrpc API root directory when importing *proto* files (for example, if file *dir1/dir2/file1.proto* should be imported to any other file (even in the same directory) do this with `import public "dir1/dir2/some.proto";`)
+* Files in the namespace directory contain globally visible types and can be imported from everywhere
+* Files in the class directory (apart from class description file *class.proto*) contain class private types and should only be imported from other files in the class directory and/or class method directories
+ * Files in the method directory (apart from method description file *method.proto*) contain method private types and should only be imported from other files in the method directory
 
-Imports order for *method.proto* file (inside each group order alphabetically):
-* Import method's class *class.proto* first
-* Import class-level types from *csmq/<class_name>* directory
-* Import globally-visible types from *csmq* directory
+Inside the method descritpion file *method.proto* always import class description file *class.proto* first (even for static methods) and then the following files when needed (inside each group order alphabetically):
+* method private types from the method directory
+* class private types from the class directory
+* global types from namespace directory
 
-Imports order for *service.proto* file:
-* Import *method.proto* files for implemented methods
-* Import *method.proto* files for invoked methods
-
-# Documenting
-
-Our [documentation generator](https://gitlab-595988116.camfrog.com/camshare/common/mq-docs) supports several [doxygen](https://www.doxygen.nl/)-like commands to facilitate documenting.
-
-Method documentation commands (can be specified in *method.proto"):
-* *\throws \<errc\> \<condition\>* - allows to explicitly describe condition when `csmq.Exception` with specified *errc* is thrown by the method (note that even in the absence of this command method still **may** throw (for example, because of network or database errors), *\throws* only used to document important parts of method contract)
-
-Service documentation commands (can be specified in *service.proto*):
-* *\author \<name\>* - service author
-* *\email \<email\>* - service author email
-* *\url \<url\>* - service repository URL
-* *\docs \<url\>* - additional service documentation URL
-* *\impl* - indicates that method is implemented/overloaded by the service
-* *\invk* - indicates that method is invoked by the service
-* *\qgroup \<name\>* - name of the NATS queue group (only for implemented methods)
-* *\accepts \<extparam-name\> \<extparam-value\>* - specifies which value should have method's external parameter during the call to be accepted by the service (only for implemented methods); *extparam-value* can be expressed in an arbitrary way
-
-## Guide
-
-* The basic rule is that all protobuf messages (except for predefined types like `ClassInfo`, `Method`, `Params` etc., which are self-describing), their fields (except for predefined `Result` type fields), enumerations and enumeration values **must** be documented
-* Use `//`-style comments
-* Documentation comment is placed right before the entity to which it relates (note that documentation generator treats the firts line of multiline comment as brief description)
-* Links to external resources are created with markdown notation: \[*link text*\]\(*link address*\)
-* Links to CMAPI entities are created automatically for fully-qualified names (for example, *csmq.profile.update* string will be converted to a link that points to corresponding method documentation)
-* Each *method.proto* file **must** contain a comment with method description at the top
-* Each *service.proto* file **must** contain the following information about the service:
-  * Description at the top of the file
-  * Repository url specified in *\url* command
-  * Author name specified in *\author* command
-  * Author email specified in *\email* command
-  * *\impl* command before `import` of each method implemented by the service
-  * *\invk* command before `import` of each method invoked by the service
-  * *\qgroup* command if method is implemented by a queue group
-  * *\accepts* command(s) is service accepts only specific value of an external parameter(s)
-
-# Testing
-
-We provide [mq-client](https://gitlab-595988116.camfrog.com/camshare/common/mq-client) utility which allows developers to quickly test their services:
-* call any CMAPI method
-* accept any CMAPI method call and answer it with fixed reply
-* monitor arbitrary parts of CMAPI
-
-*Mq-client* utility uses JSON for input/output and encodes/decodes it to/form binary protobuf format automatically.
-
-# Versioning
-
-* CMAPI version uses *major.minor.patch* format of [semantic versioning](https://semver.org/)
-* Change major version when you make incompatible changes
-* Change minor version when you add functionality in a backwards compatible manner
-* Change patch number when you make backwards compatible bug fixes
-
+Inside the service description file *service.proto* order imported method description files *method.proto* in the following way:
+* description files for methods, implemented by the service
+* description files for methods, invoked by the service
