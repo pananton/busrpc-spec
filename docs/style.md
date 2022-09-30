@@ -8,6 +8,7 @@ Busrpc *proto* file style is very similar to the one suggested in the protocol b
   * [Enums naming](#enums-naming)
   * [Busrpc entities naming](#busrpc-entities-naming)
 * [Imports](#imports)
+* [Documenting](#documenting)
 
 ## Basic rules
 
@@ -80,3 +81,15 @@ Inside the method descritpion file *method.proto* always import class descriptio
 Inside the service description file *service.proto* order imported method description files in the following way:
 * description files for methods, implemented by the service
 * description files for methods, invoked by the service
+
+## Documenting
+
+Busrpc API design follows code as documentation principle, which implies that *proto* files of the particular API should contain appropriate comments and [documentation commands](./busrpc.md#documentation-commands):
+* Each class description file *class.proto* should start with a descriptive comment
+* Each method description file *method.proto* should start with a descriptive comment
+* Each service description file *service.proto* should start with a descriptive comment
+* Each protobuf `message` or `enum` (apart from self-describing types `ClassDesc` and `MethodDesc` (and it's nested types)) should be accompanied by a descriptive comment placed right before it
+* Each `message` field or `enum` constant should be accompanied by a descriptive comment placed right before it
+* For each service method, service description file *service.proto* should have a comment right before corresponding `import` statement describing whether method is implemented, invoked or both by the service (see `\impl` and `\invk` [documentation commands](./busrpc.md#documentation-commands))
+
+If some of the specified comments are missing, busrpc development tool will issue a warning when checking API for conformance.
