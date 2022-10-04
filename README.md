@@ -1,22 +1,13 @@
 # Overview
 
-**Busrpc** is an RPC framework which relies on a generalized message bus/queue/broker (for example, [NATS](https://nats.io/) or [RabbitMQ](https://rabbitmq.com/)) as a transport layer and [protocol buffers](https://developers.google.com/protocol-buffers) as message format.
+**Busrpc** framework is an RPC framework designed with [microservice architecture](https://en.wikipedia.org/wiki/Microservices) principles in mind. It relies on a generalized message bus/queue/broker (for example, [NATS](https://nats.io/) or [RabbitMQ](https://rabbitmq.com/)) as a transport layer and [protocol buffers](https://developers.google.com/protocol-buffers) as message format.
 
 The project consists of the following components:
-* API [specification](./docs/busrpc.md) defining general rules to be followed by busrpc backends
-* API [specializations](#specializations) defining bus-dependent rules which can not be placed to common specification
-* Busrpc protobuf [style guide](./docs/style.md)
-* Command-line [tool](./tool/README.md) providing useful commands for busrpc backends developers (checking protocol for conformance, generating documentation, etc.)
+* Technical documentation, namely common [specification](./docs/busrpc.md) with accompanying bus-dependent [specializations](./docs/busrpc.md#specializations) and [style guide](./docs/style.md) for busrpc API protobuf files
+* Command-line development [tool](./devtool/README.md) for busrpc microservice developers
 * Bus-dependent [clients](#clients) for testing/tracing running busrpc backends
-* Bus-dependent [libraries](#libraries) for busrpc backends development (to be done)
+* Bus-dependent [libraries](#libraries) for busrpc microservice development
 * [Example](https://github.com/pananton/busrpc/tree/main/example) of a busrpc API for a fictional restaurtant "Weeping Willow" which is used throughout documentation
-
-# Specializations
-
-Busrpc specification tries to stay as general as possible and leaves some aspects of API design unspecified to avoid dependency on a specific message bus/queue/broker implementation. This unspecified aspects are defined in a seperate bus-dependent documents called *specializations*.
-
-Currently the project provides the following specializations:
-* NATS [specialization](./docs/specializations/nats-busrpc.md)
 
 # Clients
 
