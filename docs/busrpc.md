@@ -3,7 +3,7 @@
 This document contains general information for developers of busrpc-compliant microservices and tools: busrpc terminology, network model, protocol, API documentation, bus-dependent specializations of this specification, etc.
 
 * [Introduction](#introduction)
-* [Premises and goals](#premises-and-goals)
+* [Goals](#Goals)
 * [Network model](#network-model)
 * [Design](#design)
   * [Terminology](#terminology)
@@ -24,9 +24,9 @@ First of all, it is a form of a remote procedure call (RPC) technology (like [gr
 
 Secondly, it relies on a message bus/queue/broker component as a transport layer. Usual RPC implementations mostly operate in a peer-to-peer manner which means that communicating parties need to connect directly to each other. This is probably ok for the systems with small number (1-5) of services, but does not suite well for microservice backends where number of services can easily surpass 100. Instead, microservice backends utilize a dedicated component (called message bus/queue/broker) as a central point of communication responsible for inter-service message delivery and routing. This greatly simplifies system configuration (only message bus address is required to access any part of the system API), service deployment (because all services are loosely-coupled in this scheme) and administration.
 
-# Premises and goals
+# Goals
 
-[Microservice architecture](https://en.wikipedia.org/wiki/Microservices)(MA) is a common standard nowadays for developing large systems backends. Basic MA principles and patterns are described in a numerous amount of technical articles, publications and books. However, low-level details are frequently left underspecified. Busrpc framework main goal is to offer a turnkey solution for backend developers who apply MA for their projects.
+[Microservice architecture](https://en.wikipedia.org/wiki/Microservices) (MA) is a common standard nowadays for developing large systems backends. Basic MA principles and patterns are described in a numerous amount of technical articles, publications and books. However, low-level details are frequently left underspecified. Busrpc framework main goal is to offer a turnkey solution for backend developers who apply MA for their projects.
 
 Because MA implies that all development is distributed among some (probably - large) number of small (from 1 to 5 developers) loosely-coupled teams, the following sub-goals were also specified:
 * Busrpc framework should establish a common intuitive terminology to facilitate communication between development teams. 
