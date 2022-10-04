@@ -13,6 +13,7 @@ This document defines an API model which can be used for microservice-based back
   * [Directory layout](#directory-layout)
   * [Types visibility](#types-visibility)
 * [Documentation commands](#documentation-commands)
+* [Specializations](#specializations)
 
 # Goals
 
@@ -43,3 +44,10 @@ First of all, it is a form of RPC meaning that logical unit of busrpc API is a *
 Secondly, it relies on a message bus/queue/broker component as a transport layer. Usual RPC implementations mostly operate in a peer-to-peer manner meaning that caller needs to connect directly to the service implementing the method. This is probably ok for the systems where API is implemented by a small number (1-5) of services. However, microservice architecture implies that API parts are scattered among large number of small services (can be more than 100) additionally duplicating each other for high-availability and load-balancing. For such architecture, peer-to-peer communication leads to a configuration burden and complex service interconnections which in turn greatly complicates system deployment and management. Instead, MA-based systems utilize a dedicated component (called message bus/queue/broker) responsible for inter-service message delivery and routing. Examples of this component are [NATS](https://nats.io/) and [RabbitMQ](https://rabbitmq.com/). Caller sends a message with call information to the message bus which in turn routes it to an appropriate service(s). Note that caller and service become loosely coupled in this scheme: both only need to connect to a message bus component at a well-known location.
 
 # Documentation commands
+
+# Specializations
+
+Some aspects of the busrpc API design were intentionally left unspecified in this document to avoid dependency on a particular message bus/queue/broker implementation. This unspecified aspects are defined in a seperate bus-dependent documents called *specializations*.
+
+Currently the following specializations exist (more to be added):
+* NATS [specialization](./docs/specializations/nats-busrpc.md)
