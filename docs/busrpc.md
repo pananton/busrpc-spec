@@ -20,9 +20,9 @@ This document contains general information for developers of busrpc-compliant mi
 
 As appears from it's name, busrpc framework stands on two pillars.
 
-First of all, it is a form of a remote procedure call (RPC) technology (like [grpc](https://grpc.io/), [json-rpc](https://www.jsonrpc.org/) and similar) used for interservice communication.
+First of all, it is a form of a remote procedure call (RPC) technology (like [grpc](https://grpc.io/), [json-rpc](https://www.jsonrpc.org/) and similar) used for inter-service communication.
 
-Secondly, it relies on a message bus/queue/broker component as a transport layer. Usual RPC implementations mostly operate in a peer-to-peer manner meaning that communicating parties need to connect directly to each other. This is probably ok for the systems with small number (1-5) of services, but does not suite well for microservice backends where number of services can easily surpass 100. Instead, microservice backends utilize a dedicated component (called message bus/queue/broker) as a central point of communication responsible for interservice message delivery and routing. This greatly simplifies system configuration (only message bus address is required to access any part of the system API), service deployment (because all services are loosely-coupled in this scheme) and administration.
+Secondly, it relies on a message bus/queue/broker component as a transport layer. Usual RPC implementations mostly operate in a peer-to-peer manner which means that communicating parties need to connect directly to each other. This is probably ok for the systems with small number (1-5) of services, but does not suite well for microservice backends where number of services can easily surpass 100. Instead, microservice backends utilize a dedicated component (called message bus/queue/broker) as a central point of communication responsible for inter-service message delivery and routing. This greatly simplifies system configuration (only message bus address is required to access any part of the system API), service deployment (because all services are loosely-coupled in this scheme) and administration.
 
 # Premises and goals
 
