@@ -26,7 +26,7 @@ Currently no client libraries designed specifically for busrpc APIs exist, which
 # Contributing
 
 Any contributions are highly appreciated:
-* suggestions to specification
+* suggestions to the busrpc design
 * specializations for different message bus/queue/broker techonologies
 * new commands for busrpc development tool
 * clients for testing/tracing busrpc backends
