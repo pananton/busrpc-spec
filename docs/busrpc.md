@@ -1,6 +1,6 @@
-# Busrpc API specification
+# Busrpc design
 
-This document defines an API model which can be used for microservice-based backends.
+This document defines an busrpc framework design.
 
 * [Introduction](#introduction)
 * [Network model](#network-model)
