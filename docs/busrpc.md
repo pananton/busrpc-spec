@@ -1,8 +1,9 @@
-# Busrpc design
+# Busrpc specification
 
-This document defines an busrpc framework design.
+This document contains general information for developers of busrpc-compliant microservices and tools: busrpc terminology, network model, protocol, API documentation, bus-dependent specializations of this specification, etc.
 
 * [Introduction](#introduction)
+* [Premises and goals](#premises-and-goals)
 * [Network model](#network-model)
 * [Design](#design)
   * [Terminology](#terminology)
@@ -15,15 +16,35 @@ This document defines an busrpc framework design.
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
 
-# Goals
+# Introduction
+
+As appears from it's name, busrpc framework stands on two pillars.
+
+First of all, it is a form of a remote procedure call (RPC) technology (like [grpc](https://grpc.io/), [json-rpc](https://www.jsonrpc.org/) and similar) used for interservice communication.
+
+Secondly, it relies on a message bus/queue/broker component as a transport layer. Usual RPC implementations mostly operate in a peer-to-peer manner meaning that communicating parties need to connect directly to each other. This is probably ok for the systems with small number (1-5) of services, but does not suite well for microservice backends where number of services can easily surpass 100. Instead, microservice backends utilize a dedicated component (called message bus/queue/broker) as a central point of communication responsible for interservice message delivery and routing. This greatly simplifies system configuration (only message bus address is required to access any part of the system API), service deployment (because all services are loosely-coupled in this scheme) and administration.
+
+# Premises and goals
+
+[Microservice architecture](https://en.wikipedia.org/wiki/Microservices)(MA) is a common standard nowadays for developing large systems backends. Basic MA principles and patterns are described in a numerous amount of technical articles, publications and books. However, low-level details are frequently left underspecified. Busrpc framework main goal is to offer a turnkey solution for backend developers who apply MA for their projects.
+
+Because MA implies that all development is distributed among some (probably - large) number of small (from 1 to 5 developers) loosely-coupled teams, the following sub-goals were also specified:
+* Busrpc framework should establish a common intuitive terminology to facilitate communication between development teams. 
+* 
+* To make learning curve for busrpc newcomers shorted Introduction of specific New concepts and definitions should be avoided and terminology should build on a well-known Framework should avoid introduction of new concepts and definitions and instead build on a well-known Instead of providing new concepts and definitions, busrcp terminology should build on a well-known concept 
+* Busrpc framework should support (at least - *potentially*) a variery of message bus/queue/broker implementations and programming languages.
+* Busrpc fram
+
+
+
+
 
 Primary goal of the busrpc project is to provide a microservice development framework (consisting of technical documentation, tools and client libraries) suitable for a variety of platforms and programming languages.
 * Because in 
 
 
-[Microservice architecture](https://en.wikipedia.org/wiki/Microservices)(MA) is a common standard nowadays for developing large systems backends. Among many other things, it determines how to decompose the system on microservices 
 
- Basic MA principles and patterns are described in a numerous amount of technical articles, publications and books. However, low-level details are frequently left underspecified.
+ 
 
 
 
@@ -35,13 +56,7 @@ Busrpc API design is motivated by the following points:
 Motivation behind busrpc is 
 
 
-# Introduction
 
-As appears from it's name, busrpc API stands on two pillars.
-
-First of all, it is a form of RPC meaning that logical unit of busrpc API is a *method* (like in [grpc](https://grpc.io/), [json-rpc](https://www.jsonrpc.org/) and similar) grouped into *classes*. To *call* it, client sends a message containing values of method *parameters*, etc.) to a service. Service in it's turn performs necessary work (*implements* a method) and then optionally sends message containing method *result* back to the caller.
-
-Secondly, it relies on a message bus/queue/broker component as a transport layer. Usual RPC implementations mostly operate in a peer-to-peer manner meaning that caller needs to connect directly to the service implementing the method. This is probably ok for the systems where API is implemented by a small number (1-5) of services. However, microservice architecture implies that API parts are scattered among large number of small services (can be more than 100) additionally duplicating each other for high-availability and load-balancing. For such architecture, peer-to-peer communication leads to a configuration burden and complex service interconnections which in turn greatly complicates system deployment and management. Instead, MA-based systems utilize a dedicated component (called message bus/queue/broker) responsible for inter-service message delivery and routing. Examples of this component are [NATS](https://nats.io/) and [RabbitMQ](https://rabbitmq.com/). Caller sends a message with call information to the message bus which in turn routes it to an appropriate service(s). Note that caller and service become loosely coupled in this scheme: both only need to connect to a message bus component at a well-known location.
 
 # Documentation commands
 
