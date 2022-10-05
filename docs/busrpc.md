@@ -29,7 +29,7 @@ Busrpc framework global goal is to offer a turnkey solution for backend develope
 * promoted API design should help to solve typical problems arising when designing custom backend API (how to extract API entities from the business domain, name and document them, etc.) 
 * framework should provide tool for enforcing promoted API design (for example, as part of CI/CD pipeline) in third-party development process
 * promoted API design should be strict and complete to facilitate development of tools which can be used for all conforming implementations
-* underlying network protocol should be extensible and should support conversion between binary (for higher throughoutput and lesser latency) and text (for human-readability) format
+* underlying network protocol should be extensible and should support switching between binary (for higher throughoutput and lesser latency) and text (for human-readability) format
 
 # Documentation commands
 
