@@ -39,13 +39,25 @@ The message bus model provides two basic operations:
 1. `PUBLISH(topic, message, [replyTo])` - to send arbitrary `message` on a `topic`
 2. `SUBSCRIBE(topic)` - to listen for messages published on a `topic`
 
-*Topic* is essentially a sequence of characters used by the message bus to route messages from publisher to subscriber. On a closer look, it is a list of words separated by a special character `<sep>`. Most (if not all) message bus techonologies use dot as a separator, however described model does not require this (still dot will be used in the examples thorought this document for simplicity).
+*Topic* is essentially a sequence of characters used by the message bus to route messages from publisher to subscriber. On a closer look, it is a list of words separated by a special character `<sep>`. Most (if not all) message bus techonologies use dot (`.`) as separator, however described model does not require this (still dot will be used in the examples thorought this document for simplicity).
 
 Words constituiting a topic usually form a hierarchy, for example: `time.us`, `time.us.east`, `time.us.east.atlanta`. Abstract bus model supports the following wildcards which can be used in the `SUBSCRIBE` operation:
 * `<any1>` (usually `*`) - matches a single word, for example `time.<any1>.east` matches `time.us.east` and `time.eu.east`
-* `<anyN>` - matches 1 to many or 0 to many words, for example `time.us.<anyN>` matches `time.us.east`, `time.us.east.atlanta` and may or may not match `time.us` (makes no difference for busrpc specification)
+* `<anyN>` - matches 1 to many or 0 to many words at the end of a topic, for example `time.us.<anyN>` matches `time.us.east`, `time.us.east.atlanta` and may or may not match `time.us` (makes no difference for busrpc specification)
 
 Note that core publish/subscribe mechanism implies one-way message flow (from publisher to subscriber). To enable request/response two-way message flow, `PUBLISH` operation can also be called with a `replyTo` parameter containing topic on which publisher expects to receive a response for his request. In that case subscriber will call `PUBLISH(replyTo, response)` after original request is handled.
+
+# Design
+
+Busrpc API design is formulated in terms of object-oriented programming:
+* **class**
+* **namespace** is a collection of closely related *classes* representing entities 
+
+Any busrpc API consists of *namespaces* representing distinct API subdomains. Inside That means it's building blocks are *classes*, which contain arbitrary number of *methods*. Each class is placed into some *namespace* representing an API subdomain. Each namespace, class and method has own *scope* which  
+
+
+
+
 
 # Documentation commands
 
