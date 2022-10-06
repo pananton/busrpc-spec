@@ -3,7 +3,7 @@
 This document contains general information for developers of busrpc microservices and tools: terminology, network model, protocol design, etc.
 
 * [Introduction](#introduction)
-* [Network model](#network-model)
+* [Message bus model](#message-bus-model)
 * [Design](#design)
   * [Terminology](#terminology)
   * [Signaling errors](#signaling-errors)
@@ -30,6 +30,22 @@ Busrpc framework global goal is to offer a turnkey solution for backend develope
 * framework should provide tool for enforcing promoted API design (for example, as part of CI/CD pipeline) in third-party development process
 * promoted API design should be strict and complete to facilitate development of tools which can be used for all conforming implementations
 * underlying network protocol should be extensible and should support switching between binary (for higher throughoutput and lesser latency) and text (for human-readability) format
+
+# Message bus model
+
+One of the goals of the busrpc framework is to be applicable for a variety of message bus/queue/broker technologies. For this reason, busrpc specification relies on an abstract message bus model instead of any particular implementation like NATS or RabbitMQ. Note, that if message bus implementation violates this model, it probably can't be used along with busrpc framework.
+
+The message bus model provides two basic operations:
+1. `PUBLISH(topic, message, [replyTo])` - to send arbitrary `message` on a `topic`
+2. `SUBSCRIBE(topic)` - to listen for messages published on a `topic`
+
+*Topic* is essentially a sequence of characters used by the message bus to route messages from publisher to subscriber. On a closer look, it is a list of words separated by a special character `<sep>`. Most (if not all) message bus techonologies use dot as a separator, however described model does not require this (still dot will be used in the examples thorought this document for simplicity).
+
+Words constituiting a topic usually form a hierarchy, for example: `time.us`, `time.us.east`, `time.us.east.atlanta`. Abstract bus model supports the following wildcards which can be used in the `SUBSCRIBE` operation:
+* `<any1>` (usually `*`) - matches a single word, for example `time.<any1>.east` matches `time.us.east` and `time.eu.east`
+* `<anyN>` - matches 1 to many or 0 to many words, for example `time.us.<anyN>` matches `time.us.east`, `time.us.east.atlanta` and may or may not match `time.us` (makes no difference for busrpc specification)
+
+Note that core publish/subscribe mechanism implies one-way message flow (from publisher to subscriber). To enable request/response two-way message flow, `PUBLISH` operation can also be called with a `replyTo` parameter containing topic on which publisher expects to receive a response for his request. In that case subscriber will call `PUBLISH(replyTo, response)` after original request is handled.
 
 # Documentation commands
 
