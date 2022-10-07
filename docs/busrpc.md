@@ -1,6 +1,6 @@
 # Busrpc specification
 
-This document contains general information for developers of busrpc microservices and tools: terminology, network model, protocol design, etc.
+This document contains general information for developers of busrpc microservices and tools: terminology, network model, API design, etc.
 
 * [Introduction](#introduction)
 * [Message bus model](#message-bus-model)
@@ -49,7 +49,10 @@ Note that core publish/subscribe mechanism implies one-way message flow (from pu
 
 # Design
 
-Busrpc API design is formulated in terms of object-oriented programming:
+Busrpc API design is formulated in terms of object-oriented programming. This terms when applied for busrpc API have similar meaning as in OOP, however should not be treated as equivalent.
+
+Every busrpc-compliant API is made up the following building blocks:
+* **namespace** - a collections of somehow related *classes*
 * **class**
 * **namespace** is a collection of closely related *classes* representing entities 
 
