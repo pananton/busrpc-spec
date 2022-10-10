@@ -90,7 +90,7 @@ Busrpc API design follows code as documentation principle, which implies that *p
 * Each class description file *class.proto* should start with a descriptive comment
 * Each method description file *method.proto* should start with a descriptive comment
 * Each service description file *service.proto* should start with a descriptive comment
-* Each protobuf `message` or `enum` (apart from self-describing types `ClassDesc` and `MethodDesc` (and it's nested types)) should be accompanied by a descriptive comment placed right before it
+* Each protobuf `message` or `enum` (apart from self-describing types `ClassDesc`, `MethodDesc` and their nested types) should be accompanied by a descriptive comment placed right before it
 * Each `message` field or `enum` constant should be accompanied by a descriptive comment placed right before it
 * For each service method, service description file *service.proto* should have a comment right before corresponding `import` statement describing whether method is implemented, invoked or both by the service (see `\impl` and `\invk` [documentation commands](./busrpc.md#documentation-commands))
 
