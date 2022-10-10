@@ -7,7 +7,7 @@ The project consists of the following components:
 * Command-line development [tool](./devtool/README.md) for a busrpc microservice developers
 * Bus-dependent [clients](#clients) for testing/tracing running busrpc backends
 * Bus-dependent [libraries](#libraries) for a busrpc microservice development
-* [Example](https://github.com/pananton/busrpc/tree/main/example) of a busrpc API for a fictional restaurtant "Weeping Willow" used throughout the documentation
+* [Example](https://github.com/pananton/busrpc/tree/main/example) of a busrpc API for a simple chat application
 
 # Clients
 
