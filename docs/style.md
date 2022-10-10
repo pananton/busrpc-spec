@@ -4,9 +4,9 @@ Busrpc *proto* file style is very similar to the one suggested in the protocol b
 
 * [Basic rules](#basic-rules)
 * [File structure](#file-structure)
-* [Naming](#naming)
+* [Protobuf entities naming](#protobuf-entities-naming)
   * [Enums naming](#enums-naming)
-  * [Busrpc entities naming](#busrpc-entities-naming)
+* [Busrpc entities naming](#busrpc-entities-naming)
 * [Imports](#imports)
 * [Documenting](#documenting)
 
@@ -26,7 +26,7 @@ All *proto* files must be structured in the following way:
 * [File options](https://developers.google.com/protocol-buffers/docs/proto3#options)
 * Type definitions
 
-## Naming
+## Protobuf entities naming
 
 * Package names must correspond to the directory hierarchy, for example file *dir1/dir2/file.proto* content must be placed to *dir1.dir2* package
 * Use CamelCase for protobuf `message` name
@@ -60,9 +60,11 @@ enum Status {
 }
 ```
 
-### Busrpc entities naming
+## Busrpc entities naming
 
-* Use lower case underscore-separated names for busrpc services, classes and methods
+* Use lower case underscore-separated names for busrpc services, namespaces, classes and methods
+* Busrpc structures and enumerations correspond directly to protobuf `message` and `enum` types and should follow the rules specified by the [previous](#protobuf-entities-naming) section
+* `message` types that have special meaning in busrpc API design (`ClassDesc`, `MethodDesc`, `ObjectId`, `Params`, `Retval` and `Result`) should be treated in the same way as general busrpc structures for the purpose of naming, i.e. should follow the rules specified by the [previous](#protobuf-entities-naming) section
 * Methods that do not have a `Retval` usually can be considered as event sinks and may be prefixed with *on* (for example *on_signed_in*, *on_signed_out*, etc.)
 
 ## Imports
