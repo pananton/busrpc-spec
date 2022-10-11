@@ -39,17 +39,17 @@ The message bus model provides two basic operations:
 1. `PUBLISH(topic, message, [replyTo])` - to send arbitrary `message` on a `topic`
 2. `SUBSCRIBE(topic)` - to listen for messages published on a `topic`
 
-*Topic* is essentially a sequence of characters used by the message bus to route messages from publisher to subscriber. On a closer look, it is a list of words separated by a special character `<sep>`. Most (if not all) message bus techonologies use dot (`.`) as separator, however described model does not require this (still dot will be used in the examples thorought this document for simplicity).
+*Topic* is essentially a sequence of characters used by the message bus to route messages from publisher to subscriber. On a closer look, it is a list of words separated by a special character `<topic-word-sep>`. Most (if not all) message bus techonologies use dot (`.`) as separator, however described model does not require this (still dot will be used in the examples thorought this document for simplicity).
 
-Words constituiting a topic usually form a hierarchy, for example: `time.us`, `time.us.east`, `time.us.east.atlanta`. Abstract bus model supports the following wildcards which can be used in the `SUBSCRIBE` operation:
-* `<any1>` (usually `*`) - matches a single word, for example `time.<any1>.east` matches `time.us.east` and `time.eu.east`
-* `<anyN>` - matches 1 to many or 0 to many words at the end of a topic, for example `time.us.<anyN>` matches `time.us.east`, `time.us.east.atlanta` and may or may not match `time.us` (makes no difference for busrpc specification)
+Words constituiting a topic usually form a hierarchy, for example: `time.us`, `time.us.east`, `time.us.east.atlanta`. Abstract bus model supports the following wildcard characters which can be used in the `SUBSCRIBE` operation:
+* `<topic-wildcard-any1>` - matches a single word, for example `time.<topic-wildcard-any1>.east` matches `time.us.east` and `time.eu.east`
+* `<topic-wildcard-anyN>` - matches 1 to many or 0 to many words at the end of a topic, for example `time.us.<topic-wildcard-anyN>` matches `time.us.east`, `time.us.east.atlanta` and may or may not match `time.us` (makes no difference for busrpc specification)
 
 Note that core publish/subscribe mechanism implies one-way message flow (from publisher to subscriber). To enable request/response two-way message flow, `PUBLISH` operation provides optional `replyTo` parameter containing topic on which publisher expects to receive a response for his request. In that case subscriber will call `PUBLISH(replyTo, response)` after original request is handled.
 
 # Design
 
-Busrpc API design is formulated in terms of object-oriented programming. This terms when applied for busrpc API have similar meaning as in OOP, however should not be treated as equivalent.
+Busrpc API design is based on the concepts from object-oriented programming. This allows busrpc to re-use well-known OOP terminology and stay familiar for newcomers. Moreover, we believe that many well-established and time-tested object-oriented design principles and decomposition strategies can also be applied for a good microservice backend API, which means that developers' OOP experience might come in handy in the context of busrpc framework.
 
 Every busrpc-compliant API is made up the following building blocks:
 * **namespace** - a collections of somehow related *classes*
