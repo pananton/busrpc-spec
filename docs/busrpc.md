@@ -51,6 +51,8 @@ Note that core publish/subscribe mechanism implies one-way message flow (from pu
 
 Busrpc API design is based on the concepts from object-oriented programming. This allows busrpc to re-use well-known OOP terminology and stay familiar for newcomers. Moreover, we believe that many well-established and time-tested object-oriented design principles and decomposition strategies can also be applied for a good microservice backend API, which means that developers' OOP experience might come in handy in the context of busrpc framework.
 
+Every busrpc-compliant API consistutes a collection of *classes* distributed across one or several *namespaces*. 
+
 Every busrpc-compliant API is made up the following building blocks:
 * **namespace** - a collections of somehow related *classes*
 * **class**
