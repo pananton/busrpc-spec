@@ -5,13 +5,12 @@ This document contains general information for developers of busrpc microservice
 * [Introduction](#introduction)
 * [Message bus model](#message-bus-model)
 * [Design](#design)
-  * [Terminology](#terminology)
-  * [Signaling errors](#signaling-errors)
-  * [Class description](#class-description)
-  * [Method description](#method-description)
-  * [Service description](#service-description)
-  * [Directory layout](#directory-layout)
-  * [Types visibility](#types-visibility)
+  * [Namespace](#namespace)
+  * [Class](#class)
+  * [Method](#method)
+  * [Structure](#structure)
+  * [Endpoint](#endpoint)
+* [Protocol](#protocol)
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
 
@@ -51,18 +50,19 @@ Note that core publish/subscribe mechanism implies one-way message flow (from pu
 
 Busrpc API design is based on the concepts from object-oriented programming. This allows busrpc to re-use well-known OOP terminology and stay familiar for newcomers. Moreover, we believe that many well-established and time-tested object-oriented design principles and decomposition strategies can also be applied for a good microservice backend API, which means that developers' OOP experience might come in handy in the context of busrpc framework.
 
-Every busrpc-compliant API consistutes a collection of *classes* distributed across one or several *namespaces*. 
+Next subsections provide general description of all concepts from the busrpc API design. Exact definitions can be found in the [Protocol](#protocol) section.
 
-Every busrpc-compliant API is made up the following building blocks:
-* **namespace** - a collections of somehow related *classes*
-* **class**
-* **namespace** is a collection of closely related *classes* representing entities 
+## Namespace
 
-Any busrpc API consists of *namespaces* representing distinct API subdomains. Inside That means it's building blocks are *classes*, which contain arbitrary number of *methods*. Each class is placed into some *namespace* representing an API subdomain. Each namespace, class and method has own *scope* which  
+## Class
 
+## Method
 
+## Structure
 
+## Endpoint
 
+# Protocol
 
 # Documentation commands
 
