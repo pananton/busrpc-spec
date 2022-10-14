@@ -48,15 +48,22 @@ Note that core publish/subscribe mechanism implies one-way message flow (from pu
 
 # Design
 
-Busrpc API design is based on the concepts from object-oriented programming. This allows busrpc to re-use well-known OOP terminology and stay familiar for newcomers. Moreover, we believe that many well-established and time-tested object-oriented design principles and decomposition strategies can also be applied for a good microservice backend API, which means that developers' OOP experience might come in handy in the context of busrpc framework.
-
-Next subsections provide general description of all concepts from the busrpc API design.
+Busrpc API design is based on the concepts from object-oriented programming. This allows busrpc to re-use well-known OOP terminology and stay familiar for newcomers (note hovewer that same terms from busrpc API design and object-oriented design may differ in some aspects and should not be treated as exactly equivalent). Moreover, we believe that many well-established and time-tested object-oriented design principles and decomposition strategies can also be applied for a good microservice backend API, which means that developers' OOP experience might come in handy in the context of the busrpc framework.
 
 ## Wire types
 
 *Wire types* are busrpc types which are actually sent on the wire. Busrpc design determines two wire types:
 * *structure* which is any protobuf message type except busrpc descriptor types (`ClassDesc` and `MethodDesc`, see [Protocol](#protocol) section)
 * *enumeration* which is any protobuf enumeration type
+
+## Class
+
+Busrpc *class* is a model of a set of similarly arranged entities from the API business domain. Each class is defined by the internal state
+
+## Method
+
+## Namespace
+
 
 ## Classes
 
