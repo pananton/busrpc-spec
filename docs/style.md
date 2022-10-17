@@ -76,7 +76,7 @@ enum Status {
   * class-scoped files
   * namespace-scoped files
   * global files
-* Inside the method description file *method.proto* import class description file *class.proto* first and then all remainding files in the order specified above
+* Inside the method description file *method.proto* import class description file *class.proto* first (even if method is static) and then all remainding files in the order specified above
 * Inside the service description file *service.proto* import method description files after any other files; imported method description files should be ordered in the following way:
   * description files for methods, implemented by the service
   * description files for methods, invoked by the service
