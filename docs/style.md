@@ -64,20 +64,21 @@ enum Status {
 ## Busrpc entities naming
 
 * Use lower case underscore-separated names for busrpc services, namespaces, classes and methods
-* Busrpc structures, enumerations and descriptors correspond directly to protobuf `message` and `enum` types and should follow the rules specified by the [previous](#protobuf-entities-naming) section
+* Busrpc structures, descriptors and enumerations correspond directly to protobuf `message` and `enum` types and should follow corresponding rules specified by the [previous](#protobuf-entities-naming) section
 * Methods that do not have a `Retval` usually can be considered as event sinks and may be prefixed with *on* for uniformity (for example *on_signed_in*, *on_signed_out*, etc.)
 
 ## Imports
 
 * Always use `import public` 
 * Use path relative to busrpc API root directory when importing *proto* files (for example, if file *dir1/dir2/file1.proto* should be imported to any other file (even in the same directory) do this with `import public "dir1/dir2/some.proto";`)
-* If several files are imorted, they should be ordered by their scope (from narrowest to widest), unless explicitly stated otherwise (see next points):
+* If several files are imported, prefer to order them by their scope (from narrowest to widest):
   * method-scoped files
   * class-scoped files
   * namespace-scoped files
   * global files
-* Inside the method description file *method.proto* import class description file *class.proto* first (even if method is static) and then all remainding files in the order specified above
-* Inside the service description file *service.proto* import method description files after any other files; imported method description files should be ordered in the following way:
+* Inside the method description file *method.proto* import class description file *class.proto* first (even if method is static) and then all remaining files in the order specified in the previous point
+* Inside the service description file *service.proto* import method description files after any other files (ordered as specified above)
+* Prefer to order method description files imported by the service description file *service.proto* in the following way:
   * description files for methods, implemented by the service
   * description files for methods, invoked by the service
 
