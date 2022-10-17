@@ -28,7 +28,7 @@ All *proto* files must be structured in the following way:
 
 ## Protobuf entities naming
 
-* Name can only contain letters (a-zA-Z), digits (0-9) or underscores and should start with letter or underscore
+* Name can only contain letters (a-zA-Z), digits (0-9) and underscores and should start with letter or underscore
 * Package names must correspond to the directory hierarchy, for example file *dir1/dir2/file.proto* content must be placed to *dir1.dir2* package
 * Use CamelCase for protobuf `message` name
 * Use lower case underscore-separated names for protobuf `message` fields
