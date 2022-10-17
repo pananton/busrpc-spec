@@ -28,6 +28,7 @@ All *proto* files must be structured in the following way:
 
 ## Protobuf entities naming
 
+* Name can only contain letters (a-zA-Z), digits (0-9) or underscores and should start with letter or underscore
 * Package names must correspond to the directory hierarchy, for example file *dir1/dir2/file.proto* content must be placed to *dir1.dir2* package
 * Use CamelCase for protobuf `message` name
 * Use lower case underscore-separated names for protobuf `message` fields
@@ -63,35 +64,31 @@ enum Status {
 ## Busrpc entities naming
 
 * Use lower case underscore-separated names for busrpc services, namespaces, classes and methods
-* Busrpc structures and enumerations correspond directly to protobuf `message` and `enum` types and should follow the rules specified by the [previous](#protobuf-entities-naming) section
-* `message` types that have special meaning in busrpc API design (`ClassDesc`, `MethodDesc`, `ObjectId`, `Params`, `Retval` and `Result`) should be treated in the same way as general busrpc structures for the purpose of naming, i.e. should follow the rules specified by the [previous](#protobuf-entities-naming) section
-* Methods that do not have a `Retval` usually can be considered as event sinks and may be prefixed with *on* (for example *on_signed_in*, *on_signed_out*, etc.)
+* Busrpc structures, enumerations and descriptors correspond directly to protobuf `message` and `enum` types and should follow the rules specified by the [previous](#protobuf-entities-naming) section
+* Methods that do not have a `Retval` usually can be considered as event sinks and may be prefixed with *on* for uniformity (for example *on_signed_in*, *on_signed_out*, etc.)
 
 ## Imports
 
 * Always use `import public` 
 * Use path relative to busrpc API root directory when importing *proto* files (for example, if file *dir1/dir2/file1.proto* should be imported to any other file (even in the same directory) do this with `import public "dir1/dir2/some.proto";`)
-* Files in the namespace directory contain globally visible types and can be imported from everywhere
-* Files in the class directory (apart from class description file *class.proto*) contain class private types and should only be imported from other files in the class directory and/or class method directories
- * Files in the method directory (apart from method description file *method.proto*) contain method private types and should only be imported from other files in the method directory
-
-Inside the method descritpion file *method.proto* always import class description file *class.proto* first (even for static methods) and then the following files when needed (inside each group order alphabetically):
-* method private types from the method directory
-* class private types from the class directory
-* global types from namespace directory
-
-Inside the service description file *service.proto* order imported method description files in the following way:
-* description files for methods, implemented by the service
-* description files for methods, invoked by the service
+* If several files are imorted, they should be ordered by their scope (from narrowest to widest), unless explicitly stated otherwise (see next points):
+  * method-scoped files
+  * class-scoped files
+  * namespace-scoped files
+  * global files
+* Inside the method description file *method.proto* import class description file *class.proto* first and then all remainding files in the order specified above
+* Inside the service description file *service.proto* import method description files after any other files; imported method description files should be ordered in the following way:
+  * description files for methods, implemented by the service
+  * description files for methods, invoked by the service
 
 ## Documenting
 
 Busrpc API design follows code as documentation principle, which implies that *proto* files of the particular API should contain appropriate comments and [documentation commands](./busrpc.md#documentation-commands):
-* Each class description file *class.proto* should start with a descriptive comment
-* Each method description file *method.proto* should start with a descriptive comment
-* Each service description file *service.proto* should start with a descriptive comment
-* Each protobuf `message` or `enum` (apart from self-describing types `ClassDesc`, `MethodDesc` and their nested types) should be accompanied by a descriptive comment placed right before it
-* Each `message` field or `enum` constant should be accompanied by a descriptive comment placed right before it
+* Each class description file *class.proto* should start with a comment describing the class
+* Each method description file *method.proto* should start with a comment describing the method
+* Each service description file *service.proto* should start with a comment describing the service
+* Each busrpc structure or enumeration (apart from self-describing `Params`, `Retval`, etc.) should be accompanied by a descriptive comment placed right before it
+* Each structure field or enumeration constant should be accompanied by a descriptive comment placed right before it
 * For each service method, service description file *service.proto* should have a comment right before corresponding `import` statement describing whether method is implemented, invoked or both by the service (see `\impl` and `\invk` [documentation commands](./busrpc.md#documentation-commands))
 
 If some of the specified comments are missing, busrpc development tool will issue a warning when checking API for conformance.
