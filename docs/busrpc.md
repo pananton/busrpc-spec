@@ -5,11 +5,12 @@ This document contains general information for developers of busrpc microservice
 * [Introduction](#introduction)
 * [Message bus model](#message-bus-model)
 * [Design](#design)
-  * [Namespace](#namespace)
   * [Class](#class)
-  * [Method](#method)
   * [Structure](#structure)
+  * [Enumeration](#enumeration)
+  * [Namespace](#namespace)
   * [Endpoint](#endpoint)
+  * [Type visibility](#type-visibility)
 * [Protocol](#protocol)
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
@@ -50,19 +51,47 @@ Note that core publish/subscribe mechanism implies one-way message flow (from pu
 
 Busrpc API design is based on the concepts from object-oriented programming. This allows busrpc to re-use well-known OOP terminology and stay familiar for newcomers (note hovewer that same terms from busrpc API design and object-oriented design may differ in some aspects and should not be treated as exactly equivalent). Moreover, we believe that many well-established and time-tested object-oriented design principles and decomposition strategies can also be applied for a good microservice backend API, which means that developers' OOP experience might come in handy in the context of the busrpc framework.
 
-## Wire types
-
-*Wire types* are busrpc types which are actually sent on the wire. Busrpc design determines two wire types:
-* *structure* which is any protobuf message type except busrpc descriptor types (`ClassDesc` and `MethodDesc`, see [Protocol](#protocol) section)
-* *enumeration* which is any protobuf enumeration type
-
 ## Class
 
 Busrpc *class* is a model representing a set of similarly arranged entities from the API business domain. By similar arrangement we mean that all entities modelled by a class have the same format of internal state and expose the same set of operations which can be performed on them.
 
 Class *object* represents a specific entity and it's state from a set of entities modelled by a class. Each object is uniquely identified by an **immutable** *object identifier* throughout the system.
 
-Class *interface* is a set of operations that can be performed on a class objects. Following OOP terminology, we will call operations a *methods* in this specification. Methods may be associated with class objects or class itself. The latter are referref to as *static* methods.
+Class *interface* is a set of operations that can be performed on a class objects. Following OOP terminology, we will call operations a *methods* in this specification. Methods may be associated with class objects or class itself. The latter are referred to as *static* methods.
+
+Method *call* is represented by a network request containing method *parameters* and (optionally) identifier of the object for which method is called. After method call is processed, network response containing *return value* or *exception* is sent back to caller. Exact format of this messages is described in the [Protocol](#protocol) section.
+
+## Structure
+
+Busrpc *structure* is an alternative term for a protobuf `message` introduced for consistency with OOP terminology. Structures are busrpc wire types, i.e. every busrpc network message is represented by some structure.
+
+This specification introduces several *predefined* structures which are used to describe:
+* object identifier
+* method parameters
+* method return value
+* method exception
+* service configuration
+* type-erased request and response
+
+Additionally, several structures were introduced to provide busrpc client libraries with useful information about busrpc entities (classes, methods, etc.). Such structures are called *descriptors*. Descriptors are usually never sent over the network - in fact, they even do not have any fields, only nested type definitions.
+
+Description of the predefined structures and descriptors can be found in the [Protocol](#protocol) section.
+
+## Enumeration
+
+Busrpc *enumeration* corresponds directly to the protobuf `enum`.
+
+## Namespace
+
+*Namespace* is a group of somehow related busrpc classes, structures and enumerations. For example, namespace may contain types which are part of the same application subdomain.
+
+## Endpoint
+
+## Service
+
+Busrpc *service* is an application implementing and/or invoking busrpc class methods. 
+
+## Type visibility
 
 # Protocol
 
