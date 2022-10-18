@@ -64,8 +64,8 @@ enum Status {
 ## Busrpc entities naming
 
 * Use lower case underscore-separated names for busrpc services, namespaces, classes and methods
-* Busrpc structures, descriptors and enumerations correspond directly to protobuf `message` and `enum` types and should follow corresponding rules specified by the [previous](#protobuf-entities-naming) section
-* Methods that do not have a `Retval` usually can be considered as event sinks and may be prefixed with *on* for uniformity (for example *on_signed_in*, *on_signed_out*, etc.)
+* Busrpc structures, descriptors and enumerations correspond directly to protobuf `message` and `enum` types and should follow the rules specified by the [previous](#protobuf-entities-naming) section
+* Methods that do not have a return value (not to be confused with methods that have empty return value!) usually can be considered an event sinks and may be prefixed with *on* for uniformity (for example, *on_signed_in*, *on_profile_updated*, etc.)
 
 ## Imports
 
