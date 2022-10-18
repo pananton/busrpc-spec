@@ -44,7 +44,7 @@ Words constituiting a topic usually form a hierarchy, for example: `time.us`, `t
 * `<topic-wildcard-any1>` - matches a single word, for example `time.<topic-wildcard-any1>.east` matches `time.us.east` and `time.eu.east`
 * `<topic-wildcard-anyN>` - matches 1 to many or 0 to many words at the end of a topic, for example `time.us.<topic-wildcard-anyN>` matches `time.us.east`, `time.us.east.atlanta` and may or may not match `time.us` (makes no difference for busrpc specification)
 
-Note that core publish/subscribe mechanism implies one-way message flow (from publisher to subscriber). To enable request/response two-way message flow, `PUBLISH` operation provides optional `replyTo` parameter containing topic on which publisher expects to receive a response for his request. In that case subscriber will call `PUBLISH(replyTo, response)` after original request is handled.
+Note that core publish/subscribe mechanism implies one-way message flow (from publisher to subscriber). To enable request/response two-way message flow, `PUBLISH` operation provides optional `replyTo` parameter containing topic on which publisher expects to receive a response for his request. In that case subscriber will call `PUBLISH(replyTo, response)` to send the response.
 
 # Design
 
@@ -58,26 +58,11 @@ Busrpc API design is based on the concepts from object-oriented programming. Thi
 
 ## Class
 
-Busrpc *class* is a model of a set of similarly arranged entities from the API business domain. Each class is defined by the internal state
+Busrpc *class* is a model representing a set of similarly arranged entities from the API business domain. By similar arrangement we mean that all entities modelled by a class have the same format of internal state and expose the same set of operations which can be performed on them.
 
-## Method
+Class *object* represents a specific entity and it's state from a set of entities modelled by a class. Each object is uniquely identified by an **immutable** *object identifier* throughout the system.
 
-## Namespace
-
-
-## Classes
-
-Busrpc *class* semantically represents an OOP class, i.e. it models some entity from the business domain and 
-
-## Namespace
-
-## Class
-
-## Method
-
-## Structure
-
-## Endpoint
+Class *interface* is a set of operations that can be performed on a class objects. Following OOP terminology, we will call operations a *methods* in this specification. Methods may be associated with class objects or class itself. The latter are referref to as *static* methods.
 
 # Protocol
 
