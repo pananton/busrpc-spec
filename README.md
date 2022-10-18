@@ -9,7 +9,7 @@ The framework consists of the following components:
 * Bus-dependent [clients](#clients) for testing/observing running busrpc backends
 * Bus-dependent [libraries](#libraries) for a busrpc microservice development
 
-An example of busrpc-compliant API for a simple chat application backend can be found in the folder [*./example*](https://github.com/pananton/busrpc/tree/main/example).
+An example of busrpc-compliant API for a simple chat application backend can be found in the [*/example*](https://github.com/pananton/busrpc/tree/main/example) folder.
 
 # Clients
 
