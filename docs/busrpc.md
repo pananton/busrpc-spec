@@ -10,6 +10,7 @@ This document contains general information for developers of busrpc microservice
   * [Enumeration](#enumeration)
   * [Namespace](#namespace)
   * [Endpoint](#endpoint)
+  * [Service](#service)
   * [Type visibility](#type-visibility)
 * [Protocol](#protocol)
 * [Documentation commands](#documentation-commands)
