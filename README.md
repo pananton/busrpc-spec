@@ -1,6 +1,6 @@
 # Overview
 
-**Busrpc** framework is an RPC framework designed with [microservice architecture](https://en.wikipedia.org/wiki/Microservices) principles in mind. It relies on a generalized message bus/queue/broker (for example, [NATS](https://nats.io/) or [RabbitMQ](https://rabbitmq.com/)) as a transport layer and [protocol buffers](https://developers.google.com/protocol-buffers) as message format.
+Busrpc framework is an RPC framework designed with [microservice architecture](https://en.wikipedia.org/wiki/Microservices) principles in mind. It relies on a generalized message bus/queue/broker (for example, [NATS](https://nats.io/) or [RabbitMQ](https://rabbitmq.com/)) as a transport layer and [protocol buffers](https://developers.google.com/protocol-buffers) as message format.
 
 The framework consists of the following components:
 * Technical documentation, namely busrpc [specification](./docs/busrpc.md), bus-dependent [specializations](./docs/busrpc.md#specializations) and [style guide](./docs/style.md) for a busrpc protocol files
@@ -29,7 +29,7 @@ Currently no client libraries designed specifically for busrpc APIs exist, which
 
 Any contributions are highly appreciated:
 * suggestions to the busrpc specification
-* specializations for different message bus/queue/broker techonologies
+* specializations for various message bus/queue/broker techonologies
 * new commands for busrpc development tool
 * clients for testing/observing busrpc backends
 * busrpc client libraries
