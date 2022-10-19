@@ -8,6 +8,7 @@ Busrpc *proto* file style is very similar to the one suggested in the protocol b
   * [Enums naming](#enums-naming)
 * [Busrpc entities naming](#busrpc-entities-naming)
 * [Imports](#imports)
+  * [Import order](#import-order)
 * [Documenting](#documenting)
 
 ## Basic rules
