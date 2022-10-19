@@ -9,7 +9,7 @@ The framework consists of the following components:
 * Bus-dependent [clients](#clients) for testing/observing running busrpc backends
 * Bus-dependent [libraries](#libraries) for a busrpc microservice development
 
-An example of busrpc-compliant API for a simple chat application backend can be found in the [*/example*](https://github.com/pananton/busrpc/tree/main/example) folder.
+An example of busrpc-compliant API for a simple chat application backend can be found in the [*example*](https://github.com/pananton/busrpc/tree/main/example) directory.
 
 # Clients
 
@@ -23,7 +23,7 @@ Currently the project provides the following clients:
 
 # Libraries
 
-Currently no client libraries designed specifically for busrpc APIs exist, which means that you will probably implement one for your platform (combination of programming language and particular message bus/queue/broker). It's usually not a big deal, because you will probably use some client library from message bus/queue/broker developer (for example, see [here](https://nats.io/download/#nats-clients) for NATS client libraries or [here](https://www.rabbitmq.com/devtools.html) for RabbitMQ client libraries) and implement busrpc-specific wrappers over it. Contributions of such busrpc client libraries are highly appreciated!
+Currently no client libraries designed specifically for busrpc APIs exist, which means that you will probably implement one for your platform determined by a combination of programming language and particular message bus/queue/broker. It's usually not a big deal, because you will probably use some client library from message bus/queue/broker developer (for example, see [here](https://nats.io/download/#nats-clients) for NATS client libraries or [here](https://www.rabbitmq.com/devtools.html) for RabbitMQ client libraries) and implement busrpc-specific wrappers over it. Contributions of such busrpc client libraries are highly appreciated!
 
 # Contributing
 
