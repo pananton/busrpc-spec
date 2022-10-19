@@ -20,16 +20,17 @@ Busrpc *proto* file style is very similar to the one suggested in the protocol b
 ## File structure
 
 All *proto* files must be structured in the following way:
-* Line `syntax  =  "proto3";`
-* Package name
-* Imports (ordered, see [this](#imports) section)
-* [File options](https://developers.google.com/protocol-buffers/docs/proto3#options)
-* Type definitions
+1. Line `syntax  =  "proto3";`
+2. Package name
+3. Imports (ordered, see [this](#imports) section)
+4. [File options](https://developers.google.com/protocol-buffers/docs/proto3#options)
+5. Type definitions
 
 ## Protobuf entities naming
 
-* Name can only contain letters (a-zA-Z), digits (0-9) and underscores and should start with letter or underscore
-* Package names must correspond to the directory hierarchy, for example file *dir1/dir2/file.proto* content must be placed to *dir1.dir2* package
+* Name can only contain letters (a-zA-Z), digits (0-9) and underscores and must start with letter or underscore
+* Top-level protobuf package name for busrpc types must be *busrpc*
+* Package names must correspond to the directory hierarchy, for example types from the directory *dir1/dir2/dir3* must be placed to *busrpc.dir1.dir2.dir3* package
 * Use CamelCase for protobuf `message` name
 * Use lower case underscore-separated names for protobuf `message` fields
 * Use pluralized names for `repeated` fields
@@ -37,7 +38,7 @@ All *proto* files must be structured in the following way:
 Example:
 ```
 syntax = "proto3";
-package dir1.dir2;
+package busrpc.dir1.dir2.dir3;
 
 message SomeMessage {
   int32 some_field_1 = 1;
@@ -63,19 +64,27 @@ enum Status {
 
 ## Busrpc entities naming
 
-* Use lower case underscore-separated names for busrpc services, namespaces, classes and methods
-* Busrpc structures, descriptors and enumerations correspond directly to protobuf `message` and `enum` types and should follow the rules specified by the [previous](#protobuf-entities-naming) section
+* Use lower case underscore-separated names for busrpc namespaces, classes, methods and services
+* Busrpc structures, descriptors and enumerations correspond directly to protobuf `message` and `enum` types and must follow the rules specified by the [previous](#protobuf-entities-naming) section
 * Methods that do not have a return value (not to be confused with methods that have empty return value!) usually can be considered an event sinks and may be prefixed with *on* for uniformity (for example, *on_signed_in*, *on_profile_updated*, etc.)
 
 ## Imports
 
-* Always use `import public` 
-* Use path relative to busrpc API root directory when importing *proto* files (for example, if file *dir1/dir2/file1.proto* should be imported to any other file (even in the same directory) do this with `import public "dir1/dir2/some.proto";`)
-* If several files are imported, prefer to order them by their scope (from narrowest to widest):
-  * method-scoped files
-  * class-scoped files
-  * namespace-scoped files
-  * global files
+Each busrpc protobuf file should be self-contained, which means that including/importing it's generated source file also includes/imports generated source files of it's transitive depenendecies. The rules specified in this section are aimed to achieve this.
+
+* Use `import public`
+* Use path relative to busrpc root directory when importing *proto* files (for example, if file *dir1/dir2/file1.proto* should be imported to any other file (even in the same directory) do this with `import public "dir1/dir2/some.proto";`)
+* Import framework-provided *busrpc.proto* file to each class description file *class.proto*
+* Method description file *method.proto* must always import method's class description file *class.proto* (even if method is static)
+
+### Import order
+
+If several files are imported, prefer to order them by their scope (from narrowest to widest):
+1. method-scoped files
+2. class-scoped files
+3. namespace-scoped files
+4. global files
+
 * Inside the method description file *method.proto* import class description file *class.proto* first (even if method is static) and then all remaining files in the order specified in the previous point
 * Inside the service description file *service.proto* import method description files after any other files (ordered as specified above)
 * Prefer to order method description files imported by the service description file *service.proto* in the following way:
