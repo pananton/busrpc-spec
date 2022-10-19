@@ -30,7 +30,7 @@ All *proto* files must be structured in the following way:
 ## Protobuf entities naming
 
 * Name can only contain letters (a-zA-Z), digits (0-9) and underscores and must start with letter
-* Top-level protobuf package name for busrpc types must be *busrpc*
+* Top-level protobuf package name must be *busrpc*
 * Package names must correspond to the directory hierarchy, for example types from the directory *dir1/dir2/dir3* must be placed to *busrpc.dir1.dir2.dir3* package
 * Use CamelCase for protobuf `message` name
 * Use lower case underscore-separated names for protobuf `message` fields
@@ -83,8 +83,8 @@ Each busrpc protobuf file should be self-contained, which means that including/i
 
 * If several files are imported, prefer to order them by their nesting level: first files from the same directory, then from the parent directory, etc.
 * Prefer to order each group of imported files with the same nesting level alphabetically
-* Inside the method description file *method.proto* prefer to import class description file *class.proto* first (even if method is static) and then all remaining files in the order specified above
-* Inside the service description file *service.proto* prefer to import method description files in the following way:
+* Inside the method description file *method.proto* prefer to import class description file *class.proto* first and then other files in the order specified above
+* Inside the service description file *service.proto* prefer to import method description files in the following order:
   1. description files for methods, implemented by the service
   2. description files for methods, invoked by the service
 
