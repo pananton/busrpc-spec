@@ -1,6 +1,6 @@
 # Style guide
 
-Busrpc *proto* file style is very similar to the one suggested in the protocol buffer's official [documentation](https://developers.google.com/protocol-buffers/docs/style) (with some additions related to busrpc specifics). All places where busprc style guide violates the official one are explicitly stated.
+Busrpc protobuf file style is very similar to the one suggested in the protocol buffer's official [documentation](https://developers.google.com/protocol-buffers/docs/style) (with some additions related to busrpc specifics). All places where busprc style guide violates the official one are explicitly stated.
 
 * [Basic rules](#basic-rules)
 * [File structure](#file-structure)
@@ -20,7 +20,7 @@ Busrpc *proto* file style is very similar to the one suggested in the protocol b
 
 ## File structure
 
-All *proto* files must be structured in the following way:
+All protobuf files must be structured in the following way:
 1. Line `syntax  =  "proto3";`
 2. Package name
 3. Imports (ordered, see [this](#imports) section)
@@ -71,7 +71,7 @@ enum Status {
 
 ## Imports
 
-* Use path relative to busrpc API root directory when importing *proto* files (for example, if file *dir1/dir2/file1.proto* should be imported in any other file (even in the same directory) do this with `import public "dir1/dir2/some.proto";`)
+* Use path relative to busrpc API root directory when importing protobuf files (for example, if file *dir1/dir2/file1.proto* should be imported in any other file (even in the same directory) do this with `import public "dir1/dir2/some.proto";`)
 * Service description file *service.proto* must import description files of all methods implemented or invoked by the service
 * Prefer to follow next recommendations to guarantee that generated source files will contain all necessary types:
   * import *busrpc.proto* in every class description file *class.proto*
@@ -88,7 +88,7 @@ enum Status {
 
 ## Documenting
 
-Busrpc API should follow code as documentation principle, which implies that *proto* files should contain appropriate comments and [documentation commands](./busrpc.md#documentation-commands). Busrpc development tool [`validate`]() command issues a warning if any rule specified in this section is violated.
+Busrpc API should follow code as documentation principle, which implies that protobuf files should contain appropriate comments and [documentation commands](./busrpc.md#documentation-commands). Busrpc development tool [`validate`]() command issues a warning if any rule specified in this section is violated.
 
 * Documentation comment should appear **right before** the entity to which it relates
 * Every busrpc structure or enumeration (apart from predefined structures, which are self-describing) should be documented with a comment describing it
