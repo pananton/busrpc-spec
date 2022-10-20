@@ -58,7 +58,7 @@ Busrpc **class** is a model of a similarly arranged entities from the API busine
 
 **Object** of a class represents a concrete entity from the set of modelled entities. It is characterized by concrete value of internal state and an immutable **object identifier**, which uniquelly identifies object throughout the system.
 
-Busrpc **method call** is a network request containing method parameters and, optionally, identifier of the object for which method is called. Busrpc **method result** is a network response containing either method return value or an exception, which signals abnormal method completion. Exact format of this messages is described in the [Protocol](#protocol) section.
+Method **call** is a network request containing method parameters and, optionally, identifier of the object for which method is called. **Method result** is a network response containing either method return value or an exception, which signals abnormal method completion. Exact format of this messages is described in the [Protocol](#protocol) section.
 
 ## Structure
 
