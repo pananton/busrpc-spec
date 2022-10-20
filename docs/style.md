@@ -52,7 +52,7 @@ message SomeMessage {
 
 * Use CamelCase for `enum` name and upper case underscore-separated value names
 * Add `enum` name as a prefix to all value names
-* Each `enum` must contain a zero value (required by protobuf), however busrpc style guide do not recommend to use it as indication that value is not set (prefer `optional` instead) and do not require it to have `UNSPECIFIED` suffix (as the official style guide does)
+* Every `enum` must contain a zero value (required by protobuf), however busrpc style guide do not recommend to use it as indication that value is not set (prefer `optional` instead) and do not require it to have `UNSPECIFIED` suffix (as the official style guide does)
 
 Example:
 ```
@@ -71,13 +71,11 @@ enum Status {
 
 ## Imports
 
-Each busrpc protobuf file should be self-contained, which means that including/importing it's generated source file also includes/imports generated source files of it's depenendecies. The rules specified in this section are aimed to achieve this.
-
-* Use `import public`
-* Use path relative to busrpc API root directory when importing *proto* files (for example, if file *dir1/dir2/file1.proto* should be imported to any other file (even in the same directory) do this with `import public "dir1/dir2/some.proto";`)
-* Class description file *class.proto* must import framework-provided *busrpc.proto* file which contains busrpc built-in protobuf types and options
-* Method description file *method.proto* must import method's class description file *class.proto* (even if method or class is static)
+* Use path relative to busrpc API root directory when importing *proto* files (for example, if file *dir1/dir2/file1.proto* should be imported in any other file (even in the same directory) do this with `import public "dir1/dir2/some.proto";`)
 * Service description file *service.proto* must import description files of all methods implemented or invoked by the service
+* Prefer to follow next recommendations to guarantee that generated source files will contain all necessary types:
+  * import *busrpc.proto* in every class description file *class.proto*
+  * import class description file *class.proto* in the description files *method.proto* of every method of this class
 
 ### Import order
 
@@ -90,13 +88,10 @@ Each busrpc protobuf file should be self-contained, which means that including/i
 
 ## Documenting
 
-Busrpc API should follow code as documentation principle, which implies that *proto* files should contain appropriate comments and [documentation commands](./busrpc.md#documentation-commands).
+Busrpc API should follow code as documentation principle, which implies that *proto* files should contain appropriate comments and [documentation commands](./busrpc.md#documentation-commands). Busrpc development tool [`validate`]() command issues a warning if any rule in this section is violated.
 
-* Each class description file *class.proto* should start with a comment describing the class
-* Each method description file *method.proto* should start with a comment describing the method
-* Each service description file *service.proto* should start with a comment describing the service
-* Each busrpc structure or enumeration (apart from self-describing `Params`, `Retval`, etc.) should be accompanied by a descriptive comment placed right before it
-* Each structure field or enumeration constant should be accompanied by a descriptive comment placed right before it
-* For each service method, service description file *service.proto* should have a comment right before corresponding `import` statement describing whether method is implemented, invoked or both by the service (see `\impl` and `\invk` [documentation commands](./busrpc.md#documentation-commands))
-
-If some of the specified comments are missing, busrpc development tool will issue a warning when checking API for conformance.
+* Documentation comment should appear **right before** the entity to which it relates
+* Every busrpc structure or enumeration (apart from predefined structures, which are self-describing) should be documented with a comment describing it
+* Every structure field or enumeration constant should be documented
+* Every class/method/service descriptor (`ClassDesc`, `MethodDesc` or `ServiceDesc`) should be documented with a comment describing class/method/service
+* Every `import` statement for a method description file *method.proto* found in the service description file *service.proto* should be documented; documentation comment should contain information whether method is implemented or invoked by the service (see [service documentation commands](./busrpc.md#service-documentation-commands))
