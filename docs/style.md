@@ -74,7 +74,7 @@ enum Status {
 * Use path relative to busrpc API root directory when importing protobuf files (for example, if file *dir1/dir2/file1.proto* should be imported in any other file (even in the same directory) do this with `import public "dir1/dir2/some.proto";`)
 * Service description file *service.proto* must import description files of all methods implemented or invoked by the service
 * Prefer to follow next recommendations to guarantee that generated source files will contain all necessary types:
-  * import *busrpc.proto* in every class description file *class.proto*
+  * import framework-provided (and probably additionally customized) file *busrpc.proto* in every class description file *class.proto*
   * import class description file *class.proto* in the description files *method.proto* of every method of this class
 
 ### Import order
