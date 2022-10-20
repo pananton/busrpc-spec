@@ -4,7 +4,7 @@ This document contains general information for developers of busrpc microservice
 
 * [Introduction](#introduction)
 * [Message bus model](#message-bus-model)
-* [Design](#design)
+* [Design](#design-and-terminology)
   * [Class](#class)
   * [Structure](#structure)
   * [Enumeration](#enumeration)
@@ -36,7 +36,7 @@ Busrpc framework global goal is to offer a turnkey solution for backend develope
 
 One of the goals of the busrpc framework is to be applicable for a variety of message bus/queue/broker technologies. For this reason, busrpc specification relies on an abstract message bus model instead of any particular implementation like NATS or RabbitMQ. Note, that if message bus implementation violates this model, it probably can't be used along with busrpc framework.
 
-The message bus model provides two basic operations:
+Message bus model provides two basic operations:
 1. `PUBLISH(topic, message, [replyTo])` - to send arbitrary `message` on a `topic`
 2. `SUBSCRIBE(topic)` - to listen for messages published on a `topic`
 
@@ -54,13 +54,11 @@ Busrpc API design is based on the concepts from object-oriented programming. Thi
 
 ## Class
 
-Busrpc *class* is a model representing a set of similarly arranged entities from the API business domain. By similar arrangement we mean that all entities modelled by a class have the same format of internal state and expose the same set of operations which can be performed on them.
+Busrpc **class** is a model of a similarly arranged entities from the API business domain. By similar arrangement we mean that all entities modelled by a class have the same format of internal state and expose the same set of supported operations, which are called **methods** as it is accepted in OOP. All together, class methods form an **interface** of a class.
 
-Class *object* represents a specific entity and it's state from a set of entities modelled by a class. Each object is uniquely identified by an **immutable** *object identifier* throughout the system.
+**Object** of a class represents a concrete entity from the set of modelled entities. It is characterized by concrete value of internal state and an immutable **object identifier**, which uniquelly identifies object throughout the system.
 
-Class *interface* is a set of operations that can be performed on a class objects. Following OOP terminology, we will call operations a *methods* in this specification. Methods may be associated with class objects or class itself. The latter are referred to as *static* methods.
-
-Method *call* is represented by a network request containing method *parameters* and (optionally) identifier of the object for which method is called. After method call is processed, network response containing *return value* or *exception* is sent back to caller. Exact format of this messages is described in the [Protocol](#protocol) section.
+Busrpc **method call** is a network request containing method parameters and, optionally, identifier of the object for which method is called. Busrpc **method result** is a network response containing either method return value or an exception, which signals abnormal method completion. Exact format of this messages is described in the [Protocol](#protocol) section.
 
 ## Structure
 
