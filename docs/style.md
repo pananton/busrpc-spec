@@ -88,7 +88,7 @@ enum Status {
 
 ## Documenting
 
-Busrpc API should follow code as documentation principle, which implies that *proto* files should contain appropriate comments and [documentation commands](./busrpc.md#documentation-commands). Busrpc development tool [`validate`]() command issues a warning if any rule in this section is violated.
+Busrpc API should follow code as documentation principle, which implies that *proto* files should contain appropriate comments and [documentation commands](./busrpc.md#documentation-commands). Busrpc development tool [`validate`]() command issues a warning if any rule specified in this section is violated.
 
 * Documentation comment should appear **right before** the entity to which it relates
 * Every busrpc structure or enumeration (apart from predefined structures, which are self-describing) should be documented with a comment describing it
