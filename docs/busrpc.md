@@ -58,39 +58,31 @@ Busrpc **class** is a model of a similarly arranged entities from the API busine
 
 **Object** of a class represents a concrete entity from the set of modelled entities. It is characterized by concrete value of internal state and an immutable **object identifier**, which uniquelly identifies object throughout the system.
 
-Methods may be bound to a concrete object or to a class as a whole. The latter are called **static methods**. 
+Methods may be bound to a concrete object or to a class as a whole. The latter are called **static methods**. Busrpc specification also has a notion of a **static class**, which is a class without objects. Because of this, static class does not define an object identifier and every method of it's interface is treated as static. Static classes are mainly used to group related system-wide "utility" methods.
 
 **Method call** is a network request containing method parameters and, optionally, identifier of the object for which method is called (not needed for static method calls). **Method result** is a network response containing either method return value or an exception signalling abnormal method completion. Exact format of this messages is described in the [Protocol](#protocol) section.
 
 ## Structure
 
-Busrpc *structure* is an alternative term for a protobuf `message` introduced for consistency with OOP terminology. Structures are busrpc wire types, i.e. every busrpc network message is represented by some structure.
+Busrpc **structure** is an alternative term for a protobuf `message` introduced for consistency with OOP terminology. Structures are busrpc wire types, i.e. every busrpc network message is represented by some structure.
 
-This specification introduces several *predefined* structures which are used to describe:
-* object identifier
-* method parameters
-* method return value
-* method exception
-* service configuration
-* type-erased request and response
+**Predefined structures** are structures which have special meaning determined by this specification. In particular, **descriptors** are predefined structures which provide busrpc client libraries with type information about busrpc entity (service, class, or method). Descriptors are usually never sent over the network - in fact, they even do not have any fields, only nested type definitions.
 
-Additionally, several structures were introduced to provide busrpc client libraries with useful information about busrpc entities (classes, methods, etc.). Such structures are called *descriptors*. Descriptors are usually never sent over the network - in fact, they even do not have any fields, only nested type definitions.
-
-Description of the predefined structures and descriptors can be found in the [Protocol](#protocol) section.
+All predefined structures are described in the [Protocol](#protocol) section.
 
 ## Enumeration
 
-Busrpc *enumeration* corresponds directly to the protobuf `enum`.
+Busrpc **enumeration** corresponds directly to the protobuf `enum`.
 
 ## Namespace
 
-*Namespace* is a group of somehow related busrpc classes, structures and enumerations. For example, namespace may contain types which are part of the same application subdomain.
+**Namespace** is a group of related busrpc classes, structures and enumerations. Typically namespace contains part of the API that corresponds to a single application subdomain.
 
 ## Endpoint
 
 ## Service
 
-Busrpc *service* is an application implementing and/or invoking busrpc class methods. 
+Busrpc **service** is an application implementing and/or invoking busrpc class methods. 
 
 ## Type visibility
 
