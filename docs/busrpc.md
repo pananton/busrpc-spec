@@ -72,7 +72,7 @@ All predefined structures are described in the [Protocol](#protocol) section.
 
 ## Enumeration
 
-Busrpc **enumeration** corresponds directly to the protobuf `enum`.
+Busrpc **enumeration** corresponds directly to a protobuf `enum`.
 
 ## Namespace
 
