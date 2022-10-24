@@ -92,16 +92,15 @@ Busrpc **enumeration** corresponds directly to a protobuf `enum`.
 * optional `<observable-params>` is a list of topic words each representing a value of a single observable parameter
 * `<eof>` is a reserved word which designates the end of endpoint
 
-Busrpc specification also introduces some predefined endpoints to refer to a specific format of message bus topic. All of them are represented in the table below.
+Some message bus topic formats, commonly used for subscribing for method calls, are also mapped to a named endpoints to establish common terminology. This mapping is provided in the following table.
 
-| Topic                                                                                          | Endpoint   | Description                                       |
-| ---------------------------------------------------------------------------------------------- | -----------| ------------------------------------------------- |
-| `<topic-wildcard-anyN>`                                                                        | global     | all calls                                         |
-| `<namespace>.<topic-wildcard-anyN>`                                                            | namespace  | calls of any method of any class from a namespace |
-| `<namespace>.<class>.<topic-wildcard-anyN>`                                                    | class      | calls of any method of a class                    |
-| `<namespace>.<class>.<method>.<topic-wildcard-anyN>`                                           | method     | calls of a method                                 |
-| `<namespace>.<class>.<topic-wildcard-any1>.<object-id>.<topic-wildcard-anyN>`                  | object     | calls bound to a specific object                  |
-| `<namespace>.<class>.<method>.<topic-wildcard-any1>.<observable-params>.<topic-wildcard-anyN>` | value      | calls of a method with a specific value(s) of an                                                                                                                       observable parameter(s)                           |
+| Topic                                                                                          | Endpoint name | Description                                       |
+| ---------------------------------------------------------------------------------------------- | --------------| ------------------------------------------------- |
+| `<namespace>.<topic-wildcard-anyN>`                                                            | namespace     | calls of any method of any class from a namespace |
+| `<namespace>.<class>.<topic-wildcard-anyN>`                                                    | class         | calls of any method of a class                    |
+| `<namespace>.<class>.<method>.<topic-wildcard-anyN>`                                           | method        | calls of a method                                 |
+| `<namespace>.<class>.<topic-wildcard-any1>.<object-id>.<topic-wildcard-anyN>`                  | object        | calls bound to a specific object                  |
+| `<namespace>.<class>.<method>.<topic-wildcard-any1>.<observable-params>.<topic-wildcard-anyN>` | value         | calls of a method with a specific value(s) of an                                                                                                                        observable parameter(s)                           |
 
 ## Type visibility
 
