@@ -62,7 +62,7 @@ Busrpc **class** is a model of a similarly arranged entities from the API busine
 
 Methods may be bound to a concrete object or to a class as a whole. The latter are called **static methods**. Busrpc specification also has a notion of a **static class**, which is a class without objects. Because of this, static class does not define an object identifier and every method of it's interface is treated as static. Static classes are mainly used to group related system-wide "utility" methods.
 
-**Method call** is a network request containing method parameters and, optionally, identifier of the object for which method is called (not needed for static method calls). Some method parameters can be declared as **observable**, which means that their values 
+**Method call** is a network request containing method parameters and, optionally, identifier of the object for which method is called (not needed for static method calls). Some method parameters can additionally be declared as **observable**, which means that their values not only sent as payload of the call request but also provide implementors with an ability to cherry-pick a subset of method calls having a concrete values of observable parameters (see [Endpoint](#endpoint) section for more information).
 
 **Method result** is a network response containing either method return value or an exception signalling abnormal method completion.
 
@@ -86,12 +86,30 @@ Busrpc **enumeration** corresponds directly to a protobuf `enum`.
 
 ## Endpoint
 
-**Endpoint** is a message bus topic to which method calls are published by a caller. Format of the endpoint is `<namespace>.<class>.<method>.<object-id>[.<observable-params>].<eof>`, where:
+**Call endpoint** (or simply, endpoint) is a message bus topic to which method calls are published by a caller. Format of the call endpoint is `<namespace>.<class>.<method>.<object-id>[.<observable-params>].<eof>`, where:
 * `<namespace>`, `<class>` and `<method>` are names of the namespace, class and method correspondingly
 * `<object-id>` is identifier of an object for which method is called, or a reserved word representing null value for static methods
 * optional `<observable-params>` is a list of topic words each representing a value of a single observable parameter
 * `<eof>` is a reserved word which designates the end of endpoint
 
+From a subscriber point of view endpoints can be additionally classified into the following types:
+* **global endpoint** representing all method calls in the system
+* **namespace endpoint** representing all method calls of all classes of a concrete namespace
+* **class endpoint** representing all method calls of a concrete class
+* **method endpoint** representing a concrete method call for all objects and values of observable parameters
+* **object endpoint** representing all method calls bound to the concrete object
+* **value endpoint** representing a concrete method call for a concrete value(s) of observable parameter(s)
+
+Next table provides a mapping between endpoint type and a message bus topic.
+
+| Endpoint type | Topic                                                                                          |
+| ------------- | ---------------------------------------------------------------------------------------------- |
+| global        | `<topic-wildcard-anyN>`                                                                        |
+| namespace     | `<namespace>.<topic-wildcard-anyN>`                                                            |
+| class         | `<namespace>.<class>.<topic-wildcard-anyN>`                                                    |
+| method        | `<namespace>.<class>.<method>.<topic-wildcard-anyN>`                                           |
+| object        | `<namespace>.<class>.<topic-wildcard-any1>.<object-id>.<topic-wildcard-anyN>`                  |
+| value         | `<namespace>.<class>.<method>.<topic-wildcard-any1>.<observable-params>.<topic-wildcard-anyN>` |
 
 ## Type visibility
 
