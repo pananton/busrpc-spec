@@ -62,7 +62,7 @@ Busrpc **class** is a model of a similarly arranged entities from the API busine
 
 Methods may be bound to a concrete object or to a class as a whole. The latter are called **static methods**. Busrpc specification also has a notion of a **static class**, which is a class without objects. Because of this, static class does not define an object identifier and every method of it's interface is treated as static. Static classes are mainly used to group related system-wide "utility" methods.
 
-**Method call** is a network request containing method parameters and, optionally, identifier of the object for which method is called (not needed for static method calls). Some method parameters can additionally be declared as **observable**, which means that their values not only sent as payload of a call but also provide implementors with an ability to cherry-pick a subset of calls having a concrete values of the observable parameters (see [Endpoint](#endpoint) section for more information).
+**Method call** is a network request containing method parameters and, optionally, identifier of the object for which method is called (not needed for static method calls). Some method parameters can additionally be defined as **observable**, which means that their values not only sent as payload of a call but also provide implementors with an ability to cherry-pick a subset of calls having a concrete values of the observable parameters (see [Endpoint](#endpoint) section for more information).
 
 **Method result** is a network response containing either method return value or an exception signalling abnormal method completion.
 
@@ -103,6 +103,16 @@ Some message bus topic formats, commonly used for subscribing for method calls, 
 | `<namespace>.<class>.<method>.<topic-wildcard-any1>.<observable-params>.<topic-wildcard-anyN>` | value     | calls of a method with a specific value(s) of an                                                                                                                        observable parameter(s)                           |
 
 ## Type visibility
+
+**Scope** is a part of a busrcp API where name of a structure or enumeration can be used to refer to the corresponding type. In that case we also say that busrpc structure/enumeration is **visible** in this scope.
+
+The scope of a type is determined by the place in the directory hierarchy where the protobuf file containing it's definition is located. Additionally, scopes form a hierarchy in which types visible in the parent scope are also visible in all it's child scopes. The following scopes are defined by the busrpc specification (in the order from parent to child):
+1. a single **global scope**
+2. a **namespace scope** for each namespace
+3. a **class scope** for each class
+4. a **method scope** for each method
+
+Limiting the scope of busrpc structures and enumerations developers can easily control which parts of their API can be affected when some type is updated. For example, if some structure defined in the class `C` scope needs to be updated, only class `C` methods should be checked for compatability.
 
 # Protocol
 
