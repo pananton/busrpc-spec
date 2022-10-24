@@ -13,6 +13,7 @@ This document contains general information for developers of busrpc microservice
   * [Endpoint](#endpoint)
   * [Type visibility](#type-visibility)
 * [Protocol](#protocol)
+  * [Directory layout](#directory-layout)
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
 
@@ -115,6 +116,14 @@ The scope of a type is determined by the place in the directory hierarchy where 
 Limiting the scope of busrpc structures and enumerations developers can easily control which parts of their API can be affected when some type is updated. For example, if some structure defined in the class `C` scope needs to be updated, only class `C` methods should be checked for compatability.
 
 # Protocol
+
+Busrpc framework uses Google's [protocol buffers](https://developers.google.com/protocol-buffers) as a format of network messages. This mechanism was considered as most suitable for the busrpc framework needs because of the following features:
+* support of all popular programming languages
+* extension of protobuf file syntax with [custom options](https://developers.google.com/protocol-buffers/docs/proto3#customoptions)
+* rich API for introspecting protobuf generated types, which facilitates custom tools and client libraries development
+* easy conversion from binary data to text (JSON) and vice versa
+
+## Directory layout
 
 # Documentation commands
 
