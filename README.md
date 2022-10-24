@@ -5,7 +5,7 @@ Busrpc is an RPC framework designed with [microservice architecture](https://en.
 The framework consists of the following components:
 * Technical documentation, namely busrpc API [specification](./docs/busrpc.md), bus-dependent API [specializations](./docs/busrpc.md#specializations) and a [style guide](./docs/style.md) for an API protobuf files
 * Protobuf [file](./proto/busrpc.proto) which contains definitions of the busrpc built-in protobuf types and options used by all compliant APIs
-* Command-line development [tool](./devtool/README.md) for a busrpc microservice developers
+* Command-line development [tool](https://github.com/pananton/busrpc-devtool) for a busrpc microservice developers
 * Bus-dependent [libraries](#libraries) for a busrpc microservice development
 * Bus-dependent [clients](#clients) for testing/observing running busrpc backends
 
@@ -23,7 +23,7 @@ Clients allow developers to test and observe running busprc backends and usually
 * `observe` - to observe calls of busrpc methods
 
 Currently the project provides the following clients:
-* [NATS busrpc client](https://github.com/pananton/nats-busrpc-cli)
+* [NATS busrpc client](https://github.com/pananton/busrpc-nats-cli)
 
 # Contributing
 
