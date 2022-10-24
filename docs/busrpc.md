@@ -94,14 +94,14 @@ Busrpc **enumeration** corresponds directly to a protobuf `enum`.
 
 Busrpc specification also introduces some predefined endpoints to refer to a specific format of message bus topic. All of them are represented in the table below.
 
-| Topic                                                                                          | Endpoint           | Description |
-| ---------------------------------------------------------------------------------------------- | ------------------ | ----------- |
-| `<topic-wildcard-anyN>`                                                                        | global endpoint    | all calls
-| `<namespace>.<topic-wildcard-anyN>`                                                            | namespace endpoint | calls of any method of any class from a namespace |
-| `<namespace>.<class>.<topic-wildcard-anyN>`                                                    | class endpoint     | calls of any method of a class |
-| `<namespace>.<class>.<method>.<topic-wildcard-anyN>`                                           | method endpoint    | calls of a method |
-| `<namespace>.<class>.<topic-wildcard-any1>.<object-id>.<topic-wildcard-anyN>`                  | object endpoint    | calls bound to a specific object |
-| `<namespace>.<class>.<method>.<topic-wildcard-any1>.<observable-params>.<topic-wildcard-anyN>` | value endpoint     | calls of a method with a specific value(s) of an observable parameter(s) |
+| Topic                                                                                          | Endpoint   | Description                                       |
+| ---------------------------------------------------------------------------------------------- | -----------| ------------------------------------------------- |
+| `<topic-wildcard-anyN>`                                                                        | global     | all calls                                         |
+| `<namespace>.<topic-wildcard-anyN>`                                                            | namespace  | calls of any method of any class from a namespace |
+| `<namespace>.<class>.<topic-wildcard-anyN>`                                                    | class      | calls of any method of a class                    |
+| `<namespace>.<class>.<method>.<topic-wildcard-anyN>`                                           | method     | calls of a method                                 |
+| `<namespace>.<class>.<topic-wildcard-any1>.<object-id>.<topic-wildcard-anyN>`                  | object     | calls bound to a specific object                  |
+| `<namespace>.<class>.<method>.<topic-wildcard-any1>.<observable-params>.<topic-wildcard-anyN>` | value      | calls of a method with a specific value(s) of an                                                                                                                       observable parameter(s)                           |
 
 ## Type visibility
 
