@@ -6,11 +6,11 @@ This document contains general information for developers of busrpc microservice
 * [Message bus model](#message-bus-model)
 * [Design](#design-and-terminology)
   * [Class](#class)
+  * [Service](#service)
   * [Structure](#structure)
   * [Enumeration](#enumeration)
   * [Namespace](#namespace)
   * [Endpoint](#endpoint)
-  * [Service](#service)
   * [Type visibility](#type-visibility)
 * [Protocol](#protocol)
 * [Documentation commands](#documentation-commands)
@@ -40,7 +40,7 @@ Message bus model provides two basic operations:
 1. `PUBLISH(topic, message, [replyTo])` - to send arbitrary `message` on a `topic`
 2. `SUBSCRIBE(topic)` - to listen for messages published on a `topic`
 
-*Topic* is essentially a sequence of characters used by the message bus to route messages from publisher to subscriber. On a closer look, it is a list of words separated by a special character `<topic-word-sep>`. Most (if not all) message bus techonologies use dot (`.`) as separator, however described model does not require this (still dot will be used in the examples thorought this document for simplicity).
+**Topic** is essentially a sequence of characters used by the message bus to route messages from publisher to subscriber. On a closer look, it is a list of words separated by a special character `<topic-word-sep>`. Most (if not all) message bus techonologies use dot (`.`) as separator, however described model does not require this (still dot will be used in the examples thorought this document for simplicity).
 
 Words constituiting a topic usually form a hierarchy, for example: `time.us`, `time.us.east`, `time.us.east.atlanta`. Abstract bus model supports the following wildcard characters which can be used in the `SUBSCRIBE` operation:
 * `<topic-wildcard-any1>` - matches a single word, for example `time.<topic-wildcard-any1>.east` matches `time.us.east` and `time.eu.east`
@@ -52,6 +52,8 @@ Note that core publish/subscribe mechanism implies one-way message flow (from pu
 
 Busrpc API design is based on the concepts from object-oriented programming. This allows busrpc to re-use well-known OOP terminology and stay familiar for newcomers (note hovewer that same terms from busrpc API design and object-oriented design may differ in some aspects and should not be treated as exactly equivalent). Moreover, we believe that many well-established and time-tested object-oriented design principles and decomposition strategies can also be applied for a good microservice backend API, which means that developers' OOP experience might come in handy in the context of the busrpc framework.
 
+This section introduces the concepts of busrpc API, implementation details are covered in the [Protocol](#protocol) section.
+
 ## Class
 
 Busrpc **class** is a model of a similarly arranged entities from the API business domain. By similar arrangement we mean that all entities modelled by a class have the same format of internal state and expose the same set of supported operations, which are called **methods** as it is accepted in OOP. All together, class methods form an **interface** of a class.
@@ -60,15 +62,19 @@ Busrpc **class** is a model of a similarly arranged entities from the API busine
 
 Methods may be bound to a concrete object or to a class as a whole. The latter are called **static methods**. Busrpc specification also has a notion of a **static class**, which is a class without objects. Because of this, static class does not define an object identifier and every method of it's interface is treated as static. Static classes are mainly used to group related system-wide "utility" methods.
 
-**Method call** is a network request containing method parameters and, optionally, identifier of the object for which method is called (not needed for static method calls). **Method result** is a network response containing either method return value or an exception signalling abnormal method completion. Exact format of this messages is described in the [Protocol](#protocol) section.
+**Method call** is a network request containing method parameters and, optionally, identifier of the object for which method is called (not needed for static method calls). Some method parameters can be declared as **observable**, which means that their values 
+
+**Method result** is a network response containing either method return value or an exception signalling abnormal method completion.
+
+## Service
+
+**Service** is an application implementing and/or invoking busrpc class methods. This specification does not impose any limits on methods used by the service. For example, it is totally fine for a service to implement only a subset of class methods, or to implement/invoke methods from distinct classes. 
 
 ## Structure
 
 Busrpc **structure** is an alternative term for a protobuf `message` introduced for consistency with OOP terminology. Structures are busrpc wire types, i.e. every busrpc network message is represented by some structure.
 
 **Predefined structures** are structures which have special meaning determined by this specification. In particular, **descriptors** are predefined structures which provide busrpc client libraries with type information about busrpc entity (service, class, or method). Descriptors are usually never sent over the network - in fact, they even do not have any fields, only nested type definitions.
-
-All predefined structures are described in the [Protocol](#protocol) section.
 
 ## Enumeration
 
@@ -80,9 +86,12 @@ Busrpc **enumeration** corresponds directly to a protobuf `enum`.
 
 ## Endpoint
 
-## Service
+**Endpoint** is a message bus topic to which method calls are published by a caller. Format of the endpoint is `<namespace>.<class>.<method>.<object-id>[.<observable-params>].<eof>`, where:
+* `<namespace>`, `<class>` and `<method>` are names of the namespace, class and method correspondingly
+* `<object-id>` is identifier of an object for which method is called, or a reserved word representing null value for static methods
+* optional `<observable-params>` is a list of topic words each representing a value of a single observable parameter
+* `<eof>` is a reserved word which designates the end of endpoint
 
-Busrpc **service** is an application implementing and/or invoking busrpc class methods. 
 
 ## Type visibility
 
