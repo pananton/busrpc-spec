@@ -4,7 +4,7 @@ This document contains general information for developers of busrpc microservice
 
 * [Introduction](#introduction)
 * [Message bus model](#message-bus-model)
-* [Design](#design-and-terminology)
+* [Design](#design)
   * [Class](#class)
   * [Service](#service)
   * [Structure](#structure)
@@ -92,24 +92,16 @@ Busrpc **enumeration** corresponds directly to a protobuf `enum`.
 * optional `<observable-params>` is a list of topic words each representing a value of a single observable parameter
 * `<eof>` is a reserved word which designates the end of endpoint
 
-From a subscriber point of view endpoints can be additionally classified into the following types:
-* **global endpoint** representing all method calls in the system
-* **namespace endpoint** representing all method calls of all classes of a concrete namespace
-* **class endpoint** representing all method calls of a concrete class
-* **method endpoint** representing a concrete method call for all objects and values of observable parameters
-* **object endpoint** representing all method calls bound to the concrete object
-* **value endpoint** representing a concrete method call for a concrete value(s) of observable parameter(s)
+Busrpc specification also introduces some predefined endpoints to refer to a specific format of message bus topic. All of them are represented in the table below.
 
-Next table provides a mapping between endpoint type and a message bus topic.
-
-| Endpoint type | Topic                                                                                          |
-| ------------- | ---------------------------------------------------------------------------------------------- |
-| global        | `<topic-wildcard-anyN>`                                                                        |
-| namespace     | `<namespace>.<topic-wildcard-anyN>`                                                            |
-| class         | `<namespace>.<class>.<topic-wildcard-anyN>`                                                    |
-| method        | `<namespace>.<class>.<method>.<topic-wildcard-anyN>`                                           |
-| object        | `<namespace>.<class>.<topic-wildcard-any1>.<object-id>.<topic-wildcard-anyN>`                  |
-| value         | `<namespace>.<class>.<method>.<topic-wildcard-any1>.<observable-params>.<topic-wildcard-anyN>` |
+| Topic                                                                                          | Endpoint           | Description |
+| ---------------------------------------------------------------------------------------------- | ------------------ | ----------- |
+| `<topic-wildcard-anyN>`                                                                        | global endpoint    | all calls
+| `<namespace>.<topic-wildcard-anyN>`                                                            | namespace endpoint | calls of any method of any class from a namespace |
+| `<namespace>.<class>.<topic-wildcard-anyN>`                                                    | class endpoint     | calls of any method of a class |
+| `<namespace>.<class>.<method>.<topic-wildcard-anyN>`                                           | method endpoint    | calls of a method |
+| `<namespace>.<class>.<topic-wildcard-any1>.<object-id>.<topic-wildcard-anyN>`                  | object endpoint    | calls bound to a specific object |
+| `<namespace>.<class>.<method>.<topic-wildcard-any1>.<observable-params>.<topic-wildcard-anyN>` | value endpoint     | calls of a method with a specific value(s) of an observable parameter(s) |
 
 ## Type visibility
 
