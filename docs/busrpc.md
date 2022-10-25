@@ -14,6 +14,9 @@ This document contains general information for developers of busrpc microservice
   * [Type visibility](#type-visibility)
 * [Protocol](#protocol)
   * [Directory layout](#directory-layout)
+  * [Class description file](#class-description-file)
+  * [Method description file](#method-description-file)
+  * [Service description file](#service-description-file)
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
 
@@ -150,7 +153,7 @@ Components of the busrpc directory tree are:
 * **method directory** `<method-dir>`, which contains definition of the class method
 * **method description file** `method.proto`, which contains [method descriptor](#method-description-file) definition
 * **service directory** `<service-dir>`
-* **service description file** `service.proto`, which contains [service descriptor](#service-descriptor) definition
+* **service description file** `service.proto`, which contains [service descriptor](#service-description-file) definition
 
 Busrpc [scopes](#type-visibility) and their hierarchy matches busrpc API directory layout:
 * globally-scoped types are types defined in files in the API root directory
@@ -165,6 +168,12 @@ Note, that type visibility rules can be expressed in terms of files and director
 * file from the method directory can be imported by any file in the same method directory
 
 Note, that visibility constraints are applied only inside API root directory. For example, service description file can (and, in fact, is required to) import necessary method description files despite the fact that service description file itself is not placed to the method directory.
+
+## Class description file
+
+## Method description file
+
+## Service description file
 
 # Documentation commands
 
