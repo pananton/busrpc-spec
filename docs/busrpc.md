@@ -125,6 +125,47 @@ Busrpc framework uses Google's [protocol buffers](https://developers.google.com/
 
 ## Directory layout
 
+All busrpc protobuf files should be organized in the tree represented below. Names in angle brackets are placeholders which are assigned real names by specific API implementation. For simplicity, only a single namespace, class, method and service is represented. Of course, real API may contain arbitrary number of this entities structured in a similar way.
+
+```
+<busrpc-root-dir>/
+├── api/
+|   ├── busrpc.proto
+│   ├── <namespace-dir>/
+│       ├── <class-dir>/
+│           ├── class.proto
+│           ├── <method-dir>/
+│               ├── method.proto
+├── services/
+│   ├── <service-dir>/
+|       ├── service.proto
+```
+ 
+Components of the busrpc directory tree are:
+* `<busrpc-root-dir>` is a busrpc **root directory**, which must contain two predefined directories: **API root directory** (`api`) and **services root directory** (`services`)
+* `api/busrpc.proto` is a framework-provided file containing definitions of some predefined structures
+* `api/<namespace-dir>` is called **namespace directory**; it contains definitions of all namespace classes
+* `api/<namespace-dir>/<class-dir>` is called **class directory**; it contains definition of the class interface
+* `api/<namespace-dir>/<class-dir>/class.proto` is called **class description file**; it must contain [class descriptor](#class-description-file) definition
+* `api/<namespace-dir>/<class-dir>/<method-dir>` is called **method directory**; it contains definition of the class method
+* `api/<namespace-dir>/<class-dir>/<method-dir>/method.proto` is called **method description file**; it must contain [method descriptor](#method-description-file) definition
+* `services/<service-dir>` is called **service directory**
+* `service/<service-dir>/service.proto` is called **service description file**; it must contain [service descriptor](#service-descriptor) definition
+
+Busrpc [scopes](#type-visibility) and their hierarchy matches busrpc API directory layout:
+* globally-scoped types should be defined in files placed to the API root directory
+* namespace-scoped types should be defined in files placed to the namespace directory
+* class-scoped types should be defined in files placed to the class directory
+* method-scoped types should be defined in files placed to the method directory
+
+Note, that type visibility rules can be expressed in terms of files and directories in the following way:
+* file from the API root directory can be imported by any file
+* file from the namespace directory can be imported by any file in the same namespace directory or nested class/method directory
+* file from the class directory can be imported by any file in the same class directory or nested method directory
+* file from the method directory can be imported by any file in the same method directory
+
+Note, that visibility constraints are applied only inside API root directory. For example, service description file can (and, in fact, is required to) import necessary method description files despite the fact that service description file is not itself placed to the method directory.
+
 # Documentation commands
 
 # Specializations
