@@ -125,7 +125,7 @@ Busrpc framework uses Google's [protocol buffers](https://developers.google.com/
 
 ## Directory layout
 
-All busrpc protobuf files should be organized in the tree represented below. Names in angle brackets are placeholders which are assigned real names by specific API implementation. For simplicity, only a single namespace, class, method and service is represented. Of course, real API may contain arbitrary number of this entities structured in a similar way.
+All busrpc protobuf files should be organized in the tree represented below. Names in angle brackets are placeholders which are assigned real names by specific API implementation. For simplicity, only a single namespace, class, method and service is presented. Of course, real API may contain arbitrary number of this entities structured in a similar way.
 
 ```
 <busrpc-root-dir>/
