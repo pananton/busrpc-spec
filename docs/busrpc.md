@@ -107,7 +107,7 @@ Some message bus topic formats, commonly used for subscribing for method calls, 
 
 **Scope** is a part of a busrcp API where name of a structure or enumeration can be used to refer to the corresponding type. In that case we also say that busrpc structure/enumeration is **visible** in this scope.
 
-The scope of a type is determined by the place in the directory hierarchy where the protobuf file containing it's definition is located. Additionally, scopes form a hierarchy in which types visible in the parent scope are also visible in all it's child scopes. The following scopes are defined by the busrpc specification (in the order from parent to child):
+The scope of a type is determined by the place in the directory hierarchy where the protobuf file containing it's definition is located. Additionally, scopes form a hierarchy in which types visible in the parent scope are also visible in all child scopes. The following scopes are defined by the busrpc specification (in the order from parent to child):
 1. a single **global scope**
 2. a **namespace scope** for each namespace
 3. a **class scope** for each class
@@ -153,10 +153,10 @@ Components of the busrpc directory tree are:
 * **service description file** `service.proto`, which contains [service descriptor](#service-descriptor) definition
 
 Busrpc [scopes](#type-visibility) and their hierarchy matches busrpc API directory layout:
-* globally-scoped types should be defined in files placed to the API root directory
-* namespace-scoped types should be defined in files placed to the namespace directory
-* class-scoped types should be defined in files placed to the class directory
-* method-scoped types should be defined in files placed to the method directory
+* globally-scoped types are types defined in files in the API root directory
+* namespace-scoped types are types defined in files in the namespace directory
+* class-scoped types are types defined in files in the class directory
+* method-scoped types are types defined in files in the method directory
 
 Note, that type visibility rules can be expressed in terms of files and directories in the following way:
 * file from the API root directory can be imported by any file
@@ -164,7 +164,7 @@ Note, that type visibility rules can be expressed in terms of files and director
 * file from the class directory can be imported by any file in the same class directory or nested method directory
 * file from the method directory can be imported by any file in the same method directory
 
-Note, that visibility constraints are applied only inside API root directory. For example, service description file can (and, in fact, is required to) import necessary method description files despite the fact that service description file is not itself placed to the method directory.
+Note, that visibility constraints are applied only inside API root directory. For example, service description file can (and, in fact, is required to) import necessary method description files despite the fact that service description file itself is not placed to the method directory.
 
 # Documentation commands
 
