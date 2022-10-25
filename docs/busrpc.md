@@ -142,15 +142,15 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
 ```
  
 Components of the busrpc directory tree are:
-* `<busrpc-root-dir>` is a busrpc **root directory**, which must contain two predefined directories: **API root directory** (`api`) and **services root directory** (`services`)
-* `busrpc.proto` is a framework-provided file containing definitions of some predefined structures
-* `<namespace-dir>` is called **namespace directory**; it contains definitions of all namespace classes
-* `<class-dir>` is called **class directory**; it contains definition of the class interface
-* `class.proto` is called **class description file**; it must contain [class descriptor](#class-description-file) definition
-* `<method-dir>` is called **method directory**; it contains definition of the class method
-* `method.proto` is called **method description file**; it must contain [method descriptor](#method-description-file) definition
-* `<service-dir>` is called **service directory**
-* `service.proto` is called **service description file**; it must contain [service descriptor](#service-descriptor) definition
+* **root directory** `<busrpc-root-dir>`, which contains two predefined directories: **API root directory** (`api`) and **services root directory** (`services`)
+* framework-provided file `busrpc.proto`, which contains definitions of several predefined structures
+* **namespace directory** `<namespace-dir>`, which contains definitions of all namespace classes
+* **class directory** `<class-dir>`, which contains definition of the class interface
+* **class description file** `class.proto`, which contains [class descriptor](#class-description-file) definition
+* **method directory** `<method-dir>`, which contains definition of the class method
+* **method description file** `method.proto`, which contains [method descriptor](#method-description-file) definition
+* **service directory** `<service-dir>`
+* **service description file** `service.proto`, which contains [service descriptor](#service-descriptor) definition
 
 Busrpc [scopes](#type-visibility) and their hierarchy matches busrpc API directory layout:
 * globally-scoped types should be defined in files placed to the API root directory
