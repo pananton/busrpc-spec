@@ -149,11 +149,11 @@ Components of the busrpc directory tree are:
 * framework-provided file `busrpc.proto`, which contains definitions of several predefined structures
 * **namespace directory** `<namespace-dir>`, which contains definitions of all namespace classes
 * **class directory** `<class-dir>`, which contains definition of the class interface
-* **class description file** `class.proto`, which contains [class descriptor](#class-description-file) definition
+* [**class description file**](#class-description-file) `class.proto`, which contains class descriptor
 * **method directory** `<method-dir>`, which contains definition of the class method
-* **method description file** `method.proto`, which contains [method descriptor](#method-description-file) definition
+* [**method description file**](#method-description-file) `method.proto`, which contains method descriptor
 * **service directory** `<service-dir>`
-* **service description file** `service.proto`, which contains [service descriptor](#service-description-file) definition
+* [**service description file**](#service-description-file) `service.proto`, which contains service descriptor
 
 Busrpc [scopes](#type-visibility) and their hierarchy matches busrpc API directory layout:
 * globally-scoped types are types defined in files in the API root directory
