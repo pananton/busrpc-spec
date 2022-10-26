@@ -145,12 +145,12 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
 ```
  
 Components of this tree are:
-* root directory `<busrpc-root-dir>`, which contains two predefined directories: API root directory `api` and services root directory `services`
-* file `busrpc.proto`, which is provided by the framework and potentially customized by a specific API implementation (template can be found in the [*/proto*](#../proto) directory, customized real example in the [*/example/api*](#../example/api) directory)
-* namespace directory `<namespace-dir>`, which contains definitions of all namespace classes
-* class directory `<class-dir>`, which contains definitions of the class methods (collectively referred to as class interface) and a [class description file](#class-description-file) `class.proto`
-* method directory `<method-dir>`, which contains definition of a class method and a [method description file](#method-description-file) `method.proto`
-* service directory `<service-dir>`, which contains a [service description file](#service-description-file)
+* root directory *<busrpc-root-dir>/*, which contains two predefined directories: API root directory *api/* and services root directory *services/*
+* file *busrpc.proto*, which is provided by the framework and potentially customized by a specific API implementation (template can be found in the [*proto/*](proto) directory, customized example in the [*example/api/*](example/api) directory)
+* namespace directory *<namespace-dir>/*, which contains definitions of all namespace classes
+* class directory *<class-dir>/*, which contains definitions of the class methods (collectively referred to as class interface) and a [class description file](#class-description-file) *class.proto*
+* method directory *<method-dir>/*, which contains definition of a class method and a [method description file](#method-description-file) *method.proto*
+* service directory *<service-dir>/*, which contains a [service description file](#service-description-file)
 
 Busrpc [scopes](#type-visibility) and their hierarchy matches busrpc API directory layout:
 * globally-scoped types are types defined in files in the API root directory
