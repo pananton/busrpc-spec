@@ -15,6 +15,7 @@ This document contains general information for developers of busrpc microservice
 * [Protocol](#protocol)
   * [Directory layout](#directory-layout)
   * [Class description file](#class-description-file)
+    * [`ObjectId`](#objectid)  
   * [Method description file](#method-description-file)
   * [Service description file](#service-description-file)
 * [Documentation commands](#documentation-commands)
