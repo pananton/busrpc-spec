@@ -144,16 +144,13 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
 |       ├── service.proto
 ```
  
-Components of the busrpc directory tree are:
-* **root directory** `<busrpc-root-dir>`, which contains two predefined directories: **API root directory** (`api`) and **services root directory** (`services`)
-* framework-provided file `busrpc.proto`, which contains definitions of several predefined structures
-* **namespace directory** `<namespace-dir>`, which contains definitions of all namespace classes
-* **class directory** `<class-dir>`, which contains definition of the class interface
-* [**class description file**](#class-description-file) `class.proto`, which contains class descriptor
-* **method directory** `<method-dir>`, which contains definition of the class method
-* [**method description file**](#method-description-file) `method.proto`, which contains method descriptor
-* **service directory** `<service-dir>`
-* [**service description file**](#service-description-file) `service.proto`, which contains service descriptor
+Components of this tree are:
+* root directory `<busrpc-root-dir>`, which contains two predefined directories: API root directory `api` and services root directory `services`
+* file `busrpc.proto`, which is provided by the framework and potentially customized by a specific API implementation (template can be found in the [*/proto*](#../proto) directory, customized real example in the [*/example/api*](#../example/api) directory)
+* namespace directory `<namespace-dir>`, which contains definitions of all namespace classes
+* class directory `<class-dir>`, which contains definitions of the class methods (collectively referred to as class interface) and a [class description file](#class-description-file) `class.proto`
+* method directory `<method-dir>`, which contains definition of a class method and a [method description file](#method-description-file) `method.proto`
+* service directory `<service-dir>`, which contains a [service description file](#service-description-file)
 
 Busrpc [scopes](#type-visibility) and their hierarchy matches busrpc API directory layout:
 * globally-scoped types are types defined in files in the API root directory
@@ -171,7 +168,11 @@ Note, that visibility constraints are applied only inside API root directory. Fo
 
 ## Class description file
 
+`class.proto` contains class descriptor - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the class (documentation and object identifier format)
+
 ## Method description file
+
+`method.proto` contains method descriptor - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the method (documentation and parameters/retval format)
 
 ## Service description file
 
