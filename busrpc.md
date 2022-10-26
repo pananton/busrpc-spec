@@ -18,6 +18,7 @@ This document contains general information for developers of busrpc microservice
     * [`ObjectId`](#objectid)  
   * [Method description file](#method-description-file)
   * [Service description file](#service-description-file)
+  * [Endpoint encoding](#endpoint-encoding)
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
 
@@ -65,7 +66,7 @@ Busrpc **class** is a model of a similarly arranged entities from the API busine
 
 **Object** of a class represents a concrete entity from the set of modelled entities. It is characterized by concrete value of internal state and an immutable **object identifier**, which uniquelly identifies object throughout the system.
 
-Methods may be bound to a concrete object or to a class as a whole. The latter are called **static methods**. Busrpc specification also has a notion of a **static class**, which is a class without objects. Because of this, static class does not define an object identifier and every method of it's interface is treated as static. Static classes are mainly used to group related system-wide "utility" methods.
+Methods may be bound to a concrete object or to a class as a whole. The latter are called **static methods**. Busrpc specification also has a notion of a **static class**, which is a class without objects. Because of this, static class does not define an object identifier and every method of it's interface must be static. Static classes are mainly used to group related system-wide "utility" methods.
 
 **Method call** is a network request containing method parameters and, optionally, identifier of the object for which method is called (not needed for static method calls). Some method parameters can additionally be defined as **observable**, which means that their values not only sent as payload of a call but also provide implementors with an ability to cherry-pick a subset of calls having a concrete values of the observable parameters (see [Endpoint](#endpoint) section for more information).
 
@@ -173,15 +174,39 @@ Class description file *class.proto* must contain definition of a class descript
 
 ### `ObjectId`
 
-`ObjectId` structure may (at least, theoretically) contain arbitrary number of fields
+`ObjectId` structure contains arbitrary number of fields that together form a unique identifier of the class object. Fields may have any type except for protobuf floating-point types `float` and `double` and user-defined `message` type. Below is an example of class `employee` descriptor from `hrd` namespace, which can be a part of some organization backend API. 
+
 ```
+// file ./api/hrd/employee/class.proto
+
+syntax = "proto3";
+package busrpc.api.hrd.employee;
+
+message ClassDesc {
+  message ObjectId {
+    string first_name = 1;
+    string last_name = 2;
+  }
+}
 ```
+
+If `ClassDesc` does not contain a nested `ObjectId` type or it has no fields, then corresponding class is considered static (see [Class](#class) section above).
+
+---
+
+**NOTE**
+
+Remember, that any object identifier is added to the call endpoint, which is effectively a message bus topic (see [Endpoint](#endpoint) section). The details of how precisely `ObjectId` value is converted to a word in the message bus topic are left to a [dedicated](#endpoint-encoding) section. However, it is important to note that different message buses impose different limits on the maximum topic length, which means that care should be taken when using potentially long object identifiers.
+
+---
 
 ## Method description file
 
 `method.proto` contains method descriptor - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the method (documentation and parameters/retval format)
 
 ## Service description file
+
+## Endpoint encoding
 
 # Documentation commands
 
