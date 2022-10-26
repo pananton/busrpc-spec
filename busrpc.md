@@ -147,10 +147,10 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
 Components of this tree are:
 * root directory *\<busrpc-root-dir>/*, which contains two predefined directories: API root directory *api/* and services root directory *services/*
 * file [*busrpc.proto*](proto/busrpc.proto), which is provided by the framework; it contains important busrpc-specific definitions
-* namespace directory *<namespace-dir>/*, which contains definitions of all namespace classes
+* namespace directory *\<namespace-dir>/*, which contains definitions of all namespace classes
 * class directory *\<class-dir>/*, which contains definitions of the class methods (collectively referred to as class interface) and a [class description file](#class-description-file) *class.proto*
 * method directory *\<method-dir>/*, which contains definition of a class method and a [method description file](#method-description-file) *method.proto*
-* service directory *\<service-dir>/*, which contains a [service description file](#service-description-file)
+* service directory *\<service-dir>/*, which contains a [service description file](#service-description-file) *service.proto*
 
 Busrpc [scopes](#type-visibility) and their hierarchy matches busrpc API directory layout:
 * globally-scoped types are types defined in files in the API root directory
