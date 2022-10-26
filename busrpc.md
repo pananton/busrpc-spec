@@ -170,11 +170,15 @@ Note, that visibility constraints are applied only inside API root directory. Fo
 
 ## Class description file
 
-Class description file *class.proto* must contain definition of a class descriptor `ClassDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the class in form of nested types. Busrpc specification currently recognizes only `ObjectId` structure, which represents format of the class object identifier.
+Class description file *class.proto* must contain definition of a class descriptor `ClassDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the class in form of a nested types. Busrpc specification currently recognizes only `ObjectId` structure, which describes class object identifier.
 
 ### `ObjectId`
 
-`ObjectId` structure contains arbitrary number of fields that together form a unique identifier of the class object. Fields may have any type except for protobuf floating-point types `float` and `double` and user-defined `message` type. Below is an example of class `employee` descriptor from `hrd` namespace, which can be a part of some organization backend API. 
+`ObjectId` structure contains arbitrary number of fields that together form a unique identifier of the class object. Each `ObjectId` field must have one of the following type:
+* [scalar](https://developers.google.com/protocol-buffers/docs/proto3#scalar) type, except for floating-point types `float` and `double`
+* [enumeration](https://developers.google.com/protocol-buffers/docs/proto3#enum) type
+
+Below is an example of class `employee` descriptor from `hrd` namespace, which can be a part of some organization backend API. 
 
 ```
 // file ./api/hrd/employee/class.proto
