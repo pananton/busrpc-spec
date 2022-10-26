@@ -71,10 +71,10 @@ enum Status {
 
 ## Imports
 
-* Use path relative to busrpc API root directory when importing protobuf files (for example, if file *dir1/dir2/file1.proto* should be imported in any other file (even in the same directory) do this with `import public "dir1/dir2/some.proto";`)
+* Use path relative to busrpc root directory  (the one which contains *api/* and *services/* directories) when importing protobuf files (for example, if file *dir1/dir2/file1.proto* should be imported in any other file (even in the same directory) do this with `import "dir1/dir2/some.proto";`)
 * Service description file *service.proto* must import description files of all methods implemented or invoked by the service
 * Prefer to follow next recommendations to guarantee that generated source files will contain all necessary types:
-  * import framework-provided (and probably additionally customized) file *busrpc.proto* in every class description file *class.proto*
+  * import *busrpc.proto* in every class description file *class.proto*
   * import class description file *class.proto* in the description files *method.proto* of every method of this class
 
 ### Import order
@@ -88,9 +88,8 @@ enum Status {
 
 ## Documenting
 
-Busrpc API should follow code as documentation principle, which implies that protobuf files should contain appropriate comments and [documentation commands](./busrpc.md#documentation-commands). Busrpc development tool [`validate`]() command issues a warning if any rule specified in this section is violated.
+Busrpc API should follow code as documentation principle, which implies that protobuf files should contain appropriate comments and [documentation commands](busrpc.md#documentation-commands). Documentation comment should appear **right before** the entity to which it relates. Busrpc development tool [`validate`]() command issues a warning if any rule specified below is violated.
 
-* Documentation comment should appear **right before** the entity to which it relates
 * Every non-predefined busrpc structure or enumeration should be documented with a comment describing it
 * Predefined structures may not be documented unless explicitly requested by the rules of this section
 * Every structure field or enumeration constant should be documented
