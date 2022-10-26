@@ -168,7 +168,13 @@ Note, that visibility constraints are applied only inside API root directory. Fo
 
 ## Class description file
 
-`class.proto` contains class descriptor - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the class (documentation and object identifier format)
+Class description file *class.proto* must contain definition of a class descriptor `ClassDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the class in form of nested types. Busrpc specification currently recognizes only `ObjectId` structure, which represents format of the class object identifier.
+
+### `ObjectId`
+
+`ObjectId` structure may (at least, theoretically) contain arbitrary number of fields
+```
+```
 
 ## Method description file
 
