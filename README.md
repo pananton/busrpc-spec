@@ -3,7 +3,7 @@
 Busrpc is an RPC framework designed with [microservice architecture](https://en.wikipedia.org/wiki/Microservices) principles in mind. It relies on a generalized message bus/queue/broker (for example, [NATS](https://nats.io/) or [RabbitMQ](https://rabbitmq.com/)) as a transport layer and [protocol buffers](https://developers.google.com/protocol-buffers) as message format.
 
 The framework consists of the following components:
-* Technical documentation, namely busrpc API [specification](./docs/busrpc.md), bus-dependent API [specializations](./docs/busrpc.md#specializations) and a [style guide](./docs/style.md) for an API protobuf files
+* Technical documentation, namely busrpc API [specification](busrpc.md), bus-dependent API [specializations](busrpc.md#specializations) and a [style guide](style.md) for an API protobuf files
 * Protobuf [file](./proto/busrpc.proto) which contains definitions of the busrpc built-in protobuf types and options used by all compliant APIs
 * Command-line development [tool](https://github.com/pananton/busrpc-devtool) for a busrpc microservice developers
 * Bus-dependent [libraries](#libraries) for a busrpc microservice development
