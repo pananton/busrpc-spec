@@ -9,7 +9,7 @@ The framework consists of the following components:
 * Bus-dependent [libraries](#libraries) for a busrpc microservice development
 * Bus-dependent [clients](#clients) for testing/observing running busrpc backends
 
-An example of busrpc API for a simple chat application backend can be found in the [*/example*](example) directory.
+An example of busrpc API for a simple chat application backend can be found in the [*example/*](example) directory.
 
 # Libraries
 
