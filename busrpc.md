@@ -100,7 +100,7 @@ Busrpc **enumeration** corresponds directly to a protobuf `enum`.
 
 **Result endpoint** is a message bus topic assigned to the `replyTo` parameter when method call is published. Format of the result endpoint is `<result-endpoint-prefix>.<call-endpoint>`, where:
 * `<result-endpoint-prefix>` is a bus-dependent subtopic, whose words usually provide information, necessary to demultiplex responses and bind them to the original requests (for example, in NATS specialization `<result-endpoint-prefix>` is defined as `_INBOX.<connection-id>.<request-id>`, where `<connection-id>` is a unique connection identifier and `<request-id>` is a request identifier, which is unique for the connection)
-* `<call-endpoint>` is an exact copy of call endpoint used for the request; it's components are used by the framework [test clients](README.md#clients) to effectively catch responses when observing message flow
+* `<call-endpoint>` is an exact copy of the call endpoint used for the request; it's components are used by the framework [test clients](README.md#clients) to effectively catch only necessary responses when observing the system message flow
 
 Some message bus topic formats, commonly used for subscribing for method calls, are also mapped to a named endpoints to establish common terminology. This mapping is provided in the following table.
 
