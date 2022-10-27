@@ -70,7 +70,7 @@ Methods may be bound to a concrete object or to a class as a whole. The latter a
 
 **Method call** is represented as a network message containing method parameters and, optionally, identifier of the object for which method is called (not needed for static method calls) sent to the [call endpoint](#endpoint). Some method parameters can additionally be defined as **observable**, which means that their values not only sent as payload of a call but also added to the call endpoint providing implementors with an ability to cherry-pick a subset of calls having a concrete values of the observable parameters.
 
-**Method result** is represented as a network message containing either method return value or an exception signalling abnormal method completion sent to [result endpoint](#endpoint).
+**Method result** is represented as a network message containing either method return value or an exception sent to the [result endpoint](#endpoint).
 
 ## Service
 
