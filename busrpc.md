@@ -198,7 +198,7 @@ message ClassDesc {
 }
 ```
 
-If `ClassDesc` does not contain a nested `ObjectId` type, then corresponding class is considered static (see [Class](#class) section above).
+If `ClassDesc` does not contain a nested `ObjectId` type, then corresponding class is considered static.
 
 ## Method description file
 
