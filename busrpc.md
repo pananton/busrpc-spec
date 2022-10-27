@@ -68,9 +68,9 @@ Busrpc **class** is a model of a similarly arranged entities from the API busine
 
 Methods may be bound to a concrete object or to a class as a whole. The latter are called **static methods**. Busrpc specification also has a notion of a **static class**, which is a class without objects. Because of this, static class does not define an object identifier and every method of it's interface must be static. Static classes are mainly used to group related system-wide "utility" methods.
 
-**Method call** is a network request containing method parameters and, optionally, identifier of the object for which method is called (not needed for static method calls). Some method parameters can additionally be defined as **observable**, which means that their values not only sent as payload of a call but also provide implementors with an ability to cherry-pick a subset of calls having a concrete values of the observable parameters (see [Endpoint](#endpoint) section for more information).
+**Method call** is represented as a network message containing method parameters and, optionally, identifier of the object for which method is called (not needed for static method calls) sent to the [call endpoint](#endpoint). Some method parameters can additionally be defined as **observable**, which means that their values not only sent as payload of a call but also added to the call endpoint providing implementors with an ability to cherry-pick a subset of calls having a concrete values of the observable parameters.
 
-**Method result** is a network response containing either method return value or an exception signalling abnormal method completion.
+**Method result** is represented as a network message containing either method return value or an exception signalling abnormal method completion sent to [result endpoint](#endpoint).
 
 ## Service
 
