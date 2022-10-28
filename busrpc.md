@@ -18,7 +18,8 @@ This document contains general information for developers of busrpc microservice
     * [`ObjectId`](#objectid)  
   * [Method description file](#method-description-file)
   * [Service description file](#service-description-file)
-  * [Endpoint encoding](#endpoint-encoding)
+  * [Encoding](#Encoding)
+    * [Structure encoding](#structure-encoding) 
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
 
@@ -81,6 +82,49 @@ Methods may be bound to a concrete object or to a class as a whole. The latter a
 Busrpc **structure** is an alternative term for a protobuf `message` introduced for consistency with OOP terminology. Structures are busrpc wire types, i.e. every busrpc network message is represented by some structure.
 
 **Predefined structures** are structures which have special meaning determined by this specification. In particular, **descriptors** are predefined structures which provide busrpc client libraries with type information about busrpc entity (service, class, or method). Descriptors are usually never sent over the network - in fact, they even do not have any fields, only nested type definitions.
+
+**Encodable structure** is a structure, that can be encoded as specified in the [Structure encoding](#structure-encoding) section. To be encodable, structure must contain only non-`repeated`, non-`oneof` fields of the following types: 
+* [scalar](https://developers.google.com/protocol-buffers/docs/proto3#scalar) types, except for floating-point types `float` and `double`
+* [enumeration](https://developers.google.com/protocol-buffers/docs/proto3#enum) types
+
+```
+enum MyEnum {
+  MYENUM_VALUE_0 = 0;
+  MYENUM_VALUE_1 = 1;
+}
+
+// empty structure is encodable
+message Encodable1 { }
+
+// encodable, because all fields have valid types
+message Encodable2 {
+  optional int32 f1 = 1;
+  string f2 = 2;
+  bytes f3 = 3;
+  MyEnum f4 = 4;
+}
+
+// not encodable, each field violates one of the rules for the encodable structure
+message NotEncodable {
+  // floating-point types are not allowed
+  float f1 = 1;
+
+  // repeated fields are not allowed
+  repeated int32 f2 = 2;
+
+  // oneof is not allowed
+  oneof Variant {
+    int32 v1 = 3;
+    string v2 = 4;
+  }
+
+  // maps are not allowed
+  map<int32, int32> f3 = 5;
+
+  // fields of a user-defined type are not allowed
+  Encodable1 f4 = 6;
+}
+```
 
 ## Enumeration
 
@@ -178,17 +222,14 @@ Class description file *class.proto* must always contain definition of a class d
 
 ### `ObjectId`
 
-`ObjectId` structure contains arbitrary number of fields that together form a unique identifier of the class object. Each `ObjectId` field can have one of the following types:
-* [scalar](https://developers.google.com/protocol-buffers/docs/proto3#scalar) type, except for floating-point types `float` and `double`
-* [enumeration](https://developers.google.com/protocol-buffers/docs/proto3#enum) type
-
-Below is an example of class `employee` descriptor from `org` (short for "organization") namespace. 
+`ObjectId` is an [encodable structure](#structure), which contains arbitrary number of fields that together form a unique identifier of the class object.
 
 ```
-// file ./api/org/employee/class.proto
+// file ./api/my_app/person/class.proto
+// description file for class `my_app::person`
 
 syntax = "proto3";
-package busrpc.api.org.employee;
+package busrpc.api.my_app.person;
 
 message ClassDesc {
   message ObjectId {
@@ -200,13 +241,22 @@ message ClassDesc {
 
 If `ClassDesc` does not contain a nested `ObjectId` type, then corresponding class is considered static.
 
+```
+// file ./api/my_app/sysutils.class.proto
+// description file for static class `my_app::sysutils`
+
+message ClassDesc { }
+```
+
 ## Method description file
 
 `method.proto` contains method descriptor - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the method (documentation and parameters/retval format)
 
 ## Service description file
 
-## Endpoint encoding
+## Encoding
+
+### Structure encoding
 
 # Documentation commands
 
