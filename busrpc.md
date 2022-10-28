@@ -104,25 +104,25 @@ message Encodable2 {
   MyEnum f4 = 4;
 }
 
-// not encodable, each field violates one of the rules for the encodable structure
+// not encodable, each field violates one of the encodable structure rules
 message NotEncodable {
-  // floating-point types are not allowed
+  // floating-point types are prohibited
   float f1 = 1;
 
-  // repeated fields are not allowed
+  // repeated fields are prohibited
   repeated int32 f2 = 2;
 
-  // oneof is not allowed
+  // oneof is prohibited
   oneof Variant {
-    int32 v1 = 3;
-    string v2 = 4;
+    int32 f3 = 3;
+    string v4 = 4;
   }
 
-  // maps are not allowed
-  map<int32, int32> f3 = 5;
+  // maps are prohibited
+  map<int32, int32> f5 = 5;
 
-  // fields of a user-defined type are not allowed
-  Encodable1 f4 = 6;
+  // fields of a user-defined type are prohibited
+  Encodable1 f6 = 6;
 }
 ```
 
