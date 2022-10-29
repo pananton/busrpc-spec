@@ -230,11 +230,11 @@ Class description file *class.proto* must always contain definition of a class d
 `ObjectId` is a predefined [encodable structure](#structure), which contains arbitrary number of fields that together form a unique identifier of the class object.
 
 ```
-// file ./api/my_app/person/class.proto
-// description file for class `my_app::person`
+// file ./api/my_app/user/class.proto
+// description file for class `my_app::user`
 
 syntax = "proto3";
-package busrpc.api.my_app.person;
+package busrpc.api.my_app.user;
 
 message ClassDesc {
   message ObjectId {
@@ -261,14 +261,38 @@ Method description file *method.proto* must always contain definition of a metho
 
 ### `Params` and `Retval`
 
-`Params` and `Retval` are predefined structures, which describe method parameters and return value correspondingly. Both of this structures may be omitted in `MethodDesc`. Missing (or empty) `Params` structure means that method does not have any parameters. Missing and empty `Retval` structures are treated differently:
-* missing `Retval` defines a **one-way method** 
-
-* if `Retval` is missing, then method 
+`Params` and `Retval` are predefined structures, which describe method parameters and return value. Both of this structures may be omitted in `MethodDesc`.
+Missing or empty `Params` structure means that method does not have any parameters. `MethodDesc` without nested `Retval` describes a [one-way method](#class), which does not involve any reply when method gets called. This means the caller can't determine when and whether one-way method call is processed. `MethodDesc` with empty `Retval` describes a regular method, for which reply, albeit empty, is sent when the call is processed.
 
 ```
-// file ./api/my_app/person//method.proto
-// description file dot 
+// file ./api/my_app/user/sign_in/method.proto
+// description file for a regular method `my_app::user::sign_in`
+// can be seen as `AuthResult user::sign_in(string username, string password)`
+
+enum AuthResult {
+  AUTH_RESULT_SUCCESS = 0;
+  AUTH_RESULT_UNKNOWN_USER = 1;
+  AUTH_RESULT_INVALID_PASSWORD = 2;
+}
+
+message MethodDesc {
+  message Params {
+    string username = 1;
+    string password = 2;
+  }
+
+  message Retval {
+    AuthResult auth_result = 1;
+  }
+}
+```
+
+```
+// file ./api/my_app/user/on_signed_in/method.proto
+// description file for a one-way method without parameters `my_app::user::on_signed_in`
+// can be seen as `void user::on_signed_in()`
+
+message MethodDesc { }
 ```
 
 ### `Static`
