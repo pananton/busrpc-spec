@@ -18,6 +18,7 @@ This document contains general information for developers of busrpc microservice
     * [`ObjectId`](#objectid)  
   * [Method description file](#method-description-file)
     * [`Params` and `Retval`](#params-and-retval)
+    * [`Static`](#static)
   * [Service description file](#service-description-file)
   * [Encoding](#Encoding)
     * [Structure encoding](#structure-encoding) 
