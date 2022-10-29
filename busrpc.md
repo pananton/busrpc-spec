@@ -17,6 +17,9 @@ This document contains general information for developers of busrpc microservice
   * [Class description file](#class-description-file)
     * [`ObjectId`](#objectid)  
   * [Method description file](#method-description-file)
+    * [`Params`](#params)
+    * [`Retval`](#retval)
+    * [`Static`](#static) 
   * [Service description file](#service-description-file)
   * [Encoding](#Encoding)
     * [Structure encoding](#structure-encoding) 
@@ -71,7 +74,7 @@ Methods may be bound to a concrete object or to a class as a whole. The latter a
 
 **Method call** is represented as a network message containing method parameters and, optionally, identifier of the object for which method is called (not needed for static method calls) sent to the [call endpoint](#endpoint). Some method parameters can additionally be defined as **observable**, which means that their values not only sent as payload of the message but also added to the call endpoint providing implementors with an ability to cherry-pick a subset of calls having a concrete values of the observable parameters.
 
-**Method result** is represented as a network message containing either method return value or an exception sent to the [result endpoint](#endpoint).
+**Method result** is represented as a network message containing either method return value or an exception sent to the [result endpoint](#endpoint). Method may be defined as **one-way** - in that case it does not have any result or associated result endpoint. One-way methods are mostly used as event sinks, i.e. invoked to signal some events in the system.
 
 ## Service
 
@@ -146,6 +149,8 @@ Busrpc **enumeration** corresponds directly to a protobuf `enum`.
 * `<result-endpoint-prefix>` is a bus-dependent subtopic, whose words usually provide information, necessary to demultiplex responses and bind them to the original requests (for example, in NATS specialization `<result-endpoint-prefix>` is defined as `_INBOX.<connection-id>.<request-id>`, where `<connection-id>` is a unique connection identifier and `<request-id>` is a request identifier, which is unique for the connection)
 * `<call-endpoint>` is an exact copy of the call endpoint used for the request; it's components are used by the framework [test clients](README.md#clients) to effectively catch only necessary responses when observing the system message flow
 
+Note, that result endpoint is not defined for one-way methods.
+
 Some message bus topic formats, commonly used for subscribing for method calls, are also mapped to a named endpoints to establish common terminology. This mapping is provided in the following table.
 
 | Topic                                                                                          | Endpoint  | Description                                       |
@@ -218,11 +223,11 @@ Note, that visibility constraints are applied only inside API root directory. Fo
 
 ## Class description file
 
-Class description file *class.proto* must always contain definition of a class descriptor `ClassDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the class in form of a nested types. Busrpc specification currently recognizes only `ObjectId` structure, which describes class object identifier. Definitions of other types may also be nested inside `ClassDesc`, however this may cause conflicts in the future versions of this spefication and thus not recommended.
+Class description file *class.proto* must always contain definition of a class descriptor `ClassDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the class by means of a nested types. Busrpc specification currently recognizes only `ObjectId` structure, which describes class object identifier. Definitions of other types may also be nested inside `ClassDesc`, however this may cause conflicts in the future versions of this spefication and thus not recommended.
 
 ### `ObjectId`
 
-`ObjectId` is an [encodable structure](#structure), which contains arbitrary number of fields that together form a unique identifier of the class object.
+`ObjectId` is a predefined [encodable structure](#structure), which contains arbitrary number of fields that together form a unique identifier of the class object.
 
 ```
 // file ./api/my_app/person/class.proto
@@ -242,15 +247,32 @@ message ClassDesc {
 If `ClassDesc` does not contain a nested `ObjectId` type, then corresponding class is considered static.
 
 ```
-// file ./api/my_app/sysutils.class.proto
+// file ./api/my_app/sysutils/class.proto
 // description file for static class `my_app::sysutils`
 
 message ClassDesc { }
 ```
 
+Note, that empty `ObjectId` is not equivalent to a missing `ObjectId` - the first one does not make a class static. In fact, class with empty `ObjectId` may be treated as singleton - a class, for which only one object exists.
+
 ## Method description file
 
-`method.proto` contains method descriptor - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the method (documentation and parameters/retval format)
+Method description file *method.proto* must always contain definition of a method descriptor `MethodDesc` - a predefined busrpc structure, which provides information about the method by means of a nested types. All this nested types are described in the subsections below. Definitions of other types may also be nested inside `MethodDesc`, however this may cause conflicts in the future versions of this spefication and thus not recommended.
+
+### `Params` and `Retval`
+
+`Params` and `Retval` are predefined structures, which describe method parameters and return value correspondingly. Both of this structures may be omitted in `MethodDesc`. Missing (or empty) `Params` structure means that method does not have any parameters. Missing and empty `Retval` structures are treated differently:
+* missing `Retval` defines a **one-way method** 
+
+* if `Retval` is missing, then method 
+
+```
+// file ./api/my_app/person//method.proto
+// description file dot 
+```
+
+### `Static`
+
 
 ## Service description file
 
