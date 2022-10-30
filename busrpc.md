@@ -184,7 +184,7 @@ Busrpc framework uses Google's [protocol buffers](https://developers.google.com/
 
 **NOTE**
 
-Most examples in this section are taken from a busrpc API of a simple fictional IM application. The whole API can be found in the [*example/*](#example) directory.
+Most examples in this section are taken from a busrpc API of a simple fictional IM application. The whole API can be found in the [*example/*](example) directory.
 
 ---
 
@@ -230,23 +230,23 @@ Note, that visibility constraints are applied only inside API root directory. Fo
 
 ## Class description file
 
-Class description file *class.proto* must always contain definition of a class descriptor `ClassDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the class by means of a nested types. Busrpc specification currently recognizes only `ObjectId` structure, which describes class object identifier. Definitions of other types may also be nested inside `ClassDesc`, however this may cause conflicts in the future versions of this spefication and thus not recommended.
+Class description file *class.proto* must always contain definition of a class descriptor `ClassDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the class by means of a nested types. Busrpc specification currently recognizes only `ObjectId` structure, which describes class object identifier. Definitions of other types may also be nested inside `ClassDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
 
 ### `ObjectId`
 
 `ObjectId` is a predefined [encodable structure](#structure), which contains arbitrary number of fields that together form a unique identifier of the class object.
 
 ```
-// file ./api/my_app/user/class.proto
-// description file for class `my_app::user`
+// file ./api/chat/user/class.proto
 
 syntax = "proto3";
-package busrpc.api.my_app.user;
+package busrpc.api.chat.user;
 
+// Class `user` represents application user.
 message ClassDesc {
   message ObjectId {
-    string first_name = 1;
-    string last_name = 2;
+    // Unique username.
+    uint32 username = 1;
   }
 }
 ```
@@ -254,9 +254,12 @@ message ClassDesc {
 If `ClassDesc` does not contain a nested `ObjectId` type, then corresponding class is considered static.
 
 ```
-// file ./api/my_app/sysutils/class.proto
-// description file for static class `my_app::sysutils`
+// file ./api/chat/sysutils/class.proto
 
+syntax = "proto3";
+package busrpc.api.chat.user;
+
+// Class `sysutils` contains utilities (static methods) for managing application backend.
 message ClassDesc { }
 ```
 
@@ -264,41 +267,48 @@ Note, that empty `ObjectId` is not equivalent to a missing `ObjectId` - the firs
 
 ## Method description file
 
-Method description file *method.proto* must always contain definition of a method descriptor `MethodDesc` - a predefined busrpc structure, which provides information about the method by means of a nested types. All this nested types are described in the subsections below. Definitions of other types may also be nested inside `MethodDesc`, however this may cause conflicts in the future versions of this spefication and thus not recommended.
+Method description file *method.proto* must always contain definition of a method descriptor `MethodDesc` - a predefined busrpc structure, which provides information about the method by means of a nested types. All this nested types are described in the subsections below. Definitions of other types may also be nested inside `MethodDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
 
 ### `Params` and `Retval`
 
 `Params` and `Retval` are predefined structures, which describe method parameters and return value. Both of this structures may be omitted in `MethodDesc`.
 Missing or empty `Params` structure means that method does not have any parameters. `MethodDesc` without nested `Retval` describes a [one-way method](#class), which does not involve any reply when method gets called. This means the caller can't determine when and whether one-way method call is processed. `MethodDesc` with empty `Retval` describes a regular method, for which reply, albeit empty, is sent when the call is processed.
 
-```
-// file ./api/my_app/user/sign_in/method.proto
-// description file for a regular method `my_app::user::sign_in`
-// can be seen as `AuthResult user::sign_in(string username, string password)`
+Consider method `sign_in` from a class `user`, described in the previous section. This method is used to sign in user to the application and can be seen as `Result user::sign_in(string password)`.
 
-enum AuthResult {
-  AUTH_RESULT_SUCCESS = 0;
-  AUTH_RESULT_UNKNOWN_USER = 1;
-  AUTH_RESULT_INVALID_PASSWORD = 2;
+```
+// file ./api/chat/user/sign_in/method.proto
+
+syntax = "proto3";
+package busrpc.api.chat.user.sign_in;
+
+// The result of user login.
+enum Result {
+  RESULT_SUCCESS = 0;
+  RESULT_UNKNOWN_USERNAME = 1;
+  RESULT_INVALID_PASSWORD = 2;
 }
 
+// Sign in user to the application.
 message MethodDesc {
   message Params {
-    string username = 1;
-    string password = 2;
+    string password = 1;
   }
 
   message Retval {
-    AuthResult auth_result = 1;
+    Result result = 1;
   }
 }
 ```
 
 ```
-// file ./api/my_app/user/on_signed_in/method.proto
-// description file for a one-way method without parameters `my_app::user::on_signed_in`
-// can be seen as `void user::on_signed_in()`
+// file ./api/chat/user/on_signed_in/method.proto
+// The method described by this file can be seen as `void user::on_signed_in()`
 
+syntax = "proto3";
+package busrpc.api.chat.user.sign_in;
+
+// One-way method, which is called after user is signed in to the application.
 message MethodDesc { }
 ```
 
