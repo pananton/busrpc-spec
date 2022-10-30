@@ -236,30 +236,25 @@ Class description file *class.proto* must always contain definition of a class d
 
 `ObjectId` is a predefined [encodable structure](#structure), which contains arbitrary number of fields that together form a unique identifier of the class object.
 
+The following class represents a user of a fictional application. Every user is indentified by a unique username.
+
 ```
 // file ./api/chat/user/class.proto
+// ...
 
-syntax = "proto3";
-package busrpc.api.chat.user;
-
-// Class `user` represents application user.
 message ClassDesc {
   message ObjectId {
-    // Unique username.
     string username = 1;
   }
 }
 ```
 
-If `ClassDesc` does not contain a nested `ObjectId` type, then corresponding class is considered static.
+If `ClassDesc` does not contain a nested `ObjectId` type, then corresponding class is considered static. Static classes are commonly used to group "utility" methods. For example, static class `sysutils` defined below may provide methods for statistics gathering, configuration reloading, etc.
 
 ```
 // file ./api/chat/sysutils/class.proto
+// ...
 
-syntax = "proto3";
-package busrpc.api.chat.user;
-
-// Class `sysutils` contains utilities (static methods) for managing application backend.
 message ClassDesc { }
 ```
 
@@ -272,24 +267,25 @@ Method description file *method.proto* must always contain definition of a metho
 ### `Params` and `Retval`
 
 `Params` and `Retval` are predefined structures, which describe method parameters and return value. Both of this structures may be omitted in `MethodDesc`.
-Missing or empty `Params` structure means that method does not have any parameters. `MethodDesc` without nested `Retval` describes a [one-way method](#class), which does not involve any reply when method gets called. This means the caller can't determine when and whether one-way method call is processed. `MethodDesc` with empty `Retval` describes a regular method, for which reply, albeit empty, is sent when the call is processed.
 
-Consider method `sign_in` from a class `user`, described in the previous section. This method is used to sign in user to the application and can be seen as `Result user::sign_in(string password)`.
+Missing or empty `Params` structure means that method does not have any parameters.
+
+`MethodDesc` without nested `Retval` describes a [one-way method](#class), which does not involve any reply when method gets called. This means the caller can't determine when and whether one-way method call is processed. `MethodDesc` with empty `Retval` describes a regular method, for which reply, albeit empty, is sent when the call is processed.
+
+Consider two methods from a `user` class described in the previous section:
+* method `sign_in` verifies user credentials (`username` obtained from the object identifier and `password` passed in method parameters) and signs in user to the application if verification is passed; in pseudocode this method can be seen as `Result user::sign_in(string password)`
+* one-way method `on_signed_in` is invoked if user successfully signed in and provides other services with an ability to implement arbitrary actions for signed in user (for example, notify user contacts that he is online); in pseudocode this method can be seen as `void user::on_signed_in()`
 
 ```
 // file ./api/chat/user/sign_in/method.proto
+// ...
 
-syntax = "proto3";
-package busrpc.api.chat.user.sign_in;
-
-// The result of user login.
 enum Result {
   RESULT_SUCCESS = 0;
   RESULT_UNKNOWN_USERNAME = 1;
   RESULT_INVALID_PASSWORD = 2;
 }
 
-// Sign in user to the application.
 message MethodDesc {
   message Params {
     string password = 1;
@@ -303,17 +299,44 @@ message MethodDesc {
 
 ```
 // file ./api/chat/user/on_signed_in/method.proto
-// The method described by this file can be seen as `void user::on_signed_in()`
+// ...
 
-syntax = "proto3";
-package busrpc.api.chat.user.sign_in;
-
-// One-way method, which is called after user is signed in to the application.
 message MethodDesc { }
 ```
 
+Note, that `Result` enumeration has method scope and can't be used outside the method `user::sign_in` directory.
+
 ### `Static`
 
+`Static` is an empty predefined structure, which designates method as static. The following method registers new user to the fictional application. Because user does not exist until it is registered, this method is defined as static.
+
+```
+// ./api/chat/user/sign_up/method.proto
+// ...
+
+enum Result {
+  RESULT_SUCCESS = 0;
+  RESULT_USERNAME_EXISTS = 1;
+  RESULT_PASSWORD_TOO_WEAK = 2;
+  RESULT_INVALID_EMAIL = 3;
+}
+
+message MethodDesc {
+  message Params {
+    string username = 1;
+    string password = 2;
+    string email = 3;
+  }
+
+  message Retval {
+    Result result = 1;
+  }
+
+  message Static { }
+}
+```
+
+Remember, that all methods of a static class must be defined as static.
 
 ## Service description file
 
