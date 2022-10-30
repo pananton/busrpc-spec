@@ -273,8 +273,8 @@ Missing or empty `Params` structure means that method does not have any paramete
 `MethodDesc` without nested `Retval` describes a [one-way method](#class), which does not involve any reply when method gets called. This means the caller can't determine when and whether one-way method call is processed. `MethodDesc` with empty `Retval` describes a regular method, for which reply, albeit empty, is sent when the call is processed.
 
 Consider two methods from a `user` class described in the previous section:
-* method `sign_in` verifies user credentials (`username` obtained from the object identifier and `password` passed in method parameters) and signs in user to the application if verification is passed; in pseudocode this method can be seen as `Result user::sign_in(string password)`
-* one-way method `on_signed_in` is invoked if user successfully signed in and provides other services with an ability to implement arbitrary actions for signed in user (for example, notify user contacts that he is online); in pseudocode this method can be seen as `void user::on_signed_in()`
+* method `sign_in` verifies user credentials (`username` obtained from the object identifier and `password` passed in method parameters) and signs in user to the application if verification is passed; in pseudocode method signature can be seen as `Result user::sign_in(string password)`
+* one-way method `on_signed_in` is invoked if user successfully signed in and provides other services with an ability to implement arbitrary actions for signed in user (for example, notify user contacts that he is online); in pseudocode method signature can be seen as `void user::on_signed_in()`
 
 ```
 // file ./api/chat/user/sign_in/method.proto
