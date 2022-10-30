@@ -246,7 +246,7 @@ package busrpc.api.chat.user;
 message ClassDesc {
   message ObjectId {
     // Unique username.
-    uint32 username = 1;
+    string username = 1;
   }
 }
 ```
