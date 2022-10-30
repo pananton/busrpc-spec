@@ -20,6 +20,7 @@ This document contains general information for developers of busrpc microservice
     * [`Params` and `Retval`](#params-and-retval)
     * [`Static`](#static)
   * [Service description file](#service-description-file)
+    * [`Config`](#config) 
   * [Encoding](#Encoding)
     * [Structure encoding](#structure-encoding) 
 * [Documentation commands](#documentation-commands)
@@ -339,6 +340,29 @@ message MethodDesc {
 Note, that all methods of a static class must be defined as static.
 
 ## Service description file
+
+Service description file *service.proto* must always contain definition of a service descriptor `ServiceDesc` - a predefined busrpc structure, which provides information about the service by means of a nested types. Busrpc specification currently recognizes only `Config` structure, which describes service configuration parameters. Definitions of other types may also be nested inside `ServiceDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
+
+Additionally, service description file must import description files of all methods that service implements or invokes. Consider profile service that manages user profiles in our fictional IM application. Such service will probably implement the following methods:
+* `user::get_profile` - to load profile from the database and return it to caller
+* `user::update_profile` - to update profile in the database
+
+Besides, when processing a `user::update_profile` call, profile service may call `email::verify` method to check new email.
+
+That brings us to the following import directives in the profile service description file:
+
+```
+// file ./services/profile/service.proto
+// ...
+
+import "api/chat/user/get_profile/method.proto";
+import "api/chat/user/update_profile/method.proto";
+import "api/chat/email/verify/method.proto";
+
+// ...
+```
+
+### `Config`
 
 ## Encoding
 
