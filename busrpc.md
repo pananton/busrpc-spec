@@ -180,6 +180,14 @@ Busrpc framework uses Google's [protocol buffers](https://developers.google.com/
 * rich API for introspecting protobuf generated types, which facilitates custom tools and client libraries development
 * easy conversion from binary data to text (JSON) and vice versa
 
+---
+
+**NOTE**
+
+Most examples in this section are taken from a busrpc API of a simple fictional IM application. The whole API can be found in the [*example/*](#example) directory.
+
+---
+
 ## Directory layout
 
 All busrpc protobuf files should be organized in the tree represented below. Names in angle brackets are placeholders which are assigned real names by specific API implementation. For simplicity, only a single namespace, class, method and service is presented. Of course, real API may contain arbitrary number of this entities structured in a similar way.
