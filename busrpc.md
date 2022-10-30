@@ -336,7 +336,7 @@ message MethodDesc {
 }
 ```
 
-Remember, that all methods of a static class must be defined as static.
+Note, that all methods of a static class must be defined as static.
 
 ## Service description file
 
