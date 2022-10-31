@@ -188,7 +188,7 @@ Busrpc framework uses Google's [protocol buffers](https://developers.google.com/
 
 **NOTE**
 
-Most examples in this section are taken from a busrpc API of a simple fictional IM application. The whole API can be found in the [*example/*](example) directory.
+Most examples in this section are based on the busrpc API of a simple fictional IM application called Chat (see [*example/*](example) directory).
 
 ---
 
@@ -240,7 +240,7 @@ Class description file *class.proto* must always contain definition of a class d
 
 `ObjectId` is a predefined [encodable structure](#structure), which contains arbitrary number of fields that together form a unique identifier of the class object.
 
-The following class represents a user of an example application. Every user is indentified by a unique username.
+The following class represents a user of a Chat application. Every user is indentified by a unique username.
 
 ```
 // file ./api/chat/user/class.proto
@@ -314,7 +314,7 @@ Note, that `Result` enumeration has method scope and can't be used outside the m
 
 Observable method parameter is created using custom protobuf field option `observable`, defined in the *busrpc.proto* file. This option can be applied only if parameter meets the following requirement: it's type is either one of the types allowed for [encodable structure](#structure), or an encodable structure itself. Remember, that observable parameters (as described [earlier](#endpoint)) are also added to the call endpoint, which means that implementors may filter calls they want to handle to only those having specific value(s) of the observable parameter(s).
 
-Consider method `user::send_message` from the example application API.
+Consider method `user::send_message` from the Chat application API.
 
 ```
 // file ./api/chat/user/send_message/method.proto
@@ -331,14 +331,14 @@ message MethodDesc {
 ```
 
 This method may be used in the following way:
-* user "A" signs in to application and subscribes to a method's `user::send_message` value endpoint with the `receiver` parameter equal to "A" (i.e., to `chat.user.send_message.<topic-wildcard-any1>.A.<topic-wildcard-anyN>`) 
+* user "A" signs in to application and subscribes to a method's `user::send_message` value endpoint with the `receiver` parameter set to "A" (i.e., to `chat.user.send_message.<topic-wildcard-any1>.A.<topic-wildcard-anyN>`) 
 * user "B" calls `user::send_message` with `receiver` set to "A"
-* this call endpoint `chat.user.send_message.B.A.<eof>` matches user "A" value endpoint, so user "A" receives the message and replies to it
+* endpoint `chat.user.send_message.B.A.<eof>` of this call matches user "A" value endpoint, so user "A" receives the message and replies to it
 * user "B" receives a reply indicating that message is delivered
 
 ### `Static`
 
-`Static` is an empty predefined structure, which designates method as static. The following method is part of an example application API and is used to create new users. The method is defined as static to emphasize the fact that user (and corresponding object) does not exist at the moment the method is called.
+`Static` is an empty predefined structure, which designates method as static. The following method is part of an Chat application API and is used to create new users. The method is defined as static to emphasize the fact that user (and corresponding object) does not exist at the moment the method is called.
 
 ```
 // ./api/chat/user/sign_up/method.proto
@@ -370,26 +370,42 @@ Note, that all methods of a static class must be defined as static.
 
 Service description file *service.proto* must always contain definition of a service descriptor `ServiceDesc` - a predefined busrpc structure, which provides information about the service by means of a nested types. Busrpc specification currently recognizes only `Config` structure, which describes service configuration parameters. Definitions of other types may also be nested inside `ServiceDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
 
-Additionally, service description file must import description files of all methods that service implements or invokes. Consider profile service that manages user profiles in our fictional IM application. Such service will probably implement the following methods:
-* `user::get_profile` - to load profile from the database and return it to caller
-* `user::update_profile` - to update profile in the database
+Additionally, service description file must import description files of all methods that service implements or invokes.
 
-Besides, when processing a `user::update_profile` call, profile service may call `email::verify` method to check new email.
-
-That brings us to the following import directives in the profile service description file:
+Consider a service that sends welcome message to any user who signed in to the Chat application for the first time. Such service is pretty easy to implement using existing API: it needs to implement method `user::on_signed_in` to check whether user signs in for the first time, and if he is, call `user::send_message`. The fact that service uses two API methods is expressed in the service description file by importing corresponding *method.proto* files.
 
 ```
-// file ./services/profile/service.proto
+// file ./services/greeter/service.proto
 // ...
 
-import "api/chat/user/get_profile/method.proto";
-import "api/chat/user/update_profile/method.proto";
-import "api/chat/email/verify/method.proto";
+import "api/chat/user/on_signed_in/method.proto";
+import "api/chat/user/send_message/method.proto";
 
 // ...
 ```
 
 ### `Config`
+
+`Config` is a predefined strucuture describing service configration parameters. Note, that protobuf supports JSON serialization for it's `message` types, which means that service configuration can be easily read/written from/to the text file.
+
+```
+// file ./services/greeter/service.proto
+// ...
+
+import "services/config_base.proto";
+import "api/chat/user/on_signed_in/method.proto";
+import "api/chat/user/send_message/method.proto";
+
+message ServiceDesc {
+  message Config {
+    // General parameters (message bus host and port, call timeout, etc.).
+    services.ConfigBase general = 1;
+
+    // Text of the welcome message.
+    string welcome_text = 2;
+  }
+}
+```
 
 ## Encoding
 
