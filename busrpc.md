@@ -18,6 +18,7 @@ This document contains general information for developers of busrpc microservice
     * [`ObjectId`](#objectid)  
   * [Method description file](#method-description-file)
     * [`Params` and `Retval`](#params-and-retval)
+      * [Observable parameters](#observable-parameters) 
     * [`Static`](#static)
   * [Service description file](#service-description-file)
     * [`Config`](#config) 
@@ -161,6 +162,8 @@ Some message bus topic formats, commonly used for subscribing for method calls, 
 | `<namespace>.<class>.<topic-wildcard-any1>.<object-id>.<topic-wildcard-anyN>`                  | object    | calls bound to a specific object                  |
 | `<namespace>.<class>.<method>.<topic-wildcard-any1>.<observable-params>.<topic-wildcard-anyN>` | value     | calls of a method with a specific value(s) of an                                                                                                                        observable parameter(s)                           |
 
+Message bus may prohibit the use of some characters in it's topics. That means some components of the endpoint should be encoded to meet message bus requirement. Additionally, care should be taken to avoid violation of a message bus topic length restriction. All this issues are covered in the [Encoding](#encoding) section below.
+
 ## Type visibility
 
 **Scope** is a part of a busrcp API where name of a structure or enumeration can be used to refer to the corresponding type. In that case we also say that busrpc structure/enumeration is **visible** in this scope.
@@ -237,7 +240,7 @@ Class description file *class.proto* must always contain definition of a class d
 
 `ObjectId` is a predefined [encodable structure](#structure), which contains arbitrary number of fields that together form a unique identifier of the class object.
 
-The following class represents a user of a fictional application. Every user is indentified by a unique username.
+The following class represents a user of an example application. Every user is indentified by a unique username.
 
 ```
 // file ./api/chat/user/class.proto
@@ -250,10 +253,10 @@ message ClassDesc {
 }
 ```
 
-If `ClassDesc` does not contain a nested `ObjectId` type, then corresponding class is considered static. Static classes are commonly used to group "utility" methods. For example, static class `sysutils` defined below may provide methods for statistics gathering, configuration reloading, etc.
+If `ClassDesc` does not contain a nested `ObjectId` type, then corresponding class is considered static. Static classes are commonly used to group "utility" methods. For example, static class `translator` provides methods for translating UI controls to a user language.
 
 ```
-// file ./api/chat/sysutils/class.proto
+// file ./api/chat/translator/class.proto
 // ...
 
 message ClassDesc { }
@@ -307,9 +310,35 @@ message MethodDesc { }
 
 Note, that `Result` enumeration has method scope and can't be used outside the method `user::sign_in` directory.
 
+#### Observable parameters
+
+Observable method parameter is created using custom protobuf field option `observable`, defined in the *busrpc.proto* file. This option can be applied only if parameter meets the following requirement: it's type is either one of the types allowed for [encodable structure](#encodable-structure), or an encodable structure itself. Remember, that observable parameters (as described [earlier](#endpoint)) are also added to the call endpoint, which means that implementors may filter calls they want to handle to only those having specific value(s) of the observable parameter(s).
+
+Consider method `user::send_message` from the example application API.
+
+```
+// file ./api/chat/user/send_message/method.proto
+// ...
+
+message MethodDesc {
+  message Params {
+    string receiver = 1 [(observable) = true];
+    string text = 2;
+  }
+
+  message Retval { }
+}
+```
+
+This method may be used in the following way (endpoint encoding rules are described in details in the [Encoding](#encoding) section below):
+* user "A" signs in to application and subscribes to a method's `user::send_message` value endpoint with the `receiver` parameter equal to "A" (i.e., to `chat.user.send_message.<topic-wildcard-any1>.A.<topic-wildcard-anyN>`) 
+* user "B" calls `user::send_message` with `receiver` set to "A"
+* call endpoint `chat.user.send_message.B.A.<eof>` matches user "A" value endpoint, so user "A" receives the message and replies to it
+* user "B" receives a reply indicating that message is delivered
+
 ### `Static`
 
-`Static` is an empty predefined structure, which designates method as static. The following method registers new user to the fictional application. Because user does not exist until it is registered, this method is defined as static.
+`Static` is an empty predefined structure, which designates method as static. The following method is part of an example application API and is used to create new users. The method is defined as static to emphasize the fact that user (and corresponding object) does not exist at the moment the method is called.
 
 ```
 // ./api/chat/user/sign_up/method.proto
@@ -317,16 +346,14 @@ Note, that `Result` enumeration has method scope and can't be used outside the m
 
 enum Result {
   RESULT_SUCCESS = 0;
-  RESULT_USERNAME_EXISTS = 1;
+  RESULT_USERNAME_ALREADY_TAKEN = 1;
   RESULT_PASSWORD_TOO_WEAK = 2;
-  RESULT_INVALID_EMAIL = 3;
 }
 
 message MethodDesc {
   message Params {
     string username = 1;
     string password = 2;
-    string email = 3;
   }
 
   message Retval {
