@@ -274,11 +274,11 @@ Method description file *method.proto* must always contain definition of a metho
 
 Missing or empty `Params` structure means that method does not have any parameters.
 
-`MethodDesc` without nested `Retval` describes a [one-way method](#class), which does not involve any reply when method gets called. This means the caller can't determine when and whether one-way method call is processed. `MethodDesc` with empty `Retval` describes a regular method, for which reply, albeit empty, is sent when the call is processed.
+`MethodDesc` without nested `Retval` describes a [one-way method](#class), which does not involve any reply when it gets called. This means the caller can't determine when and whether one-way method call is processed. `MethodDesc` with empty `Retval` describes a regular method, for which reply, albeit empty, is sent when the call is processed.
 
 Consider two methods from a `user` class described in the previous section:
 * method `sign_in` verifies user credentials (`username` obtained from the object identifier and `password` passed in method parameters) and signs in user to the application if verification is passed; in pseudocode method signature can be seen as `Result user::sign_in(string password)`
-* one-way method `on_signed_in` is invoked if user successfully signed in and provides other services with an ability to implement arbitrary actions for signed in user (for example, notify user contacts that he is online); in pseudocode method signature can be seen as `void user::on_signed_in()`
+* one-way method `on_signed_in` is invoked for signed in user to allow other services implement arbitrary actions for signed in user (for example, notify user contacts that he is online); in pseudocode method signature can be seen as `void user::on_signed_in()`
 
 ```
 // file ./api/chat/user/sign_in/method.proto
@@ -312,7 +312,7 @@ Note, that `Result` enumeration has method scope and can't be used outside the m
 
 #### Observable parameters
 
-Observable method parameter is created using custom protobuf field option `observable`, defined in the *busrpc.proto* file. This option can be applied only if parameter meets the following requirement: it's type is either one of the types allowed for [encodable structure](#encodable-structure), or an encodable structure itself. Remember, that observable parameters (as described [earlier](#endpoint)) are also added to the call endpoint, which means that implementors may filter calls they want to handle to only those having specific value(s) of the observable parameter(s).
+Observable method parameter is created using custom protobuf field option `observable`, defined in the *busrpc.proto* file. This option can be applied only if parameter meets the following requirement: it's type is either one of the types allowed for [encodable structure](#structure), or an encodable structure itself. Remember, that observable parameters (as described [earlier](#endpoint)) are also added to the call endpoint, which means that implementors may filter calls they want to handle to only those having specific value(s) of the observable parameter(s).
 
 Consider method `user::send_message` from the example application API.
 
