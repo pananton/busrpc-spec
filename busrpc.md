@@ -398,7 +398,7 @@ import "api/chat/user/send_message/method.proto";
 
 message ServiceDesc {
   message Config {
-    // General parameters (message bus host and port, call timeout, etc.).
+    // General parameters needed by any service (for example, message bus host and port).
     services.ConfigBase general = 1;
 
     // Text of the welcome message.
