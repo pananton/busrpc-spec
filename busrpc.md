@@ -330,10 +330,10 @@ message MethodDesc {
 }
 ```
 
-This method may be used in the following way (endpoint encoding rules are described in details in the [Encoding](#encoding) section below):
+This method may be used in the following way:
 * user "A" signs in to application and subscribes to a method's `user::send_message` value endpoint with the `receiver` parameter equal to "A" (i.e., to `chat.user.send_message.<topic-wildcard-any1>.A.<topic-wildcard-anyN>`) 
 * user "B" calls `user::send_message` with `receiver` set to "A"
-* call endpoint `chat.user.send_message.B.A.<eof>` matches user "A" value endpoint, so user "A" receives the message and replies to it
+* this call endpoint `chat.user.send_message.B.A.<eof>` matches user "A" value endpoint, so user "A" receives the message and replies to it
 * user "B" receives a reply indicating that message is delivered
 
 ### `Static`
