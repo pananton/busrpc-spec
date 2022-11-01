@@ -24,6 +24,8 @@ This document contains general information for developers of busrpc microservice
   * [Service description file](#service-description-file)
     * [`Config`](#config)
   * [Network messages](#network-messages)
+    * [`CallMessage`](#callmessage)
+    * [`ResultMessage`](#resultmessage)
   * [Encoding](#Encoding)
     * [Structure encoding](#structure-encoding)
 * [Documentation commands](#documentation-commands)
