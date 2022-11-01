@@ -28,7 +28,7 @@ This document contains general information for developers of busrpc microservice
     * [`ResultMessage`](#resultmessage)
   * [Endpoint encoding](#endpoint-encoding)
     * [Structure encoding](#structure-encoding)
-  * [Default values](#default-values)
+  * [Default field values](#default-field-values)
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
 
@@ -480,15 +480,15 @@ Field `exception` contains global predefined [`Exception`](#exception) structure
 
 ### Structure encoding
 
-## Default values
+## Default field values
 
-File *busrpc.proto* contains definitions of several options that allow to specify default values for structure fields (other than [those](https://developers.google.com/protocol-buffers/docs/proto3#default) implied by protobuf itself). Of course, protobuf compiler does not understand semantics of this options, however, [client libraries](README.md#libraries) are expected to respect them. This options are:
+File *busrpc.proto* contains definitions of several options that allow to specify default values for structure fields (other than [those](https://developers.google.com/protocol-buffers/docs/proto3#default) defined by protobuf itself). Of course, protobuf compiler does not understand semantics of this options, however, [client libraries](README.md#libraries) are expected to respect them. This options are:
 * `default_bool` - default value for protobuf `bool` type
 * `default_int` - default value for protobuf integer types (`int32`, `uint32`, `int64`, `uint64`, `sint32`, `sint64`, `fixed32`, `fixed64`, `sfixed32`, `sfixed64`)
 * `default_double` - default value for protobuf floating-point types (`float`, `double`)
 * `default_string` - default value for protobuf `string` type
 
-This options are especially useful for describing method parameters (`MethodDesc::Params` fields) and service configuration (`ServiceDesc::Config`).
+This options are especially useful for describing method parameters (`MethodDesc::Params` fields) and service configuration (`ServiceDesc::Config` fields).
 
 ```
 // file ./services/greeter/service.proto
