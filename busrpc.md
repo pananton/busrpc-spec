@@ -23,12 +23,14 @@ This document contains general information for developers of busrpc microservice
     * [`Static`](#static)
   * [Service description file](#service-description-file)
     * [`Config`](#config)
+  * [Default field values](#default-field-values)
   * [Network messages](#network-messages)
     * [`CallMessage`](#callmessage)
     * [`ResultMessage`](#resultmessage)
   * [Endpoint encoding](#endpoint-encoding)
     * [Structure encoding](#structure-encoding)
-  * [Default field values](#default-field-values)
+  * [Invoking a method](#invoking-a-method)
+  * [Implementing a method](#implementing-a-method)
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
 
@@ -436,6 +438,28 @@ message ServiceDesc {
 }
 ```
 
+## Default field values
+
+File *busrpc.proto* contains definitions of several options that allow to specify default values for structure fields (other than [those](https://developers.google.com/protocol-buffers/docs/proto3#default) defined by protobuf itself). Of course, protobuf compiler does not understand semantics of this options, however, [client libraries](README.md#libraries) are expected to respect them. This options are:
+* `default_bool` - default value for protobuf `bool` type
+* `default_int` - default value for protobuf integer types (`int32`, `uint32`, `int64`, `uint64`, `sint32`, `sint64`, `fixed32`, `fixed64`, `sfixed32`, `sfixed64`)
+* `default_double` - default value for protobuf floating-point types (`float`, `double`)
+* `default_string` - default value for protobuf `string` type
+
+This options are especially useful for describing method parameters (`MethodDesc::Params` fields) and service configuration (`ServiceDesc::Config` fields).
+
+```
+// file ./services/greeter/service.proto
+// ...
+
+message ServiceDesc {
+  message Config {
+    services.ConfigBase general = 1;
+    string welcome_text = 2 [(default_string) = "Thank you for trying Chat!"];
+  }
+}
+```
+
 ## Network messages
 
 Busrpc specification defines two protobuf `message` types which are directly used as a network format:
@@ -480,27 +504,9 @@ Field `exception` contains global predefined [`Exception`](#exception) structure
 
 ### Structure encoding
 
-## Default field values
+## Invoking a method
 
-File *busrpc.proto* contains definitions of several options that allow to specify default values for structure fields (other than [those](https://developers.google.com/protocol-buffers/docs/proto3#default) defined by protobuf itself). Of course, protobuf compiler does not understand semantics of this options, however, [client libraries](README.md#libraries) are expected to respect them. This options are:
-* `default_bool` - default value for protobuf `bool` type
-* `default_int` - default value for protobuf integer types (`int32`, `uint32`, `int64`, `uint64`, `sint32`, `sint64`, `fixed32`, `fixed64`, `sfixed32`, `sfixed64`)
-* `default_double` - default value for protobuf floating-point types (`float`, `double`)
-* `default_string` - default value for protobuf `string` type
-
-This options are especially useful for describing method parameters (`MethodDesc::Params` fields) and service configuration (`ServiceDesc::Config` fields).
-
-```
-// file ./services/greeter/service.proto
-// ...
-
-message ServiceDesc {
-  message Config {
-    services.ConfigBase general = 1;
-    string welcome_text = 2 [(default_string) = "Thank you for trying Chat!"];
-  }
-}
-```
+## Implementing a method
 
 # Documentation commands
 
