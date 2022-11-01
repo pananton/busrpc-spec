@@ -10,6 +10,7 @@ This document contains general information for developers of busrpc microservice
   * [Structure](#structure)
   * [Enumeration](#enumeration)
   * [Namespace](#namespace)
+  * [Exception](#exception)
   * [Endpoint](#endpoint)
   * [Type visibility](#type-visibility)
 * [Protocol](#protocol)
@@ -75,7 +76,7 @@ Methods may be bound to a concrete object or to a class as a whole. The latter a
 
 **Method call** is represented as a network message containing method parameters and, optionally, identifier of the object for which method is called (not needed for static method calls) sent to the [call endpoint](#endpoint). Some method parameters can additionally be defined as **observable**, which means that their values not only sent as payload of the message but also added to the call endpoint providing implementors with an ability to cherry-pick a subset of calls having a concrete values of the observable parameters.
 
-**Method result** is represented as a network message containing either method return value or an exception sent to the [result endpoint](#endpoint). Method may be defined as a **one-way** - in that case it does not have any result or associated result endpoint. One-way methods are mostly used as event sinks, i.e. invoked to signal some events in the system.
+**Method result** is represented as a network message containing either method return value or an [exception](#exception) sent to the [result endpoint](#endpoint). Method may be defined as a **one-way** - in that case it does not have any result or associated result endpoint. One-way methods are mostly used as event sinks, i.e. invoked to signal some events in the system.
 
 ## Service
 
@@ -137,6 +138,30 @@ Busrpc **enumeration** corresponds directly to a protobuf `enum`.
 ## Namespace
 
 **Namespace** is a group of related busrpc classes, structures and enumerations. Typically namespace contains part of the API that corresponds to a single application subdomain.
+
+## Exception
+
+Busrpc method result is either a method-specified return value or an **exception**, which is an instance of a global `Exception` structure. Exception indicates abnormal method completion.
+
+Basic minimal `Exception` structure is defined in the [*busrpc.proto*](#proto/busrpc.proto) file. It contains only error code information, represented as `Errc` enumeration. Third-party APIs may add more fields to the `Exception` structure and/or define new values for the `Errc` enumeration, however, type names (`Exception` and `Errc`) should not be changed.
+
+```
+// Exception error code.
+enum Errc {
+  // Unexpected error.
+  ERRC_UNEXPECTED = 0;
+}
+
+// Global exception type for busrpc methods.
+message Exception {
+  // Error code.
+  Errc code = 1;
+}
+```
+
+By **throwing** an exception busrpc specification means sending an instance of `Exception` structure as the method result. By **catching** exception we mean handling (for example, using some fallback mechanism) the situation when caller receives `Exception` instance instead of the method return value.
+
+Whenever caller receives an exception which he does not know how to handle, he must forward exception to the upstream caller. Consider situation, when method "A" calls method "B", method "B" calls method "C" and method "C" throws an exception. If method "B" does not know, how to handle occurred exception, then it should send it is it's own result to the method "A". This technique is called **exception propagation** and can be found in many programming languages with OOP support.
 
 ## Endpoint
 
@@ -212,7 +237,7 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
  
 Components of this tree are:
 * root directory *\<busrpc-root-dir>/*, which contains two predefined directories: API root directory *api/* and services root directory *services/*
-* file [*busrpc.proto*](proto/busrpc.proto), which is provided by the framework; it contains important busrpc-specific definitions
+* file [*busrpc.proto*](proto/busrpc.proto), which is provided by the framework; it contains important busrpc-specific definitions and should be included to any busrpc-compliant API
 * namespace directory *\<namespace-dir>/*, which contains definitions of all namespace classes
 * class directory *\<class-dir>/*, which contains definitions of the class methods (collectively referred to as class interface) and a [class description file](#class-description-file) *class.proto*
 * method directory *\<method-dir>/*, which contains definition of a class method and a [method description file](#method-description-file) *method.proto*
@@ -403,6 +428,41 @@ message ServiceDesc {
 
     // Text of the welcome message.
     string welcome_text = 2;
+  }
+}
+```
+
+## Network messages
+
+Busrpc specification defines two protobuf `message` types which are directly used as a network format:
+1. `CallMessage` for transferring method call data (object identifier and parameters)
+2. `ResultMessage` for transferring method result (return value or exception)
+
+Both this types can be found in the *busrpc.proto* file.
+
+```
+// Network message, which is sent to call a busrpc method.
+message CallMessage {
+  // Serialized busrpc object identifier (`ClassDesc::ObjectId`).
+  // Sender should not set this field when calling a static method. Receiver should accept message with initialized
+  // `object_id` even if it is sent for a static method, however, should completely ignore `object_id` field.
+  optional bytes object_id = 1;
+
+  // Serialized method parameters (`MethodDesc::Params`).
+  // Sender should not set this field when calling a method, for which `MethodDesc::Params` is not defined. Receiver
+  // should accept message with initialized `params` even if it is sent for a method without `MethodDesc::Params`,
+  // however, should completely ignore `params` field.
+  optional bytes params = 2;
+}
+
+// Network message, which is sent to deviver result of a busrpc method invocation to the caller.
+message ResultMessage {
+  oneof Result {
+    // Serialized method return value (`MethodDesc::Retval`).
+    bytes retval = 1;
+
+    // Exception occurred while processing the method call.
+    busrpc.Exception exception = 2;
   }
 }
 ```
