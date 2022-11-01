@@ -26,8 +26,9 @@ This document contains general information for developers of busrpc microservice
   * [Network messages](#network-messages)
     * [`CallMessage`](#callmessage)
     * [`ResultMessage`](#resultmessage)
-  * [Encoding](#Encoding)
+  * [Endpoint encoding](#endpoint-encoding)
     * [Structure encoding](#structure-encoding)
+  * [Default values](#default-values)
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
 
@@ -190,7 +191,7 @@ Some message bus topic formats, commonly used for subscribing for method calls, 
 | `<namespace>.<class>.<topic-wildcard-any1>.<object-id>.<topic-wildcard-anyN>`                  | object    | calls bound to a specific object                  |
 | `<namespace>.<class>.<method>.<topic-wildcard-any1>.<observable-params>.<topic-wildcard-anyN>` | value     | calls of a method with a specific value(s) of an                                                                                                                        observable parameter(s)                           |
 
-Message bus may prohibit the use of some characters in it's topics. That means some components of the endpoint should be encoded to meet message bus requirement. Additionally, care should be taken to avoid violation of a message bus topic length restriction. All this issues are covered in the [Encoding](#encoding) section below.
+Message bus may prohibit the use of some characters in it's topics. That means some components of the endpoint should be encoded to meet message bus requirement. Additionally, care should be taken to avoid violation of a message bus topic length restriction. All this issues are covered in the [Endpoint encoding](#endpoint-encoding) section.
 
 ## Type visibility
 
@@ -475,9 +476,31 @@ Field `retval` contains protobuf-serialized `Retval` structure from the method d
 
 Field `exception` contains global predefined [`Exception`](#exception) structure and is set if method threw an exception.
 
-## Encoding
+## Endpoint encoding
 
 ### Structure encoding
+
+## Default values
+
+File *busrpc.proto* contains definitions of several options that allow to specify default values for structure fields (other than [those](https://developers.google.com/protocol-buffers/docs/proto3#default) implied by protobuf itself). Of course, protobuf compiler does not understand semantics of this options, however, [client libraries](README.md#libraries) are expected to respect them. This options are:
+* `default_bool` - default value for protobuf `bool` type
+* `default_int` - default value for protobuf integer types (`int32`, `uint32`, `int64`, `uint64`, `sint32`, `sint64`, `fixed32`, `fixed64`, `sfixed32`, `sfixed64`)
+* `default_double` - default value for protobuf floating-point types (`float`, `double`)
+* `default_string` - default value for protobuf `string` type
+
+This options are especially useful for describing method parameters (`MethodDesc::Params` fields) and service configuration (`ServiceDesc::Config`).
+
+```
+// file ./services/greeter/service.proto
+// ...
+
+message ServiceDesc {
+  message Config {
+    services.ConfigBase general = 1;
+    string welcome_text = 2 [(default_string) = "Thank you for trying Chat!"];
+  }
+}
+```
 
 # Documentation commands
 
@@ -487,15 +510,3 @@ Some aspects of the busrpc API design were intentionally left unspecified in thi
 
 Currently the following specializations exist (more to be added):
 * NATS [specialization](./docs/specializations/nats-busrpc.md)
-
-
-
----
-
-**NOTE**
-
-
-Remember, that any object identifier is added to the call endpoint, which is effectively a message bus topic (see [Endpoint](#endpoint) section). The details of how precisely `ObjectId` value is converted to a word in the message bus topic are left to a [dedicated](#endpoint-encoding) section. However, it is important to note that different message buses impose different limits on the maximum topic length, which means that care should be taken when using potentially long object identifiers.
-
----
-
