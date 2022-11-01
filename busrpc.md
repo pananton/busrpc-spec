@@ -16,15 +16,16 @@ This document contains general information for developers of busrpc microservice
 * [Protocol](#protocol)
   * [Directory layout](#directory-layout)
   * [Class description file](#class-description-file)
-    * [`ObjectId`](#objectid)  
+    * [`ObjectId`](#objectid)
   * [Method description file](#method-description-file)
     * [`Params` and `Retval`](#params-and-retval)
-      * [Observable parameters](#observable-parameters) 
+      * [Observable parameters](#observable-parameters)
     * [`Static`](#static)
   * [Service description file](#service-description-file)
-    * [`Config`](#config) 
+    * [`Config`](#config)
+  * [Network messages](#network-messages)
   * [Encoding](#Encoding)
-    * [Structure encoding](#structure-encoding) 
+    * [Structure encoding](#structure-encoding)
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
 
@@ -143,7 +144,7 @@ Busrpc **enumeration** corresponds directly to a protobuf `enum`.
 
 Busrpc method result is either a method-specified return value or an **exception**, which is an instance of a global `Exception` structure. Exception indicates abnormal method completion.
 
-Basic minimal `Exception` structure is defined in the [*busrpc.proto*](#proto/busrpc.proto) file. It contains only error code information, represented as `Errc` enumeration. Third-party APIs may add more fields to the `Exception` structure and/or define new values for the `Errc` enumeration, however, type names (`Exception` and `Errc`) should not be changed.
+Basic minimal `Exception` structure is defined in the [*busrpc.proto*](proto/busrpc.proto) file. It contains only error code information, represented as `Errc` enumeration value. Third-party APIs may add more fields to the `Exception` structure and/or define new values for the `Errc` enumeration, however, type names (`Exception` and `Errc`) must not be changed.
 
 ```
 // Exception error code.
@@ -161,7 +162,7 @@ message Exception {
 
 By **throwing** an exception busrpc specification means sending an instance of `Exception` structure as the method result. By **catching** exception we mean handling (for example, using some fallback mechanism) the situation when caller receives `Exception` instance instead of the method return value.
 
-Whenever caller receives an exception which he does not know how to handle, he must forward exception to the upstream caller. Consider situation, when method "A" calls method "B", method "B" calls method "C" and method "C" throws an exception. If method "B" does not know, how to handle occurred exception, then it should send it is it's own result to the method "A". This technique is called **exception propagation** and can be found in many programming languages with OOP support.
+Whenever caller receives an exception which he does not know how to handle, he must forward exception to the upstream caller. Consider situation, when method `A` calls method `B`, method `B` calls method `C` and method `C` throws an exception. If method `B` does not know, how to handle occurred exception, then it should send it as it's own result to the method `A`. This mechanism is called **exception propagation** and can be found in many programming languages with OOP support.
 
 ## Endpoint
 
@@ -438,24 +439,28 @@ Busrpc specification defines two protobuf `message` types which are directly use
 1. `CallMessage` for transferring method call data (object identifier and parameters)
 2. `ResultMessage` for transferring method result (return value or exception)
 
-Both this types can be found in the *busrpc.proto* file.
+Both types can be found in the *busrpc.proto* file.
+
+### `CallMessage`
+
+`CallMessage` is defined as follows:
 
 ```
-// Network message, which is sent to call a busrpc method.
 message CallMessage {
-  // Serialized busrpc object identifier (`ClassDesc::ObjectId`).
-  // Sender should not set this field when calling a static method. Receiver should accept message with initialized
-  // `object_id` even if it is sent for a static method, however, should completely ignore `object_id` field.
   optional bytes object_id = 1;
-
-  // Serialized method parameters (`MethodDesc::Params`).
-  // Sender should not set this field when calling a method, for which `MethodDesc::Params` is not defined. Receiver
-  // should accept message with initialized `params` even if it is sent for a method without `MethodDesc::Params`,
-  // however, should completely ignore `params` field.
   optional bytes params = 2;
 }
+```
 
-// Network message, which is sent to deviver result of a busrpc method invocation to the caller.
+Field `object_id` contains a protobuf-serialized `ClassDesc::ObjectId` structure and determines the object, for which method is called. Sender should not set this field when calling a static method, however, receiver should accept `CallMessage` with initialized `object_id` even if it is received for a static method and simply discard `object_id` (i.e., busrpc specification follows "be conservative in what you do, be liberal in what you accept from others" principle).
+
+Field `params` contains protobuf-serialized `MethodDesc::Params` structure. Again, sender should not set this field when calling a method, for which `MethodDesc::Params` is not defined, however, receiver should accept `CallMessage` with initialized `params` even if it is sent for a method without `MethodDesc::Params` and simply discard `params`.
+
+### `ResultMessage`
+
+`ResultMessage` is defined as follows:
+
+```
 message ResultMessage {
   oneof Result {
     // Serialized method return value (`MethodDesc::Retval`).
@@ -466,6 +471,10 @@ message ResultMessage {
   }
 }
 ```
+
+Field `retval` contains protobuf-serialized `MethodDesc::Retval` structure and is set only if method did not throw an exception.
+
+Field `exception` contains global predefined `Exception` structure and is set if method threw an exception.
 
 ## Encoding
 
