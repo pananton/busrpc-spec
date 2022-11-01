@@ -502,6 +502,14 @@ Field `exception` contains global predefined [`Exception`](#exception) structure
 
 ## Endpoint encoding
 
+In the [Endpoint](#endpoint) section we've already described how call and result endpoints are obtained. However, we mentioned there that some components of the endpoint require additional encoding, otherwise 2 problems may arise:
+1. if endpoint component contains symbols, which are not allowed by message bus implementation for a topic word, then endpoint will not represent a valid topic and any `PUBLISH` or `SUBSCRIBE` operations will fail
+2. if endpoint component is a long sequence of characters, either component itself or endpoint as a whole may violate message bus length restriction 
+
+The first problem is solved using a variation of [percent encoding](https://en.wikipedia.org/wiki/Percent-encoding).
+
+The second problem requires developers to carefully design their APIs and avoid situations, when some endpoints may randomly exceed the message bus limit. This specification proposes a solution, in which fixed-size hash of the component's data is added to the endpoint instead of the data itself.
+
 ### Structure encoding
 
 ## Invoking a method
