@@ -454,9 +454,9 @@ message CallMessage {
 }
 ```
 
-Field `object_id` contains protobuf-serialized `ObjectId` structure from class descriptor and determines the object, for which method is called. Sender should not set this field when calling a static method, however, receiver should accept `CallMessage` with initialized `object_id` even if it is received for a static method and simply discard `object_id` (i.e., busrpc specification follows "be conservative in what you do, be liberal in what you accept from others" principle).
+Field `object_id` contains protobuf-serialized `ObjectId` structure from the class descriptor and determines the object, for which method is called. Sender should not set this field when calling a static method, however, receiver should accept `CallMessage` with initialized `object_id` even if it is received for a static method and simply discard `object_id` (i.e., busrpc specification follows "be conservative in what you do, be liberal in what you accept from others" principle).
 
-Field `params` contains protobuf-serialized `Params` structure from method descriptor. Again, sender should not set this field when calling a method, for which `MethodDesc::Params` is not defined, however, receiver should accept `CallMessage` with initialized `params` even if it is sent for a method without `MethodDesc::Params` and simply discard `params`.
+Field `params` contains protobuf-serialized `Params` structure from the method descriptor. Sender should not set this field when calling a method, for which `Params` is not defined. Receiver should accept `CallMessage` with initialized `params` even if it is sent for a method without `Params` and simply discard `params`.
 
 ### `ResultMessage`
 
@@ -465,18 +465,15 @@ Field `params` contains protobuf-serialized `Params` structure from method descr
 ```
 message ResultMessage {
   oneof Result {
-    // Serialized method return value (`MethodDesc::Retval`).
     bytes retval = 1;
-
-    // Exception occurred while processing the method call.
     busrpc.Exception exception = 2;
   }
 }
 ```
 
-Field `retval` contains protobuf-serialized `Retval` structure from method descriptor and is set only if method did not throw an exception.
+Field `retval` contains protobuf-serialized `Retval` structure from the method descriptor and is set only if method did not throw an exception.
 
-Field `exception` contains global predefined `Exception` structure and is set if method threw an exception.
+Field `exception` contains global predefined [`Exception`](#exception) structure and is set if method threw an exception.
 
 ## Encoding
 
