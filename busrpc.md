@@ -176,7 +176,7 @@ Whenever caller receives an exception which he does not know how to handle, he m
 * `<namespace>`, `<class>` and `<method>` are names of the namespace, class and method correspondingly
 * `<object-id>` is identifier of an object for which method is called, or a reserved word representing null value for static methods
 * optional `<observable-params>` is a subtopic, whose words represent values of the observable parameters
-* `<eof>` is a reserved word which designates the end of endpoint
+* `<eof>` is a special token which designates the end of endpoint
 
 **Result endpoint** is a message bus topic assigned to the `replyTo` parameter when method call is published. Format of the result endpoint is `<result-endpoint-prefix>.<call-endpoint>`, where:
 * `<result-endpoint-prefix>` is a bus-dependent subtopic, whose words usually provide information, necessary to demultiplex responses and bind them to the original requests (for example, in NATS specialization `<result-endpoint-prefix>` is defined as `_INBOX.<connection-id>.<request-id>`, where `<connection-id>` is a unique connection identifier and `<request-id>` is a request identifier, which is unique for the connection)
@@ -503,7 +503,7 @@ Field `exception` contains global predefined [`Exception`](#exception) structure
 ## Endpoint encoding
 
 In the [Endpoint](#endpoint) section we've already described how call and result endpoints are obtained. However, we mentioned there that some components of the endpoint require additional encoding, otherwise 2 problems may arise:
-1. if endpoint component contains symbols, which are not allowed by message bus implementation for a topic word, then endpoint will not represent a valid topic and any `PUBLISH` or `SUBSCRIBE` operations will fail
+1. if endpoint component contains characters, which are not allowed by message bus implementation for a topic word, then endpoint will not represent a valid topic and any `PUBLISH` or `SUBSCRIBE` operations will fail
 2. if endpoint component is a long sequence of characters, either component itself or endpoint as a whole may violate message bus length restriction 
 
 To solve the first problem, busrpc specification defines an escape encoding scheme to be applied to the reserved characters when necessary.
@@ -517,16 +517,21 @@ As a hash function busrpc framework uses SHA-224, which is chosen for the follow
 
 ### Escape encoding
 
-We expect, that the following symbols can be used as-is in a message bus topic:
+We expect, that the following characters can be used as-is in a message bus topic:
 * alphanumericals (a-z, A-Z and 0-9)
 * underscore `_` (to avoid encoding of the namespace/class/method names)
 * hyphen `-` (to avoid encoding of the negative numbers)
 
-Other symbols may have a reserved meaning for busrpc specification or message bus. 
+Other characters may be reserved or prohibited by the message bus, which is described in the bus [specialization](#specializations). Additionally, busrpc specification itself introduces several characters with a special meaning. This characters are chosen separetely for each message bus. In this document they are reffered to by the following tokens:
+* `<esc>` - escape character
+* `<field-sep>` - separator for structure fields when structure is encoded as endpoint component (see [below](#structure-encoding))
+
+If sequence of characters to be used as endpoint component contains reverved characters, all of them should be encoded as `<esc><hex><hex>`. Here `<esc>` is an escape character and `<hex><hex>` is a hexadecimal representation of the encoded character. Busrpc specification recommends to use lowercase "a-f" for hexadecimal digits, however, it is not required.
 
 ### Scalar value encoding
 
-Values of the protobuf [scalar types
+Values of the protobuf [scalar types\
+
 ### Structure encoding
 
 ## Invoking a method
