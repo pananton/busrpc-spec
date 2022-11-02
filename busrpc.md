@@ -15,6 +15,7 @@ This document contains general information for developers of busrpc microservice
   * [Type visibility](#type-visibility)
 * [Protocol](#protocol)
   * [Directory layout](#directory-layout)
+  * [Protobuf package names](#protobuf-package-names)
   * [Class description file](#class-description-file)
     * [`ObjectId`](#objectid)
   * [Method description file](#method-description-file)
@@ -263,6 +264,12 @@ Note, that type visibility rules can be expressed in terms of files and director
 
 Note, that visibility constraints are applied only inside API root directory. For example, service description file can (and, in fact, is required to) import necessary method description files despite the fact that service description file itself is not placed to the method directory.
 
+## Protobuf package names
+
+Busrpc directory layout determines the hierarchy of the protobuf [packages](https://developers.google.com/protocol-buffers/docs/proto3#packages):
+* top-level package name is `busrpc`
+* other package names follow directory hierarchy, for example, content of the *api/busrpc.proto* file (as well as any other file in the API root directory) should be placed into `busrpc.api` package
+
 ## Class description file
 
 Class description file *class.proto* must always contain definition of a class descriptor `ClassDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the class by means of a nested types. Busrpc specification currently recognizes only `ObjectId` structure, which describes class object identifier. Definitions of other types may also be nested inside `ClassDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
@@ -423,16 +430,9 @@ import "api/chat/user/send_message/method.proto";
 // file ./services/greeter/service.proto
 // ...
 
-import "services/config_base.proto";
-import "api/chat/user/on_signed_in/method.proto";
-import "api/chat/user/send_message/method.proto";
-
 message ServiceDesc {
   message Config {
-    // General parameters needed by any service (for example, message bus host and port).
-    services.ConfigBase general = 1;
-
-    // Text of the welcome message.
+    busrpc.services.ConfigBase general = 1;
     string welcome_text = 2;
   }
 }
@@ -506,10 +506,24 @@ In the [Endpoint](#endpoint) section we've already described how call and result
 1. if endpoint component contains symbols, which are not allowed by message bus implementation for a topic word, then endpoint will not represent a valid topic and any `PUBLISH` or `SUBSCRIBE` operations will fail
 2. if endpoint component is a long sequence of characters, either component itself or endpoint as a whole may violate message bus length restriction 
 
-The first problem is solved using a variation of [percent encoding](https://en.wikipedia.org/wiki/Percent-encoding).
+To solve the first problem, busrpc specification defines an escape encoding scheme to be applied to the reserved characters when necessary. The reserved character is replaced with `<esc><hex><hex>` triplet, where `<esc>` is an escape character and `<hex><hex>` is an hexadecimal representation of the reserved character. We recommend to use lowercase "a-f" for `<hex>`, however, it is not required. Note, that which characters are reserved and what symbol is used as an escape character may depend on the underlying message bus and is not defined by this specification. See specific message bus [specialization](#specializations) for such information.
 
-The second problem requires developers to carefully design their APIs and avoid situations, when some endpoints may randomly exceed the message bus limit. This specification proposes a solution, in which fixed-size hash of the component's data is added to the endpoint instead of the data itself.
+---
 
+**NOTE**
+
+We expect, that the following symbols can be used as-is in a message bus topic:
+* alphanumericals (a-z, A-Z and 0-9)
+* underscore `_` (to avoid encoding of the namespace/class/method names)
+* hyphen `-` (to avoid encoding of the negative numbers)
+
+---
+
+The second problem requires developers to carefully design their APIs and avoid situations, when some endpoints may occasionally exceed the message bus limit. This specification proposes a solution, in which fixed-size hash of the component's data is added to the endpoint instead of the data itself.
+
+### Scalar value encoding
+
+Values of the protobuf [scalar types
 ### Structure encoding
 
 ## Invoking a method
