@@ -502,11 +502,11 @@ Field `exception` contains global predefined [`Exception`](#exception) structure
 
 ## Endpoint encoding
 
-In the [Endpoint](#endpoint) section we've already described how call and result endpoints are obtained. However, we mentioned there that some components of the endpoint require additional encoding, otherwise 2 problems may arise:
-1. if endpoint component contains characters, which are not allowed by message bus implementation for a topic word, then endpoint will not represent a valid topic and any `PUBLISH` or `SUBSCRIBE` operations will fail
+In the [Endpoint](#endpoint) section we've already described how call and result endpoints are arranged. However, we mentioned there that some components of the endpoint require additional encoding, otherwise 2 problems may arise:
+1. if endpoint component contains characters, which are forbidden by underlying message bus for a topic or have some special meaning for it (like wildcards), then endpoint may be considered invalid or (even worse) may be treated incorrectly by `PUBLISH` or `SUBSCRIBE` operation
 2. if endpoint component is a long sequence of characters, either component itself or endpoint as a whole may violate message bus length restriction 
 
-To solve the first problem, busrpc specification defines an escape encoding scheme to be applied to the reserved characters when necessary.
+To solve the first problem, busrpc specification defines an [encoding](#characters-encoding) to be applied to the reserved characters when necessary.
 
 The second problem requires developers to carefully design their APIs and avoid situations, when some endpoints may occasionally exceed the message bus limit. This specification proposes a solution, in which fixed-size hash of the endpoint component's data is added to the endpoint instead of the data itself.
 
@@ -514,23 +514,22 @@ As a hash function busrpc framework uses SHA-224, which is chosen for the follow
 * it is a cryptographic hash function, which means that it is practically impossible to find two distinct inputs that are hashed to the same value
 * it's performance does not degrade for a small inputs (tens of bytes)
 * modern CPUs provide high-performance instructions for SHA hash calculation
+* it's output is shorter than SHA-256
 
-### Escape encoding
+### Characters encoding
 
-We expect, that the following characters can be used as-is in a message bus topic:
+This specification expects, that the following characters can be used as-is in a message bus topic:
 * alphanumericals (a-z, A-Z and 0-9)
 * underscore `_` (to avoid encoding of the namespace/class/method names)
 * hyphen `-` (to avoid encoding of the negative numbers)
 
-Other characters may be reserved or prohibited by the message bus, which is described in the bus [specialization](#specializations). Additionally, busrpc specification itself introduces several characters with a special meaning. This characters are chosen separetely for each message bus. In this document they are reffered to by the following tokens:
+Other characters may be reserved or forbidden by the message bus, which is described in the bus [specialization](#specializations).
+
+Additionally, busrpc specification itself introduces several characters with a special meaning. This characters are chosen separetely for each message bus. In this document they are reffered to by the following tokens:
 * `<esc>` - escape character
 * `<field-sep>` - separator for structure fields when structure is encoded as endpoint component (see [below](#structure-encoding))
 
-If sequence of characters to be used as endpoint component contains reverved characters, all of them should be encoded as `<esc><hex><hex>`. Here `<esc>` is an escape character and `<hex><hex>` is a hexadecimal representation of the encoded character. Busrpc specification recommends to use lowercase "a-f" for hexadecimal digits, however, it is not required.
-
-### Scalar value encoding
-
-Values of the protobuf [scalar types\
+If endpoint component contains reserved characters, all of them should be encoded as `<esc><hex><hex>`. Here `<esc>` is an escape character and `<hex><hex>` is a hexadecimal representation of the reserved character. Busrpc specification recommends to use lowercase "a-f" for the hexadecimal digits, however, it is not required.
 
 ### Structure encoding
 
