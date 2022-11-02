@@ -506,7 +506,7 @@ In the [Endpoint](#endpoint) section we've already described how call and result
 1. if endpoint component contains characters, which are forbidden by underlying message bus for a topic or have some special meaning for it (like wildcards), then endpoint may be considered invalid or (even worse) may be treated incorrectly by `PUBLISH` or `SUBSCRIBE` operation
 2. if endpoint component is a long sequence of characters, either component itself or endpoint as a whole may violate message bus length restriction 
 
-To solve the first problem, busrpc specification defines an [encoding](#characters-encoding) to be applied to the reserved characters when necessary.
+To solve the first problem, busrpc specification defines an [encoding](#character-encoding) to be applied to the reserved characters when necessary.
 
 The second problem requires developers to carefully design their APIs and avoid situations, when some endpoints may occasionally exceed the message bus limit. This specification proposes a solution, in which fixed-size hash of the endpoint component's data is added to the endpoint instead of the data itself.
 
@@ -516,7 +516,7 @@ As a hash function busrpc framework uses SHA-224, which is chosen for the follow
 * modern CPUs provide high-performance instructions for SHA hash calculation
 * it's output is shorter than SHA-256
 
-### Characters encoding
+### Reserved character encoding
 
 This specification expects, that the following characters can be used as-is in a message bus topic:
 * alphanumericals (a-z, A-Z and 0-9)
