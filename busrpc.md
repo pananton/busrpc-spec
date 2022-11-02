@@ -506,20 +506,23 @@ In the [Endpoint](#endpoint) section we've already described how call and result
 1. if endpoint component contains symbols, which are not allowed by message bus implementation for a topic word, then endpoint will not represent a valid topic and any `PUBLISH` or `SUBSCRIBE` operations will fail
 2. if endpoint component is a long sequence of characters, either component itself or endpoint as a whole may violate message bus length restriction 
 
-To solve the first problem, busrpc specification defines an escape encoding scheme to be applied to the reserved characters when necessary. The reserved character is replaced with `<esc><hex><hex>` triplet, where `<esc>` is an escape character and `<hex><hex>` is an hexadecimal representation of the reserved character. We recommend to use lowercase "a-f" for `<hex>`, however, it is not required. Note, that which characters are reserved and what symbol is used as an escape character may depend on the underlying message bus and is not defined by this specification. See specific message bus [specialization](#specializations) for such information.
+To solve the first problem, busrpc specification defines an escape encoding scheme to be applied to the reserved characters when necessary.
 
----
+The second problem requires developers to carefully design their APIs and avoid situations, when some endpoints may occasionally exceed the message bus limit. This specification proposes a solution, in which fixed-size hash of the endpoint component's data is added to the endpoint instead of the data itself.
 
-**NOTE**
+As a hash function busrpc framework uses SHA-224, which is chosen for the following reasons:
+* it is a cryptographic hash function, which means that it is practically impossible to find two distinct inputs that are hashed to the same value
+* it's performance does not degrade for a small inputs (tens of bytes)
+* modern CPUs provide high-performance instructions for SHA hash calculation
+
+### Escape encoding
 
 We expect, that the following symbols can be used as-is in a message bus topic:
 * alphanumericals (a-z, A-Z and 0-9)
 * underscore `_` (to avoid encoding of the namespace/class/method names)
 * hyphen `-` (to avoid encoding of the negative numbers)
 
----
-
-The second problem requires developers to carefully design their APIs and avoid situations, when some endpoints may occasionally exceed the message bus limit. This specification proposes a solution, in which fixed-size hash of the component's data is added to the endpoint instead of the data itself.
+Other symbols may have a reserved meaning for busrpc specification or message bus. 
 
 ### Scalar value encoding
 
