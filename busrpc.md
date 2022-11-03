@@ -530,7 +530,7 @@ Call endpoint is created using the following algorithm (note, that creating resu
 
 Only [encodable](#structure) fields can be a subject for converting to the endpoint component. This section describes how various protobuf types are encoded.
 
-File [*busrpc.proto*](proto/busrpc.proto) contains definition of a protobuf option `hashed_field`. This option specifies that instead of encoded field value it's SHA-224 hash should be added to the endpoint. Hash value is considered a byte sequence and is encoded [respectively](#bytes-encoding) before adding to the endpoint.
+File [*busrpc.proto*](proto/busrpc.proto) contains definition of a protobuf option `hashed_field`. This option specifies that instead of encoded field value it's SHA-224 hash should be added to the endpoint. Hash value is considered a byte sequence and is encoded [respectively](#bytes) before adding to the endpoint.
 
 Options `hashed_field` is usually applied to `string` and `bytes` protobuf types, which may have arbitrary length. However, specification allows to use it for other encodable types for consistency, though it usually makes no sense because hash has greater size than original value.
 
