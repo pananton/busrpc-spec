@@ -33,8 +33,8 @@ This document contains general information for developers of busrpc microservice
     * [Field encoding](#field-encoding)
       * [Boolean](#boolean)
       * [Integer](#integer)
-      * [Strings](#strings)
-      * [Bytes](#bytes)
+      * [String](#string)
+      * [Byte sequence](#byte-sequence)
     * [Structure encoding](#structure-encoding)
     * [Examples](#examples)
 * [Documentation commands](#documentation-commands)
@@ -530,7 +530,7 @@ Call endpoint is created using the following algorithm (note, that creating resu
 
 Only [encodable](#structure) fields can be a subject for converting to the endpoint component. This section describes how various protobuf types are encoded.
 
-File [*busrpc.proto*](proto/busrpc.proto) contains definition of a protobuf option `hashed_field`. This option specifies that instead of encoded field value it's SHA-224 hash should be added to the endpoint. Hash value is considered a byte sequence and is encoded [respectively](#bytes) (as a hexadecimal string) before adding to the endpoint.
+File [*busrpc.proto*](proto/busrpc.proto) contains definition of a protobuf option `hashed_field`. This option specifies that instead of encoded field value it's SHA-224 hash should be added to the endpoint. Hash value is considered a byte sequence and is encoded [respectively](#byte-sequence) (as a hexadecimal string) before adding to the endpoint.
 
 Option `hashed_field` is usually applied to `string` and `bytes` protobuf types, which may have arbitrary length. However, specification allows to use it for other encodable types for consistency, though it usually makes no sense because hash will have greater size than original value.
 
@@ -542,9 +542,9 @@ Protobuf `bool` field value is converted to string "1" if value is `true` and "0
 
 Protobuf integer field value is converted to it's string representation with a single leading `-` sign for negative values. No leading zeros are allowed, unless the value itself is zero, in which case it is converted to "0". If `hashed_field` option is specified for the field, it is applied to the conversion result.
 
-#### Strings
+#### String
 
-#### Bytes
+#### Byte sequence
 
 If `hashed_field` option is not specified for a protobuf `bytes` field, then it's value is converted to a string containing hexadecimal representation of each byte. **Only lowercase** `a-f` digits can be used in the hexadecimal representation of a byte.
 
