@@ -518,11 +518,33 @@ As a hash function busrpc framework uses SHA-224, which is chosen for the follow
 
 Call endpoint is created using the following algorithm (note, that creating result endpoint from the call endpoint is trivial):
 1. Fill `<namespace>`, `<class>` and `<method>` components with the namespace, class and method names correspondingly. Note, that this components may contain only alphanumeric symbols or underscore, thus do not require additional encoding.  
-2. Encode `ObjectId` structure as specified by [structure encoding](#encoding) rules and append result as a single word to the endpoint.
-3. For each observable parameter in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers), encode the parameter as specified by [field encoding](#field-encoding) rules and append it as word to the endpoint.
+2. Encode `ObjectId` structure as specified by [structure encoding](#encoding) rules and append result to the endpoint.
+3. For each observable parameter in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers), encode the parameter as specified by [field encoding](#field-encoding) rules and append it to the endpoint.
 4. Append `<eof>` reserved word.
 
 ### Field encoding
+
+Only [encodable](#structure) fields can be a subject for converting to the endpoint component. This section describes how various protobuf types are encoded.
+
+File [*busrpc.proto*](proto/busrpc.proto) contains definition of a protobuf option `hashed_field`. This option specifies that instead of encoded field value it's SHA-224 hash should be added to the endpoint. Hash value is considered a byte sequence and is encoded [respectively](#bytes-encoding) before adding to the endpoint.
+
+Options `hashed_field` is usually applied to `string` and `bytes` protobuf types, which may have arbitrary length. However, specification allows to use it for other encodable types for consistency, though it usually makes no sense because hashed value will have greater size than original.
+
+#### Boolean encoding
+
+Protobuf `bool` field value is converted to string "1" if value is `true` and "0" otherwise. If additionally `hashed_field` option is specified for the field, it is applied to the conversion result.
+
+#### Integer encoding
+
+Protobuf integer field value is converted to it's string representation with a single leading `-` sign if value is negative. No leading zeros are allowed, unless the value itself is zero, in which case it is converted to "0". If additionally `hashed_field` option is specified for the field, it is applied to the conversion result.
+
+#### Strings encoding
+
+#### Bytes encoding
+
+If `hashed_field` option is not specified for a protobuf `bytes` field, then it's value is converted to a string containing hexadecimal representation of each byte. **Only lowercase** `a-f` digits can be used in the hexadecimal representation of a byte.
+
+If `hashed_field` option is specified for a protobuf `bytes` field, then it is applied directly to the field value.
 
 ### Structure encoding
 
