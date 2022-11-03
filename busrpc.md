@@ -532,7 +532,7 @@ Only [encodable](#structure) fields can be a subject for converting to the endpo
 
 File [*busrpc.proto*](proto/busrpc.proto) contains definition of a protobuf option `hashed_field`. This option specifies that instead of encoded field value it's SHA-224 hash should be added to the endpoint. Hash value is considered a byte sequence and is encoded [respectively](#bytes) (as a hexadecimal string) before adding to the endpoint.
 
-Option `hashed_field` is usually applied to `string` and `bytes` protobuf types, which may have arbitrary length. However, specification allows to use it for other encodable types for consistency, though it usually makes no sense because hash has greater size than original value.
+Option `hashed_field` is usually applied to `string` and `bytes` protobuf types, which may have arbitrary length. However, specification allows to use it for other encodable types for consistency, though it usually makes no sense because hash will have greater size than original value.
 
 #### Boolean
 
