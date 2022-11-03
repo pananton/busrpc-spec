@@ -534,17 +534,17 @@ File [*busrpc.proto*](proto/busrpc.proto) contains definition of a protobuf opti
 
 Options `hashed_field` is usually applied to `string` and `bytes` protobuf types, which may have arbitrary length. However, specification allows to use it for other encodable types for consistency, though it usually makes no sense because hash has greater size than original value.
 
-#### Boolean encoding
+#### Boolean
 
 Protobuf `bool` field value is converted to string "1" if value is `true` and "0" otherwise. If `hashed_field` option is specified for the field, it is applied to the conversion result.
 
-#### Integer encoding
+#### Integer
 
 Protobuf integer field value is converted to it's string representation with a single leading `-` sign for negative values. No leading zeros are allowed, unless the value itself is zero, in which case it is converted to "0". If `hashed_field` option is specified for the field, it is applied to the conversion result.
 
-#### Strings encoding
+#### Strings
 
-#### Bytes encoding
+#### Bytes
 
 If `hashed_field` option is not specified for a protobuf `bytes` field, then it's value is converted to a string containing hexadecimal representation of each byte. **Only lowercase** `a-f` digits can be used in the hexadecimal representation of a byte.
 
