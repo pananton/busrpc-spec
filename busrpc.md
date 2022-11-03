@@ -28,9 +28,11 @@ This document contains general information for developers of busrpc microservice
   * [Network messages](#network-messages)
     * [`CallMessage`](#callmessage)
     * [`ResultMessage`](#resultmessage)
-  * [Endpoint components encoding](#endpoint-components-encoding)
-    * [Character encoding](#character-encoding)
+  * [Endpoint encoding](#endpoint-encoding)
+    * [General algorithm](#general-algorithm)
+    * [Field encoding](#field-encoding)
     * [Structure encoding](#structure-encoding)
+    * [Examples](#examples)
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
 
@@ -188,7 +190,7 @@ Some message bus topic formats, commonly used for subscribing for method calls, 
 | `<namespace>.<class>.<topic-wildcard-any1>.<object-id>.<topic-wildcard-anyN>`                  | object    | calls bound to a specific object                  |
 | `<namespace>.<class>.<method>.<topic-wildcard-any1>.<observable-params>.<topic-wildcard-anyN>` | value     | calls of a method with a specific value(s) of an                                                                                                                        observable parameter(s)                           |
 
-Message bus may prohibit the use of some characters in it's topics. That means some components of the endpoint should be encoded to meet message bus requirement. Additionally, care should be taken to avoid violation of a message bus topic length restriction. All this issues are covered [below](#endpoint-components-encoding).
+Message bus may prohibit the use of some characters in it's topics. That means endpoint should be encoded to meet message bus requirements. Also care should be taken to avoid violation of a message bus topic length restriction. The encoding algorithm itself must be unambigous to allow various busrpc clients to communicate. All this issues are covered [below](#endpoint-encoding).
 
 ## Type visibility
 
@@ -344,7 +346,7 @@ Note, that `Result` enumeration has method scope and can't be used outside the m
 
 #### Observable parameters
 
-Observable method parameter is created using custom protobuf field option `observable`, defined in the *busrpc.proto* file. This option can be applied only to encodable fields of `Params` structure. Remember, that observable parameters (as described [earlier](#endpoint)) are also added to the call endpoint, which means that implementors may filter calls they want to handle to only those having specific value(s) of the observable parameter(s).
+Observable method parameter is created using custom protobuf field option `observable`, defined in the *busrpc.proto* file. This option can be applied only to [encodable fields](#structure) of `Params` structure. Remember, that observable parameters (as described [earlier](#endpoint)) are also added to the call endpoint, which means that implementors may filter calls they want to handle to only those having specific value(s) of the observable parameter(s).
 
 Consider method `user::send_message` from the Chat application API.
 
@@ -494,7 +496,7 @@ Field `retval` contains protobuf-serialized `Retval` structure from the method d
 
 Field `exception` contains global predefined [`Exception`](#exception) structure and is set if method threw an exception.
 
-## Endpoint components encoding
+## Endpoint encoding
 
 Remember from the [Endpoint](#endpoint) section that endpoint is a character string, which is formatted like `[<result-endpoint-prefix>.]<namespace>.<class>.<method>.<object-id>[.<observable-params>].<eof>`. In this section we describe how to convert protocol data to the endpoint components. Note, that format of the `<result-endpoint-prefix>` part (meaningful for result endpoints only) is defined by a message bus and is out of scope of this specification.
 
@@ -502,7 +504,7 @@ Busrpc endpoint is inherently a message bus topic. Message bus may impose some l
 1. some characters may be prohibited or treated specially
 2. word or topic length may be limited
 
-The first problem is solved using the busrpc [character encoding](#character-encoding).
+The first problem is solved by careful encoding of the prohibited/special characters. Busrpc specification assumes, that alphanumericals (`a-z`, `A-Z`, `0-9`), underscore `_` and hyphen `-` never require encoding. Other characters may potentially require encoding depending on the underlying message bus. Information about prohibited/special characters can be found from the message bus [specialization](#specializations).
 
 The second problem requires developers to carefully design their APIs and avoid situations, when some endpoints may occasionally exceed the message bus limit. Busrpc specification helps to deal with this problem in the following way: it describes how fixed-size hash of the component's data can be used in the endpoint instead of the data itself.
 
@@ -511,6 +513,14 @@ As a hash function busrpc framework uses SHA-224, which is chosen for the follow
 * it's performance does not degrade on small inputs (tens of bytes)
 * modern CPUs provide high-performance instructions for SHA hash calculation
 * it's output is shorter than SHA-256
+
+### General algorithm
+
+### Field encoding
+
+### Structure encoding
+
+### Example
 
 ### Character encoding
 
@@ -524,11 +534,6 @@ Additionally, busrpc encoding uses two special characters, which are defined in 
 Message bus specialization contains information, which characters are prohibited for topic or have special meaning. If this characters are found in the endpoint component, they are encoded as a triple `<esc><hex><hex>`. Here, `<esc>` is a predefined bus-specific escape character and `<hex><hex>` is a hexadecimal representation of the character. **Only lowercase** "a-f" can be used as hexadecimal digits. Note, that `<esc>` and `<field-sep>` (used for structure encoding, see below) are treated specially, thus should be encoded if this special treatment is undesirable.
 
 As an example consider message bus, that defines `<esc>` as `%` and uses `.` as topic word separator. In that case, string "%hello.world%` is encoded as `%25hello%2eworld%25` when used as endpoint component.
-
-### Field encoding
-
-
-### Structure encoding
 
 # Documentation commands
 
