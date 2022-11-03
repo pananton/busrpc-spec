@@ -175,7 +175,7 @@ Whenever caller receives an exception which he does not know how to handle, he m
 * `<namespace>`, `<class>` and `<method>` are names of the namespace, class and method correspondingly
 * `<object-id>` is identifier of an object for which method is called, or a reserved word representing null value for static methods
 * `<observable-params>` is a sequence of words representing values of the observable parameters (can be 0 or many)
-* `<eof>` is a special token which designates the end of endpoint
+* `<eof>` is a reserved word which designates the end of endpoint
 
 **Result endpoint** is a message bus topic assigned to the `replyTo` parameter when method call is published. Format of the result endpoint is `<result-endpoint-prefix>.<call-endpoint>`, where:
 * `<result-endpoint-prefix>` is a sequence of words, which provide information, necessary to demultiplex responses and bind them to the original requests (for example, in NATS specialization `<result-endpoint-prefix>` is defined as `_INBOX.<connection-id>.<request-id>`, where pair of connection and request identifiers uniquelly identifies request in the system)
@@ -193,7 +193,7 @@ Some message bus topic formats, commonly used for subscribing for method calls, 
 | `<namespace>.<class>.<topic-wildcard-any1>.<object-id>.<topic-wildcard-anyN>`                  | object    | calls bound to a specific object                  |
 | `<namespace>.<class>.<method>.<topic-wildcard-any1>.<observable-params>.<topic-wildcard-anyN>` | value     | calls of a method with a specific value(s) of an                                                                                                                        observable parameter(s)                           |
 
-Message bus may prohibit the use of some characters in it's topics. That means some components of the endpoint should be encoded to meet message bus requirement. Additionally, care should be taken to avoid violation of a message bus topic length restriction. All this issues are covered in the corresponding [section](#endpoint-components-encoding).
+Message bus may prohibit the use of some characters in it's topics. That means some components of the endpoint should be encoded to meet message bus requirement. Additionally, care should be taken to avoid violation of a message bus topic length restriction. All this issues are covered [below](#endpoint-components-encoding).
 
 ## Type visibility
 
@@ -501,7 +501,7 @@ Field `exception` contains global predefined [`Exception`](#exception) structure
 
 ## Endpoint components encoding
 
-Remember from the [Endpoint](#endpoint) section that endpoint is a character string, which is formatted like `[<result-endpoint-prefix>.]<namespace>.<class>.<method>.<object-id>[.<observable-params>].<eof>`. In this section we describe how to convert protocol data to the endpoint components. Note, that format of the `<result-endpoint-prefix>` part (meaningful for result endpoints only) is defined by the message bus implementation and is out of scope of this specification.
+Remember from the [Endpoint](#endpoint) section that endpoint is a character string, which is formatted like `[<result-endpoint-prefix>.]<namespace>.<class>.<method>.<object-id>[.<observable-params>].<eof>`. In this section we describe how to convert protocol data to the endpoint components. Note, that format of the `<result-endpoint-prefix>` part (meaningful for result endpoints only) is defined by a message bus and is out of scope of this specification.
 
 Busrpc endpoint is inherently a message bus topic. Message bus may impose some limitations on it's topics, which must be respected by the endpoints:
 1. some characters may be prohibited or treated specially
@@ -509,11 +509,11 @@ Busrpc endpoint is inherently a message bus topic. Message bus may impose some l
 
 The first problem is solved using the busrpc [character encoding](#character-encoding).
 
-The second problem requires developers to carefully design their APIs and avoid situations, when some endpoints may occasionally exceed the message bus limit. Busrpc specification helps to deal with this problem in the following way: it describes how fixed-size hash of the endpoint component's data can be used in the endpoint instead of the data itself.
+The second problem requires developers to carefully design their APIs and avoid situations, when some endpoints may occasionally exceed the message bus limit. Busrpc specification helps to deal with this problem in the following way: it describes how fixed-size hash of the component's data can be used in the endpoint instead of the data itself.
 
 As a hash function busrpc framework uses SHA-224, which is chosen for the following reasons:
 * it is a cryptographic hash function, which means that it is practically impossible to find two distinct inputs that are hashed to the same value
-* it's performance does not degrade for a small inputs (tens of bytes)
+* it's performance does not degrade on small inputs (tens of bytes)
 * modern CPUs provide high-performance instructions for SHA hash calculation
 * it's output is shorter than SHA-256
 
