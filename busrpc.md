@@ -518,17 +518,20 @@ As a hash function busrpc framework uses SHA-224, which is chosen for the follow
 * it's output is shorter than SHA-256
 
 ### Character encoding
- 
-Busrpc specification requires, that the fol, that the following characters can be used as-is in a message bus topic:
+
+Busrpc specification requires, that the following characters can be used as-is in a message bus topic:
 * alphanumericals (a-z, A-Z and 0-9)
-* underscore `_` (to avoid encoding of the namespace/class/method names)
-* hyphen `-` (to avoid encoding of the negative numbers)
+* underscore `_`
+* hyphen `-`
 
-Additionally, busrpc specification itself introduces several characters with a special meaning. This characters are chosen separetely for each message bus. In this document they are reffered to by the following tokens:
-* `<esc>` - escape character
-* `<field-sep>` - separator for structure fields when structure is encoded as endpoint component (see [below](#structure-encoding))
+Additionally, busrpc encoding uses two special characters, which are defined in the message bus [specialization](#specializations) and referred to in the specificaton as `<esc>` and `<field-sep>`. This two characters should also be usable as-is in the message bus topic.
 
-If endpoint component contains reserved characters, all of them should be encoded as `<esc><hex><hex>`. Here `<esc>` is an escape character and `<hex><hex>` is a hexadecimal representation of the reserved character. Busrpc specification recommends to use lowercase "a-f" for the hexadecimal digits, however, it is not required.
+Message bus specialization contains information, which characters are prohibited for topic or have special meaning. If this characters are found in the endpoint component, they are encoded as a triple `<esc><hex><hex>`. Here, `<esc>` is a predefined bus-specific escape character and `<hex><hex>` is a hexadecimal representation of the character. **Only lowercase** "a-f" can be used as hexadecimal digits. Note, that `<esc>` and `<field-sep>` (used for structure encoding, see below) are treated specially, thus should be encoded if this special treatment is undesirable.
+
+As an example consider message bus, that defines `<esc>` as `%` and uses `.` as topic word separator. In that case, string "%hello.world%` is encoded as `%25hello%2eworld%25` when used as endpoint component.
+
+### Field encoding
+
 
 ### Structure encoding
 
