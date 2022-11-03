@@ -28,10 +28,9 @@ This document contains general information for developers of busrpc microservice
   * [Network messages](#network-messages)
     * [`CallMessage`](#callmessage)
     * [`ResultMessage`](#resultmessage)
-  * [Endpoint encoding](#endpoint-encoding)
+  * [Endpoint components encoding](#endpoint-components-encoding)
+    * [Character encoding](#character-encoding)
     * [Structure encoding](#structure-encoding)
-  * [Invoking a method](#invoking-a-method)
-  * [Implementing a method](#implementing-a-method)
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
 
@@ -175,11 +174,11 @@ Whenever caller receives an exception which he does not know how to handle, he m
 **Call endpoint** is a message bus topic to which method calls are published by a caller. Format of the call endpoint is `<namespace>.<class>.<method>.<object-id>[.<observable-params>].<eof>`, where:
 * `<namespace>`, `<class>` and `<method>` are names of the namespace, class and method correspondingly
 * `<object-id>` is identifier of an object for which method is called, or a reserved word representing null value for static methods
-* optional `<observable-params>` is a subtopic, whose words represent values of the observable parameters
+* `<observable-params>` is a sequence of words representing values of the observable parameters (can be 0 or many)
 * `<eof>` is a special token which designates the end of endpoint
 
 **Result endpoint** is a message bus topic assigned to the `replyTo` parameter when method call is published. Format of the result endpoint is `<result-endpoint-prefix>.<call-endpoint>`, where:
-* `<result-endpoint-prefix>` is a bus-dependent subtopic, whose words usually provide information, necessary to demultiplex responses and bind them to the original requests (for example, in NATS specialization `<result-endpoint-prefix>` is defined as `_INBOX.<connection-id>.<request-id>`, where `<connection-id>` is a unique connection identifier and `<request-id>` is a request identifier, which is unique for the connection)
+* `<result-endpoint-prefix>` is a sequence of words, which provide information, necessary to demultiplex responses and bind them to the original requests (for example, in NATS specialization `<result-endpoint-prefix>` is defined as `_INBOX.<connection-id>.<request-id>`, where pair of connection and request identifiers uniquelly identifies request in the system)
 * `<call-endpoint>` is an exact copy of the call endpoint used for the request; it's components are used by the framework [test clients](README.md#clients) to effectively catch only necessary responses when observing the system message flow
 
 Note, that result endpoint is not defined for one-way methods.
@@ -194,7 +193,7 @@ Some message bus topic formats, commonly used for subscribing for method calls, 
 | `<namespace>.<class>.<topic-wildcard-any1>.<object-id>.<topic-wildcard-anyN>`                  | object    | calls bound to a specific object                  |
 | `<namespace>.<class>.<method>.<topic-wildcard-any1>.<observable-params>.<topic-wildcard-anyN>` | value     | calls of a method with a specific value(s) of an                                                                                                                        observable parameter(s)                           |
 
-Message bus may prohibit the use of some characters in it's topics. That means some components of the endpoint should be encoded to meet message bus requirement. Additionally, care should be taken to avoid violation of a message bus topic length restriction. All this issues are covered in the [Endpoint encoding](#endpoint-encoding) section.
+Message bus may prohibit the use of some characters in it's topics. That means some components of the endpoint should be encoded to meet message bus requirement. Additionally, care should be taken to avoid violation of a message bus topic length restriction. All this issues are covered in the corresponding [section](#endpoint-components-encoding).
 
 ## Type visibility
 
@@ -500,15 +499,17 @@ Field `retval` contains protobuf-serialized `Retval` structure from the method d
 
 Field `exception` contains global predefined [`Exception`](#exception) structure and is set if method threw an exception.
 
-## Endpoint encoding
+## Endpoint components encoding
 
-In the [Endpoint](#endpoint) section we've already described how call and result endpoints are arranged. However, we mentioned there that some components of the endpoint require additional encoding, otherwise 2 problems may arise:
-1. if endpoint component contains characters, which are forbidden by underlying message bus for a topic or have some special meaning for it (like wildcards), then endpoint may be considered invalid or (even worse) may be treated incorrectly by `PUBLISH` or `SUBSCRIBE` operation
-2. if endpoint component is a long sequence of characters, either component itself or endpoint as a whole may violate message bus length restriction 
+Remember from the [Endpoint](#endpoint) section that endpoint is a character string, which is formatted like `[<result-endpoint-prefix>.]<namespace>.<class>.<method>.<object-id>[.<observable-params>].<eof>`. In this section we describe how to convert protocol data to the endpoint components. Note, that format of the `<result-endpoint-prefix>` part (meaningful for result endpoints only) is defined by the message bus implementation and is out of scope of this specification.
 
-To solve the first problem, busrpc specification defines an [encoding](#character-encoding) to be applied to the reserved characters when necessary.
+Busrpc endpoint is inherently a message bus topic. Message bus may impose some limitations on it's topics, which must be respected by the endpoints:
+1. some characters may be prohibited or treated specially
+2. word or topic length may be limited
 
-The second problem requires developers to carefully design their APIs and avoid situations, when some endpoints may occasionally exceed the message bus limit. This specification proposes a solution, in which fixed-size hash of the endpoint component's data is added to the endpoint instead of the data itself.
+The first problem is solved using the busrpc [character encoding](#character-encoding).
+
+The second problem requires developers to carefully design their APIs and avoid situations, when some endpoints may occasionally exceed the message bus limit. Busrpc specification helps to deal with this problem in the following way: it describes how fixed-size hash of the endpoint component's data can be used in the endpoint instead of the data itself.
 
 As a hash function busrpc framework uses SHA-224, which is chosen for the following reasons:
 * it is a cryptographic hash function, which means that it is practically impossible to find two distinct inputs that are hashed to the same value
@@ -516,14 +517,12 @@ As a hash function busrpc framework uses SHA-224, which is chosen for the follow
 * modern CPUs provide high-performance instructions for SHA hash calculation
 * it's output is shorter than SHA-256
 
-### Reserved character encoding
-
-This specification expects, that the following characters can be used as-is in a message bus topic:
+### Character encoding
+ 
+Busrpc specification requires, that the fol, that the following characters can be used as-is in a message bus topic:
 * alphanumericals (a-z, A-Z and 0-9)
 * underscore `_` (to avoid encoding of the namespace/class/method names)
 * hyphen `-` (to avoid encoding of the negative numbers)
-
-Other characters may be reserved or forbidden by the message bus, which is described in the bus [specialization](#specializations).
 
 Additionally, busrpc specification itself introduces several characters with a special meaning. This characters are chosen separetely for each message bus. In this document they are reffered to by the following tokens:
 * `<esc>` - escape character
@@ -532,10 +531,6 @@ Additionally, busrpc specification itself introduces several characters with a s
 If endpoint component contains reserved characters, all of them should be encoded as `<esc><hex><hex>`. Here `<esc>` is an escape character and `<hex><hex>` is a hexadecimal representation of the reserved character. Busrpc specification recommends to use lowercase "a-f" for the hexadecimal digits, however, it is not required.
 
 ### Structure encoding
-
-## Invoking a method
-
-## Implementing a method
 
 # Documentation commands
 
