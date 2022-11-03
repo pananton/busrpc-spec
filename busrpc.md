@@ -94,9 +94,11 @@ Busrpc **structure** is an alternative term for a protobuf `message` introduced 
 
 **Predefined structures** are structures which have special meaning determined by this specification. In particular, **descriptors** are predefined structures which provide busrpc client libraries with type information about busrpc entity (service, class, or method). Descriptors are usually never sent over the network - in fact, they even do not have any fields, only nested type definitions.
 
-**Encodable structure** is a structure, that can be encoded as specified in the [Structure encoding](#structure-encoding) section. To be encodable, structure must contain only non-`repeated`, non-`oneof` fields of the following types: 
-* [scalar](https://developers.google.com/protocol-buffers/docs/proto3#scalar) types, except for floating-point types `float` and `double`
-* [enumeration](https://developers.google.com/protocol-buffers/docs/proto3#enum) types
+Structure field is called **encodable**, if it is non-`repeated` and has one of the following types:
+* [scalar](https://developers.google.com/protocol-buffers/docs/proto3#scalar), except for floating-point types `float` and `double`
+* [enumeration](https://developers.google.com/protocol-buffers/docs/proto3#enum)
+
+**Encodable structure** is an empty structure, or structure, which consists of encodable fields only.
 
 ```
 enum MyEnum {
@@ -107,7 +109,7 @@ enum MyEnum {
 // empty structure is encodable
 message Encodable1 { }
 
-// encodable, because all fields have valid types
+// encodable (all fields are encodable)
 message Encodable2 {
   optional int32 f1 = 1;
   string f2 = 2;
@@ -115,24 +117,17 @@ message Encodable2 {
   MyEnum f4 = 4;
 }
 
-// not encodable, each field violates one of the encodable structure rules
+// not encodable (all fields are not encodable)
 message NotEncodable {
-  // floating-point types are prohibited
   float f1 = 1;
-
-  // repeated fields are prohibited
   repeated int32 f2 = 2;
 
-  // oneof is prohibited
   oneof Variant {
     int32 f3 = 3;
     string v4 = 4;
   }
 
-  // maps are prohibited
   map<int32, int32> f5 = 5;
-
-  // fields of a user-defined type are prohibited
   Encodable1 f6 = 6;
 }
 ```
@@ -349,7 +344,7 @@ Note, that `Result` enumeration has method scope and can't be used outside the m
 
 #### Observable parameters
 
-Observable method parameter is created using custom protobuf field option `observable`, defined in the *busrpc.proto* file. This option can be applied only if parameter meets the following requirement: it's type is either one of the types allowed for [encodable structure](#structure), or an encodable structure itself. Remember, that observable parameters (as described [earlier](#endpoint)) are also added to the call endpoint, which means that implementors may filter calls they want to handle to only those having specific value(s) of the observable parameter(s).
+Observable method parameter is created using custom protobuf field option `observable`, defined in the *busrpc.proto* file. This option can be applied only to encodable fields of `Params` structure. Remember, that observable parameters (as described [earlier](#endpoint)) are also added to the call endpoint, which means that implementors may filter calls they want to handle to only those having specific value(s) of the observable parameter(s).
 
 Consider method `user::send_message` from the Chat application API.
 
@@ -445,7 +440,7 @@ File *busrpc.proto* contains definitions of several options that allow to specif
 * `default_double` - default value for protobuf floating-point types (`float`, `double`)
 * `default_string` - default value for protobuf `string` type
 
-This options are especially useful for describing method parameters (`MethodDesc::Params` fields) and service configuration (`ServiceDesc::Config` fields).
+This options are especially useful for describing method parameters and service configuration parameters.
 
 ```
 // file ./services/greeter/service.proto
