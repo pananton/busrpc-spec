@@ -190,7 +190,7 @@ Some message bus topic formats, commonly used for subscribing for method calls, 
 | `<namespace>.<class>.<topic-wildcard-any1>.<object-id>.<topic-wildcard-anyN>`                  | object    | calls bound to a specific object                  |
 | `<namespace>.<class>.<method>.<topic-wildcard-any1>.<observable-params>.<topic-wildcard-anyN>` | value     | calls of a method with a specific value(s) of an                                                                                                                        observable parameter(s)                           |
 
-Message bus may prohibit the use of some characters in it's topics. That means endpoint should be encoded to meet message bus requirements. Also care should be taken to avoid violation of a message bus topic length restriction. The encoding algorithm itself must be unambigous to allow various busrpc clients to communicate. All this issues are covered [below](#endpoint-encoding).
+Message bus may prohibit the use of some characters in it's topics. That means endpoint should be encoded to meet message bus requirements. Also care should be taken to avoid violation of a message bus topic length restriction. Finally, the encoding algorithm itself must be unambigous to allow various busrpc clients to communicate. All this issues are covered [below](#endpoint-encoding).
 
 ## Type visibility
 
@@ -506,7 +506,7 @@ Busrpc endpoint is inherently a message bus topic. Message bus may impose some l
 
 The first problem is solved by careful encoding of the prohibited/special characters. Busrpc specification assumes, that alphanumericals (`a-z`, `A-Z`, `0-9`), underscore `_` and hyphen `-` never require encoding. Other characters may potentially require encoding depending on the underlying message bus. Information about prohibited/special characters can be found from the message bus [specialization](#specializations).
 
-The second problem requires developers to carefully design their APIs and avoid situations, when some endpoints may occasionally exceed the message bus limit. Busrpc specification helps to deal with this problem in the following way: it describes how fixed-size hash of the component's data can be used in the endpoint instead of the data itself.
+The second problem requires developers to carefully design their APIs and avoid situations, when some endpoints may occasionally exceed the message bus limit. Busrpc specification helps to deal with this problem in the following way: it describes how fixed-size hash of the endpoint component's data can be used in the endpoint instead of the data itself.
 
 As a hash function busrpc framework uses SHA-224, which is chosen for the following reasons:
 * it is a cryptographic hash function, which means that it is practically impossible to find two distinct inputs that are hashed to the same value
@@ -516,11 +516,17 @@ As a hash function busrpc framework uses SHA-224, which is chosen for the follow
 
 ### General algorithm
 
+Call endpoint is created using the following algorithm (note, that creating result endpoint from the call endpoint is trivial):
+1. Fill `<namespace>`, `<class>` and `<method>` components with the namespace, class and method names correspondingly. Note, that this components may contain only alphanumeric symbols or underscore, thus do not require additional encoding.  
+2. Encode `ObjectId` structure as specified by [structure encoding](#encoding) rules and append result as a single word to the endpoint.
+3. For each observable parameter in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers), encode the parameter as specified by [field encoding](#field-encoding) rules and append it as word to the endpoint.
+4. Append `<eof>` reserved word.
+
 ### Field encoding
 
 ### Structure encoding
 
-### Example
+### Examples
 
 ### Character encoding
 
