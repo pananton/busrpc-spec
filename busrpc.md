@@ -30,12 +30,12 @@ This document contains general information for developers of busrpc microservice
     * [`ResultMessage`](#resultmessage)
   * [Endpoint encoding](#endpoint-encoding)
     * [General algorithm](#general-algorithm)
-    * [Field encoding](#field-encoding)
+    * [Type encoding](#type-encoding)
       * [Boolean encoding](#boolean-encoding)
       * [Integer encoding](#integer-encoding)
       * [String encoding](#string-encoding)
       * [Byte sequence encoding](#byte-sequence-encoding)
-    * [Structure encoding](#structure-encoding)
+      * [Structure encoding](#structure-encoding)
     * [Example](#example)
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
@@ -523,10 +523,10 @@ As a hash function busrpc framework uses SHA-224, which is chosen for the follow
 Call endpoint is created using the following algorithm (note, that creating result endpoint from the call endpoint is trivial):
 1. Fill `<namespace>`, `<class>` and `<method>` components with the namespace, class and method names correspondingly. Note, that this components may contain only alphanumeric symbols and underscores, thus do not require additional encoding.  
 2. For non-`static` class, encode [`ObjectId`](#objectid) structure as specified by the [structure encoding](#structure-encoding) rules and append result to the endpoint. For `static` class, append reserved `<null>` word to the endpoint.
-3. For each [observable parameter](#observable-parameters) in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers), encode the parameter as specified by the [field encoding](#field-encoding) rules and append it to the endpoint.
+3. For each [observable parameter](#observable-parameters) in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers), encode the parameter as specified by the [field encoding](#type-encoding) rules and append it to the endpoint.
 4. Append `<eof>` reserved word.
 
-### Field encoding
+### Type encoding
 
 File [*busrpc.proto*](proto/busrpc.proto) contains definition of a protobuf option `hashed_field`. This option specifies that instead of encoded field value it's SHA-224 hash should be added to the endpoint. Hash value is considered a byte sequence and is encoded [respectively](#byte-sequence-encoding) (as a hexadecimal string) before adding to the endpoint.
 
@@ -557,7 +557,7 @@ Before encoding fields marked as `optional`, perform the following step:
 2. If `hashed_field` option is not specified, convert `bytes` value to a hexadecimal string using **only lowercase** `a-f` digits and finish encoding.
 3. If `hashed_field` option is specified, apply hashing directly to the `bytes` value.
 
-### Structure encoding
+#### Structure encoding
 
 ### Example
 
