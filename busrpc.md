@@ -31,10 +31,10 @@ This document contains general information for developers of busrpc microservice
   * [Endpoint encoding](#endpoint-encoding)
     * [General algorithm](#general-algorithm)
     * [Field encoding](#field-encoding)
-      * [Boolean](#boolean)
-      * [Integer](#integer)
-      * [String](#string)
-      * [Byte sequence](#byte-sequence)
+      * [Boolean encoding](#boolean-encoding)
+      * [Integer encoding](#integer-encoding)
+      * [String encoding](#string-encoding)
+      * [Byte sequence encoding](#byte-sequence-encoding)
     * [Structure encoding](#structure-encoding)
     * [Examples](#examples)
 * [Documentation commands](#documentation-commands)
@@ -99,12 +99,12 @@ Methods may be bound to a concrete object or to a class as a whole. The latter a
 Busrpc **structure** is an alternative term for a protobuf `message` introduced for consistency with OOP terminology. Structures are busrpc wire types, i.e. every busrpc network message is represented by some structure.
 
 **Predefined structures** are structures which have special meaning determined by this specification. In particular, **descriptors** are predefined structures which provide busrpc client libraries with type information about busrpc entity (service, class, or method). Descriptors are usually never sent over the network - in fact, they even do not have any fields, only nested type definitions.
+ 
+Busrpc specification defines a concept of an **encodable type** - a protobuf type which can be encoded as specified in the [Endpoint encoding](#endpoint-encoding) section below. Encodable type can be one of the following:
+* **encodable scalar type**, which is a non-`repeated` protobuf [scalar](https://developers.google.com/protocol-buffers/docs/proto3#scalar) type except for floating-point types `float` and `double` or [enumeration](https://developers.google.com/protocol-buffers/docs/proto3#enum)
+* **encodable structure type**, which is an empty structure, or structure whose fields have an encodable scalar type
 
-Structure field is called **encodable**, if it is non-`repeated` and has one of the following types:
-* [scalar](https://developers.google.com/protocol-buffers/docs/proto3#scalar), except for floating-point types `float` and `double`
-* [enumeration](https://developers.google.com/protocol-buffers/docs/proto3#enum)
-
-**Encodable structure** is an empty structure, or structure, which consists of encodable fields only.
+Some examples of encodable and not encodable structure types:
 
 ```
 enum MyEnum {
@@ -115,7 +115,7 @@ enum MyEnum {
 // empty structure is encodable
 message Encodable1 { }
 
-// encodable (all fields are encodable)
+// all fields have encodable scalar type, so the structure is encodable
 message Encodable2 {
   optional int32 f1 = 1;
   string f2 = 2;
@@ -123,7 +123,7 @@ message Encodable2 {
   MyEnum f4 = 4;
 }
 
-// not encodable (all fields are not encodable)
+// not encodable (every field violates encodable scalar type definition somehow)
 message NotEncodable {
   float f1 = 1;
   repeated int32 f2 = 2;
@@ -134,7 +134,7 @@ message NotEncodable {
   }
 
   map<int32, int32> f5 = 5;
-  Encodable1 f6 = 6;
+  Encodable1 f6 = 6; // encodable structure type is not an encodable scalar type
 }
 ```
 
@@ -174,7 +174,7 @@ Whenever caller receives an exception which he does not know how to handle, he m
 
 **Call endpoint** is a message bus topic to which method calls are published by a caller. Format of the call endpoint is `<namespace>.<class>.<method>.<object-id>[.<observable-params>].<eof>`, where:
 * `<namespace>`, `<class>` and `<method>` are names of the namespace, class and method correspondingly
-* `<object-id>` is identifier of an object for which method is called, or a reserved word representing null value for static methods
+* `<object-id>` is identifier of an object for which method is called, or a reserved word `<null>` for static methods
 * `<observable-params>` is a sequence of words representing values of the observable parameters (can be 0 or many)
 * `<eof>` is a reserved word which designates the end of endpoint
 
@@ -198,7 +198,7 @@ Message bus may prohibit the use of some characters in it's topics. That means e
 
 ## Type visibility
 
-**Scope** is a part of a busrcp API where name of a structure or enumeration can be used to refer to the corresponding type. In that case we also say that busrpc structure/enumeration is **visible** in this scope.
+**Scope** is a part of a busrpc API where name of a structure or enumeration can be used to refer to the corresponding type. In that case we also say that busrpc structure/enumeration is **visible** in this scope.
 
 The scope of a type is determined by the place in the directory hierarchy where the protobuf file containing it's definition is located. Additionally, scopes form a hierarchy in which types visible in the parent scope are also visible in all child scopes. The following scopes are defined by the busrpc specification (in the order from parent to child):
 1. a single **global scope**
@@ -350,7 +350,7 @@ Note, that `Result` enumeration has method scope and can't be used outside the m
 
 #### Observable parameters
 
-Observable method parameter is created using custom protobuf field option `observable`, defined in the *busrpc.proto* file. This option can be applied only to [encodable fields](#structure) of `Params` structure. Remember, that observable parameters (as described [earlier](#endpoint)) are also added to the call endpoint, which means that implementors may filter calls they want to handle to only those having specific value(s) of the observable parameter(s).
+[Observable](#class) method parameter is created using custom protobuf field option `observable`, defined in the *busrpc.proto* file. This option can be applied only to those `Params` fields, which have [encodable type](#structure). Remember, that observable parameters (as described [earlier](#endpoint)) are also added to the call endpoint, which means that implementors may cherry-pick calls with a desired value(s) of the observable parameter(s).
 
 Consider method `user::send_message` from the Chat application API.
 
@@ -410,7 +410,7 @@ Service description file *service.proto* must always contain definition of a ser
 
 Additionally, service description file must import description files of all methods that service implements or invokes.
 
-Consider a service that sends welcome message to any user who signed in to the Chat application for the first time. Such service is pretty easy to implement using existing API: it needs to implement method `user::on_signed_in` to check whether user signs in for the first time, and if he is, call `user::send_message`. The fact that service uses two API methods is expressed in the service description file by importing corresponding *method.proto* files.
+Consider a service that sends welcome message to any user who signed in to the Chat application for the first time. Such service is pretty easy to implement using existing API: it needs to implement method `user::on_signed_in` to check whether user signs in for the first time, and if he is, call `user::send_message` method of some system-defined user account to send a welcome message to him. The fact that service uses two API methods is expressed in the service description file by importing corresponding *method.proto* files.
 
 ```
 // file ./services/greeter/service.proto
@@ -424,7 +424,7 @@ import "api/chat/user/send_message/method.proto";
 
 ### `Config`
 
-`Config` is a predefined strucuture describing service configration parameters. Note, that protobuf supports JSON serialization for it's `message` types, which means that service configuration can be easily read/written from/to the text file.
+`Config` is a predefined strucuture describing service configuration parameters. Note, that protobuf supports JSON serialization for it's `message` types, which means that service configuration can be easily read/written from/to the text file.
 
 ```
 // file ./services/greeter/service.proto
@@ -534,17 +534,17 @@ File [*busrpc.proto*](proto/busrpc.proto) contains definition of a protobuf opti
 
 Option `hashed_field` is usually applied to `string` and `bytes` protobuf types, which may have arbitrary length. However, specification allows to use it for other encodable types for consistency, though it usually makes no sense because hash will have greater size than original value.
 
-#### Boolean
+#### Boolean encoding
 
 Protobuf `bool` field value is converted to string "1" if value is `true` and "0" otherwise. If `hashed_field` option is specified for the field, it is applied to the conversion result.
 
-#### Integer
+#### Integer encoding
 
 Protobuf integer field value is converted to it's string representation with a single leading `-` sign for negative values. No leading zeros are allowed, unless the value itself is zero, in which case it is converted to "0". If `hashed_field` option is specified for the field, it is applied to the conversion result.
 
-#### String
+#### String encoding
 
-#### Byte sequence
+#### Byte sequence encoding
 
 If `hashed_field` option is not specified for a protobuf `bytes` field, then it's value is converted to a string containing hexadecimal representation of each byte. **Only lowercase** `a-f` digits can be used in the hexadecimal representation of a byte.
 
