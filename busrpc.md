@@ -36,7 +36,7 @@ This document contains general information for developers of busrpc microservice
       * [String encoding](#string-encoding)
       * [Byte sequence encoding](#byte-sequence-encoding)
     * [Structure encoding](#structure-encoding)
-    * [Examples](#examples)
+    * [Example](#example)
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
 
@@ -522,37 +522,44 @@ As a hash function busrpc framework uses SHA-224, which is chosen for the follow
 
 Call endpoint is created using the following algorithm (note, that creating result endpoint from the call endpoint is trivial):
 1. Fill `<namespace>`, `<class>` and `<method>` components with the namespace, class and method names correspondingly. Note, that this components may contain only alphanumeric symbols and underscores, thus do not require additional encoding.  
-2. Encode [`ObjectId`](#objectid) structure as specified by [structure encoding](#structure-encoding) rules and append result to the endpoint.
-3. For each [observable parameter](#observable-parameters) in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers), encode the parameter as specified by [field encoding](#field-encoding) rules and append it to the endpoint.
+2. For non-`static` class, encode [`ObjectId`](#objectid) structure as specified by the [structure encoding](#structure-encoding) rules and append result to the endpoint. For `static` class, append reserved `<null>` word to the endpoint.
+3. For each [observable parameter](#observable-parameters) in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers), encode the parameter as specified by the [field encoding](#field-encoding) rules and append it to the endpoint.
 4. Append `<eof>` reserved word.
 
 ### Field encoding
 
-Only [encodable](#structure) fields can be a subject for converting to the endpoint component. This section describes how various protobuf types are encoded.
-
-File [*busrpc.proto*](proto/busrpc.proto) contains definition of a protobuf option `hashed_field`. This option specifies that instead of encoded field value it's SHA-224 hash should be added to the endpoint. Hash value is considered a byte sequence and is encoded [respectively](#byte-sequence) (as a hexadecimal string) before adding to the endpoint.
+File [*busrpc.proto*](proto/busrpc.proto) contains definition of a protobuf option `hashed_field`. This option specifies that instead of encoded field value it's SHA-224 hash should be added to the endpoint. Hash value is considered a byte sequence and is encoded [respectively](#byte-sequence-encoding) (as a hexadecimal string) before adding to the endpoint.
 
 Option `hashed_field` is usually applied to `string` and `bytes` protobuf types, which may have arbitrary length. However, specification allows to use it for other encodable types for consistency, though it usually makes no sense because hash will have greater size than original value.
 
+Before encoding fields marked as `optional`, perform the following step:
+0. If field is not set, add reserved word `<null>` to the endpoint and finish encoding.
+
 #### Boolean encoding
 
-Protobuf `bool` field value is converted to string "1" if value is `true` and "0" otherwise. If `hashed_field` option is specified for the field, it is applied to the conversion result.
+1. Convert protobuf `bool` field value to string "1" if value is `true` and "0" otherwise.
+2. If `hashed_field` option is specified for the field, apply hashing to the result of the previous point.
 
 #### Integer encoding
 
-Protobuf integer field value is converted to it's string representation with a single leading `-` sign for negative values. No leading zeros are allowed, unless the value itself is zero, in which case it is converted to "0". If `hashed_field` option is specified for the field, it is applied to the conversion result.
+1. Convert protobuf integer field value to it's string representation with a single leading `-` sign for negative values. No leading zeros are allowed, unless the value itself is zero, in which case it is converted to "0".
+2. If `hashed_field` option is specified for the field, apply hashing to the result of the previous point.
 
 #### String encoding
 
+1. If protobuf `string` field value has zero length, convert it to an `<empty>` reserved word and finish encoding.
+2. If `hashed_field` option is not specified, replace all prohibited/reserved characters (defined by the [specialization](#specializations)) in the `string` value with the triplets `<esc><hex><hex>`, where `<esc>` is bus-specific escape character and `<hex><hex>` is a hexadecimal representation of the prohibited/reserved character. **Only lowercase** `a-f` digits are allowed for `<hex>`.
+3. If `hashed_field` option is specified, apply hashing directly to the `string` value.
+
 #### Byte sequence encoding
 
-If `hashed_field` option is not specified for a protobuf `bytes` field, then it's value is converted to a string containing hexadecimal representation of each byte. **Only lowercase** `a-f` digits can be used in the hexadecimal representation of a byte.
-
-If `hashed_field` option is specified for a protobuf `bytes` field, then it is applied directly to the field value.
+1. If protobuf `bytes` field value has zero size, convert it to an `<empty>` reserved word and finish encoding.
+2. If `hashed_field` option is not specified, convert `bytes` value to a hexadecimal string using **only lowercase** `a-f` digits and finish encoding.
+3. If `hashed_field` option is specified, apply hashing directly to the `bytes` value.
 
 ### Structure encoding
 
-### Examples
+### Example
 
 ### Character encoding
 
