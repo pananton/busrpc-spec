@@ -564,10 +564,6 @@ We will describe encoding algorithm in terms of a function call `EncodeValue(val
 2. If APPLY_HASH is not set, then for each structure field in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers) perform the following:
   1. If it is not a first field, append a special bus-specific character `<field-sep>` to the `result`.
   2. Append `EncodeValue(field)` to the `result`.
-3. Otherwise:
-  1. For each structure field in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers) perform the following:
-  2. Calculate SHA-224 hash of `tmp` and set `result` to `EncodeValue(hash)`.
-4. Return `result`.
 
 ### General algorithm
 
