@@ -565,11 +565,11 @@ Next subsections describe operations of an `EncodeValue(value, flags)` for all v
   * APPLY_HASH flag is **not set**:
     1. If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
     2. Otherwise, append `EncodeValue(field_value)` to `tmp`.
-    3. Finally, append bus-specific field separator represented by `<field-sep>` reserved character to `tmp`.
+    3. Append bus-specific field separator character `<field-sep>` to `tmp`.
   * APPLY_HASH flag is **set**:
     1. If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
-    2. Otherwise, if field type is not `bytes` or `string`, append `EncodeValue(field_value)` to `tmp`.
-    3. Otherwise, append `bytes`/`string` value to `tmp` (note, that value is added as-is, without additional encoding).
+    2. Otherwise, if field type is not `string` or `bytes`, append `EncodeValue(field_value)` to `tmp`.
+    3. Otherwise, append `string`/`bytes` field value to `tmp` (note, that field value is appended as-is, without additional encoding).
 4. If APPLY_HASH flag is not set, return `tmp` as a string
 5. Otherwise, calculate SHA-224 hash of `tmp` and return `EncodeValue(hash, 0)`.
  
