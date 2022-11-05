@@ -100,9 +100,10 @@ Busrpc **structure** is an alternative term for a protobuf `message` introduced 
 
 **Predefined structures** are structures which have special meaning determined by this specification. In particular, **descriptors** are predefined structures which provide busrpc client libraries with type information about busrpc entity (service, class, or method). Descriptors are usually never sent over the network - in fact, they even do not have any fields, only nested type definitions.
  
-Busrpc specification defines a concept of an **encodable type** - a protobuf type which can be encoded as specified in the [Endpoint encoding](#endpoint-encoding) section below. Encodable type can be one of the following:
-* **encodable scalar type**, which is a non-`repeated` protobuf [scalar](https://developers.google.com/protocol-buffers/docs/proto3#scalar) type except for floating-point types `float` and `double` or [enumeration](https://developers.google.com/protocol-buffers/docs/proto3#enum)
-* **encodable structure type**, which is an empty structure, or structure whose fields have an encodable scalar type
+Busrpc specification defines a concept of an **encodable type** - a protobuf type which can be encoded as specified in the [Endpoint encoding](#endpoint-encoding) section below. Encodable type can't be `repeated` and should be one the following:
+* [scalar](https://developers.google.com/protocol-buffers/docs/proto3#scalar) type except for floating-point types `float` and `double`
+* [enumeration](https://developers.google.com/protocol-buffers/docs/proto3#enum) type
+* **encodable structure** type, which contains only fields of encodable scalar/enumeration types (structure without fields is also encodable)
 
 Some examples of encodable and not encodable structure types:
 
@@ -115,7 +116,7 @@ enum MyEnum {
 // empty structure is encodable
 message Encodable1 { }
 
-// all fields have encodable scalar type, so the structure is encodable
+// all fields have encodable scalar/enumeration type, so the structure is encodable
 message Encodable2 {
   optional int32 f1 = 1;
   string f2 = 2;
@@ -123,7 +124,7 @@ message Encodable2 {
   MyEnum f4 = 4;
 }
 
-// not encodable (every field violates encodable scalar type definition somehow)
+// not encodable (every field is not encodable scalar/enumeration type)
 message NotEncodable {
   float f1 = 1;
   repeated int32 f2 = 2;
@@ -134,7 +135,7 @@ message NotEncodable {
   }
 
   map<int32, int32> f5 = 5;
-  Encodable1 f6 = 6; // encodable structure type is not an encodable scalar type
+  Encodable1 f6 = 6;
 }
 ```
 
@@ -350,7 +351,7 @@ Note, that `Result` enumeration has method scope and can't be used outside the m
 
 #### Observable parameters
 
-[Observable](#class) method parameter is created using custom protobuf field option `observable`, defined in the *busrpc.proto* file. This option can be applied only to those `Params` fields, which have [encodable type](#structure). Remember, that observable parameters (as described [earlier](#endpoint)) are also added to the call endpoint, which means that implementors may cherry-pick calls with a desired value(s) of the observable parameter(s).
+[Observable](#class) method parameter is created using custom protobuf field option `observable`, defined in the [*busrpc.proto*](proto/busrpc.proto) file. This option can be applied only to those `Params` fields, which have [encodable type](#structure). Remember, that observable parameters (as described [earlier](#endpoint)) are also added to the call endpoint and provide implementors with an ability to cherry-pick calls with a desired value(s) of the observable parameter(s).
 
 Consider method `user::send_message` from the Chat application API.
 
@@ -516,7 +517,7 @@ As a hash function busrpc framework uses SHA-224, which is chosen for the follow
 * it is a cryptographic hash function, which means that it is practically impossible to find two distinct inputs that are hashed to the same value
 * it's performance does not degrade on small inputs (tens of bytes)
 * modern CPUs provide high-performance instructions for SHA hash calculation
-* it's output is shorter than SHA-256
+* it's output is shorter than SHA-256, which is important because we try to make endpoint as short as possible
 
 ### General algorithm
 
