@@ -521,10 +521,51 @@ As a hash function busrpc framework uses SHA-224, which is chosen for the follow
 
 ### Type encoding
 
-To describe endpoint encoding algorithm we first define a function `EncodeValue`. This function unambiguously converts a value of [encodable type](#structure) to a  string, which can be safely used as an endpoint component.
+To describe endpoint encoding algorithm we first define an algorithm `EncodeValue`, which unambiguously converts a value of [encodable](#structure) protobuf type to a string.
 
-Signature of a function, implementing the algorithm, Algorithm accepts two parameters and outputs an encoded string. The function implementing
-Encoding modifiers control the encoding process. Busrpc currently uses a single modifier HASH, which signals that protobuf type value should be   
+If we consider `EncodeValue` as a function, it's signature will be `string EncodeValue(value, flags)`. Here, `value` is a value to be encoded and `flags` are flags, controlling encoding process.
+
+Specification currently defines only one flag HASH, which makes algorithm return SHA-224 hash of `value` instead of value itself. This flag is frequently used together with `string`, `bytes` and structure type values, because they may have arbitrary length. However, it can also be applied for scalar/enumeration type values, though it usually makes no sense, because the result will occupy more space in the endpoint than original value.
+
+We will describe encoding algorithm in terms of a function call `EncodeValue(value, flags)`. Regardless of the `value` type, first step of `EncodeValue(value, flags)` is:
+0. If `value` is NULL (i.e., not set), return `<null>` reserved word.
+
+#### Boolean encoding
+
+1. Set `result` to "1" if `value` is `true` or "0" otherwise.
+2. If HASH modifier is not set, return `result`.
+3. Otherwise, calculate SHA-224 hash of `result` and return `EncodeValue(hash)`.
+
+#### Integer encoding
+
+1. Convert `value` to string and set it as `result. Use single `-` sign for negative values. Do not use leading zeros, unless `value` is zero, in which case it is converted to "0".
+2. If HASH modifier is not set, return `result`.
+3. Otherwise, calculate SHA-224 hash of `result` and return `EncodeValue(hash)`.
+
+#### Enumeration encoding
+
+1. Return `EncodeValue(ToInteger(value), flags)`
+
+#### String encoding
+
+1. If `value` is empty, return `<empty>` reserved word.
+2. If HASH modifier is set, calculate SHA-224 hash of `value` and return `EncodeValue(hash)`.
+3. Otherwise, replace all prohibited/reserved characters (as defined by the message bus [specialization](#specializations)) in `value` with a triplets `<esc><hex><hex>` and return it as result. Here, `<esc>` is bus-specific escape character and `<hex><hex>` is a hexadecimal representation of the prohibited/reserved character. Use **only lowercase** `a-f` digits in `<hex>`.
+
+#### Byte sequence encoding
+
+1. If `value` is empty, return `<empty>` reserved word.
+2. If HASH modifier is set, calculate SHA-224 hash of `value` and return `EncodeValue(hash)`.
+3. Otherwise, convert every byte of a sequence to it's hexadecimal representation `<hex><hex>` and return the result of conversion. Use **only lowercase** `a-f` digits in `<hex>`.
+
+#### Structure encoding
+
+1. If structure does not have fields, return `<empty>` reserved word.
+2. 
+
+
+
+
 ### General algorithm
 
 Call endpoint is created using the following algorithm (note, that creating result endpoint from the call endpoint is trivial):
