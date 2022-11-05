@@ -443,7 +443,7 @@ message ServiceDesc {
 
 File *busrpc.proto* contains definitions of several options that allow to specify default values for structure fields (other than [those](https://developers.google.com/protocol-buffers/docs/proto3#default) defined by protobuf itself). Of course, protobuf compiler does not understand semantics of this options, however, [client libraries](README.md#libraries) are expected to respect them. This options are:
 * `default_bool` - default value for protobuf `bool` type
-* `default_int` - default value for protobuf integer types (`int32`, `uint32`, `int64`, `uint64`, `sint32`, `sint64`, `fixed32`, `fixed64`, `sfixed32`, `sfixed64`)
+* `default_int` - default value for protobuf integer types (`int32`, `fixed32`, `sint32`, `sfixed32`, `uint32`, `int64`, `fixed64`, `sint64`, `sfixed64`, `uint64`)
 * `default_double` - default value for protobuf floating-point types (`float`, `double`)
 * `default_string` - default value for protobuf `string` type
 
@@ -519,6 +519,12 @@ As a hash function busrpc framework uses SHA-224, which is chosen for the follow
 * modern CPUs provide high-performance instructions for SHA hash calculation
 * it's output is shorter than SHA-256, which is important because we try to make endpoint as short as possible
 
+### Type encoding
+
+To describe endpoint encoding algorithm we first define a function `EncodeValue`. This function unambiguously converts a value of [encodable type](#structure) to a  string, which can be safely used as an endpoint component.
+
+Signature of a function, implementing the algorithm, Algorithm accepts two parameters and outputs an encoded string. The function implementing
+Encoding modifiers control the encoding process. Busrpc currently uses a single modifier HASH, which signals that protobuf type value should be   
 ### General algorithm
 
 Call endpoint is created using the following algorithm (note, that creating result endpoint from the call endpoint is trivial):
@@ -526,6 +532,35 @@ Call endpoint is created using the following algorithm (note, that creating resu
 2. For non-`static` class, encode [`ObjectId`](#objectid) structure as specified by the [structure encoding](#structure-encoding) rules and append result to the endpoint. For `static` class, append reserved `<null>` word to the endpoint.
 3. For each [observable parameter](#observable-parameters) in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers), encode the parameter as specified by the [field encoding](#type-encoding) rules and append it to the endpoint.
 4. Append `<eof>` reserved word.
+
+### Type encoding
+
+This section describes how [encodable types](#structure) are converted to string which can be safely used as an endpoint component.
+
+#### Boolean encoding
+
+Protobuf `bool` value is encoded as string "1" if value is `true` and "0" otherwise.
+
+#### Integer encoding
+
+Protobuf integer value (`int32`, `fixed32`, `sint32`, `sfixed32`, `uint32`, `int64`, `fixed64`, `sint64`, `sfixed64`, `uint64`) is encoded as it's string representation with a single leading `-` sign for negative values. No leading zeros are allowed, unless the value itself is zero, in which case it is encoded as "0".
+
+#### String encoding
+
+If `string` value is empty, it is encoded as `<empty>` reserved word.
+
+Otherwise, every prohibited/reserved character (as defined by the message bus [specialization](#specializations)) in the `string` value is encoded as a triplet `<esc><hex><hex>`, where `<esc>` is a bus-specific escape character and `<hex><hex>` is a hexadecimal representation of the prohibited/reserved character. **Only lowercase** `a-f` digits are allowed for `<hex>`.
+
+#### Byte sequence encoding
+
+If `bytes` value is empty, it is encoded as `<empty>` reserved word.
+
+Otherwise `bytes` value is encoded as a string, which contais `<hex><hex>` pairs for every byte in the sequence. **Only lowercase** `a-f` digits are allowed for `<hex>`.
+
+#### Structure encoding
+
+
+
 
 ### Type encoding
 
