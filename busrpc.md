@@ -100,7 +100,7 @@ Busrpc **structure** is an alternative term for a protobuf `message` introduced 
 
 **Predefined structures** are structures which have special meaning determined by this specification. In particular, **descriptors** are predefined structures which provide busrpc client libraries with type information about busrpc entity (service, class, or method). Descriptors are usually never sent over the network - in fact, they even do not have any fields, only nested type definitions.
  
-Busrpc specification defines a concept of an **encodable type** - a protobuf type which can be encoded as specified in the [Endpoint encoding](#endpoint-encoding) section below. Encodable type can't be `repeated` and should be one the following:
+Busrpc specification defines a concept of an **encodable type** - a protobuf type which can be encoded as specified in the [Type encoding](#type-encoding) section below. Encodable type can't be `repeated` and should be one the following:
 * [scalar](https://developers.google.com/protocol-buffers/docs/proto3#scalar) type except for floating-point types `float` and `double`
 * [enumeration](https://developers.google.com/protocol-buffers/docs/proto3#enum) type
 * **encodable structure** type, which contains only fields of encodable scalar/enumeration types (structure without fields is also encodable)
@@ -521,13 +521,13 @@ As a hash function busrpc framework uses SHA-224, which is chosen for the follow
 
 ### Type encoding
 
-To describe endpoint encoding algorithm we first define an algorithm `EncodeValue`, which unambiguously converts a value of [**encodable**](#structure) protobuf type to a string.
+To describe endpoint encoding algorithm we first define an algorithm `EncodeValue`, which unambiguously converts a value of [encodable](#structure) protobuf type to a string.
 
-If we consider `EncodeValue` as a function, it's signature will be `string EncodeValue(value, flags)`. Here, `value` is a value to be encoded and `flags` are flags, controlling encoding process.
+If we consider `EncodeValue` as a function, it's signature will be `string EncodeValue(value, flags)`. Here, `value` is a value to be encoded and `flags` are flags, controlling the encoding process.
 
-Specification currently defines only one flag APPLY_HASH, which makes algorithm return SHA-224 hash of `value` instead of value itself. This flag is frequently used together with `string`, `bytes` and structure types, because their values may have arbitrary length. However, it can also be applied to other types, though it usually makes no sense, because the result will occupy more space in the endpoint than the value encoded without specifying this flag.
+Specification currently defines only one flag APPLY_HASH, which tells algorithm to additionally apply SHA-224 hash to the `value`. This flag is frequently used together with `string`, `bytes` and structure types, because their values may have arbitrary length. However, it can also be applied to other types, though it usually makes no sense, because the result will occupy more space in the endpoint than the value, encoded without specifying this flag.
 
-Next subsections describe operations of an `EncodeValue(value, flags)` for all possible types of `value`.
+Next subsections describe operations of an `EncodeValue(value, flags)` for all valid types of `value`.
 
 #### Boolean encoding
 
@@ -548,7 +548,7 @@ Next subsections describe operations of an `EncodeValue(value, flags)` for all p
 #### String encoding
 
 1. If `value` is empty, return `<empty>` reserved word.
-2. If APPLY_HASH flag is not set, replace all prohibited/reserved characters (as defined by the message bus [specialization](#specializations)) in `value` with a triplets `<esc><hex><hex>` and return it as result. Here, `<esc>` is bus-specific escape character and `<hex><hex>` is a hexadecimal representation of the prohibited/reserved character. Use **only lowercase** `a-f` digits in `<hex>`.
+2. If APPLY_HASH flag is not set, replace all prohibited/reserved characters (as defined by the message bus [specialization](#specializations)) in `value` with a triplets `<esc><hex><hex>` and return it as result. Here, `<esc>` is a bus-specific escape character and `<hex><hex>` is a hexadecimal representation of the prohibited/reserved character. Use **only lowercase** `a-f` digits in `<hex>`.
 3. Otherwise, calculate SHA-224 hash of `value` and return `EncodeValue(hash, 0)`.
 
 #### Byte sequence encoding
@@ -561,23 +561,18 @@ Next subsections describe operations of an `EncodeValue(value, flags)` for all p
 
 1. If structure does not have fields, return `<empty>` reserved word.
 2. Create an empty `tmp` byte sequence to hold intermediate result.
-
-Next steps are performed for each structure field in the ascending order of [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers). These steps depend on the presence of the APPLY_HASH flag. We could express them as a single group, however found resulting algorithm confusing. So we decided to describe each case separately.
-
-APPLY_HASH flag is **not set**:
-3. If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
-4. Otherwise, append `EncodeValue(field_value)` to `tmp`.
-5. Finally, append bus-specific field separator represented by `<field-sep>` reserved character to `tmp`.
-
-APPLY_HASH flag is **set**:
-3. If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
-4. Otherwise, if field type is not `bytes` or `string`, append `EncodeValue(field_value)` to `tmp`.
-5. Otherwise, append `bytes`/`string` value to `tmp` (note, that value is added as-is, without additional encoding).
-
-Finally, the following steps are performed:
-6. If APPLY_HASH is not set, return `tmp` as a string
-7. Otherwise, calculate SHA-224 hash of `tmp` and return `EncodeValue(hash, 0)`.
-
+3. For each structure field in the ascending order of [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers) do:
+  * APPLY_HASH flag is **not set**:
+    * If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
+    * Otherwise, append `EncodeValue(field_value)` to `tmp`.
+    * Finally, append bus-specific field separator represented by `<field-sep>` reserved character to `tmp`.
+  * APPLY_HASH flag is **set**:
+    * If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
+    * Otherwise, if field type is not `bytes` or `string`, append `EncodeValue(field_value)` to `tmp`.
+    * Otherwise, append `bytes`/`string` value to `tmp` (note, that value is added as-is, without additional encoding).
+4. If APPLY_HASH is not set, return `tmp` as a string
+5. Otherwise, calculate SHA-224 hash of `tmp` and return `EncodeValue(hash, 0)`.
+ 
 ### General algorithm
 
 File [*busrpc.proto*](proto/busrpc.proto) contains definition of two options that control when APPLY_HASH flag is passed to the `EncodeValue` function:
@@ -591,82 +586,7 @@ Call endpoint is created using the following algorithm (note, that creating resu
 3. For each [observable parameter](#observable-parameters) in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers), encode the parameter as specified by the [field encoding](#type-encoding) rules and append it to the endpoint.
 4. Append `<eof>` reserved word.
 
-### Type encoding
-
-This section describes how [encodable types](#structure) are converted to string which can be safely used as an endpoint component.
-
-#### Boolean encoding
-
-Protobuf `bool` value is encoded as string "1" if value is `true` and "0" otherwise.
-
-#### Integer encoding
-
-Protobuf integer value (`int32`, `fixed32`, `sint32`, `sfixed32`, `uint32`, `int64`, `fixed64`, `sint64`, `sfixed64`, `uint64`) is encoded as it's string representation with a single leading `-` sign for negative values. No leading zeros are allowed, unless the value itself is zero, in which case it is encoded as "0".
-
-#### String encoding
-
-If `string` value is empty, it is encoded as `<empty>` reserved word.
-
-Otherwise, every prohibited/reserved character (as defined by the message bus [specialization](#specializations)) in the `string` value is encoded as a triplet `<esc><hex><hex>`, where `<esc>` is a bus-specific escape character and `<hex><hex>` is a hexadecimal representation of the prohibited/reserved character. **Only lowercase** `a-f` digits are allowed for `<hex>`.
-
-#### Byte sequence encoding
-
-If `bytes` value is empty, it is encoded as `<empty>` reserved word.
-
-Otherwise `bytes` value is encoded as a string, which contais `<hex><hex>` pairs for every byte in the sequence. **Only lowercase** `a-f` digits are allowed for `<hex>`.
-
-#### Structure encoding
-
-
-
-
-### Type encoding
-
-File [*busrpc.proto*](proto/busrpc.proto) contains definition of a protobuf option `hashed_field`. This option specifies that instead of encoded field value it's SHA-224 hash should be added to the endpoint. Hash value is considered a byte sequence and is encoded [respectively](#byte-sequence-encoding) (as a hexadecimal string) before adding to the endpoint.
-
-Option `hashed_field` is usually applied to `string` and `bytes` protobuf types, which may have arbitrary length. However, specification allows to use it for other encodable types for consistency, though it usually makes no sense because hash will have greater size than original value.
-
-Before encoding fields marked as `optional`, perform the following step:
-0. If field is not set, add reserved word `<null>` to the endpoint and finish encoding.
-
-#### Boolean encoding
-
-1. Convert protobuf `bool` field value to string "1" if value is `true` and "0" otherwise.
-2. If `hashed_field` option is specified for the field, apply hashing to the result of the previous point.
-
-#### Integer encoding
-
-1. Convert protobuf integer field value to it's string representation with a single leading `-` sign for negative values. No leading zeros are allowed, unless the value itself is zero, in which case it is converted to "0".
-2. If `hashed_field` option is specified for the field, apply hashing to the result of the previous point.
-
-#### String encoding
-
-1. If protobuf `string` field value has zero length, convert it to an `<empty>` reserved word and finish encoding.
-2. If `hashed_field` option is not specified, replace all prohibited/reserved characters (defined by the [specialization](#specializations)) in the `string` value with the triplets `<esc><hex><hex>`, where `<esc>` is bus-specific escape character and `<hex><hex>` is a hexadecimal representation of the prohibited/reserved character. **Only lowercase** `a-f` digits are allowed for `<hex>`.
-3. If `hashed_field` option is specified, apply hashing directly to the `string` value.
-
-#### Byte sequence encoding
-
-1. If protobuf `bytes` field value has zero size, convert it to an `<empty>` reserved word and finish encoding.
-2. If `hashed_field` option is not specified, convert `bytes` value to a hexadecimal string using **only lowercase** `a-f` digits and finish encoding.
-3. If `hashed_field` option is specified, apply hashing directly to the `bytes` value.
-
-#### Structure encoding
-
 ### Example
-
-### Character encoding
-
-Busrpc specification requires, that the following characters can be used as-is in a message bus topic:
-* alphanumericals (a-z, A-Z and 0-9)
-* underscore `_`
-* hyphen `-`
-
-Additionally, busrpc encoding uses two special characters, which are defined in the message bus [specialization](#specializations) and referred to in the specificaton as `<esc>` and `<field-sep>`. This two characters should also be usable as-is in the message bus topic.
-
-Message bus specialization contains information, which characters are prohibited for topic or have special meaning. If this characters are found in the endpoint component, they are encoded as a triple `<esc><hex><hex>`. Here, `<esc>` is a predefined bus-specific escape character and `<hex><hex>` is a hexadecimal representation of the character. **Only lowercase** "a-f" can be used as hexadecimal digits. Note, that `<esc>` and `<field-sep>` (used for structure encoding, see below) are treated specially, thus should be encoded if this special treatment is undesirable.
-
-As an example consider message bus, that defines `<esc>` as `%` and uses `.` as topic word separator. In that case, string "%hello.world%` is encoded as `%25hello%2eworld%25` when used as endpoint component.
 
 # Documentation commands
 
