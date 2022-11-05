@@ -563,13 +563,13 @@ Next subsections describe operations of an `EncodeValue(value, flags)` for all v
 2. Create an empty `tmp` byte sequence to hold intermediate result.
 3. For each structure field in the ascending order of [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers) do:
   * APPLY_HASH flag is **not set**:
-    * If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
-    * Otherwise, append `EncodeValue(field_value)` to `tmp`.
-    * Finally, append bus-specific field separator represented by `<field-sep>` reserved character to `tmp`.
+    1. If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
+    2. Otherwise, append `EncodeValue(field_value)` to `tmp`.
+    3. Finally, append bus-specific field separator represented by `<field-sep>` reserved character to `tmp`.
   * APPLY_HASH flag is **set**:
-    * If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
-    * Otherwise, if field type is not `bytes` or `string`, append `EncodeValue(field_value)` to `tmp`.
-    * Otherwise, append `bytes`/`string` value to `tmp` (note, that value is added as-is, without additional encoding).
+    1. If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
+    2. Otherwise, if field type is not `bytes` or `string`, append `EncodeValue(field_value)` to `tmp`.
+    3. Otherwise, append `bytes`/`string` value to `tmp` (note, that value is added as-is, without additional encoding).
 4. If APPLY_HASH is not set, return `tmp` as a string
 5. Otherwise, calculate SHA-224 hash of `tmp` and return `EncodeValue(hash, 0)`.
  
