@@ -562,8 +562,14 @@ We will describe encoding algorithm in terms of a function call `EncodeValue(val
 
 1. If structure does not have fields, return `<empty>` reserved word.
 2. If APPLY_HASH is not set, then for each structure field in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers) perform the following:
-  1. If it is not a first field, append a special bus-specific character `<field-sep>` to the `result`.
-  2. Append `EncodeValue(field)` to the `result`.
+  i. If it is not a first field, append a special bus-specific character `<field-sep>` to the `result`.
+  ii. Append `EncodeValue(field)` to the `result`.
+3. Otherwise:
+  i. For each structure field in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers) perform the following:
+    1. If field type is `string` or `bytes`, append field value to a byte sequence `tmp` as-is.
+    2. Otherwise, append `EncodeValue(field)` to the byte sequence `tmp`.
+  ii. Calculate SHA-224 hash of `tmp` and set `result` to `EncodeValue(hash)`.
+4. Return `result`.
 
 ### General algorithm
 
