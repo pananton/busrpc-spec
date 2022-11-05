@@ -566,8 +566,6 @@ We will describe encoding algorithm in terms of a function call `EncodeValue(val
   2. Append `EncodeValue(field)` to the `result`.
 3. Otherwise:
   1. For each structure field in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers) perform the following:
-    1. If field type is `string` or `bytes`, append field value to a byte sequence `tmp` as-is
-    2. Otherwise, append `EncodeValue(field)` to the byte sequence `tmp`
   2. Calculate SHA-224 hash of `tmp` and set `result` to `EncodeValue(hash)`.
 4. Return `result`.
 
