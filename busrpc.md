@@ -29,13 +29,13 @@ This document contains general information for developers of busrpc microservice
     * [`CallMessage`](#callmessage)
     * [`ResultMessage`](#resultmessage)
   * [Endpoint encoding](#endpoint-encoding)
-    * [General algorithm](#general-algorithm)
     * [Type encoding](#type-encoding)
       * [Boolean encoding](#boolean-encoding)
       * [Integer encoding](#integer-encoding)
       * [String encoding](#string-encoding)
       * [Byte sequence encoding](#byte-sequence-encoding)
       * [Structure encoding](#structure-encoding)
+    * [General algorithm](#general-algorithm)
     * [Example](#example)
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
@@ -527,20 +527,19 @@ If we consider `EncodeValue` as a function, it's signature will be `string Encod
 
 Specification currently defines only one flag APPLY_HASH, which makes algorithm return SHA-224 hash of `value` instead of value itself. This flag is frequently used together with `string`, `bytes` and structure types, because their values may have arbitrary length. However, it can also be applied to other types, though it usually makes no sense, because the result will occupy more space in the endpoint than the value encoded without specifying this flag.
 
-We will describe encoding algorithm in terms of a function call `EncodeValue(value, flags)`. Regardless of the `value` type, first step of `EncodeValue(value, flags)` is:
-0. If `value` is NULL (i.e., not set), return `<null>` reserved word.
+Next subsections describe operations of an `EncodeValue(value, flags)` for all possible types of `value`.
 
 #### Boolean encoding
 
 1. Set `result` to "1" if `value` is `true` or "0" otherwise.
 2. If APPLY_HASH flag is not set, return `result`.
-3. Otherwise, calculate SHA-224 hash of `result` and return `EncodeValue(hash)`.
+3. Otherwise, calculate SHA-224 hash of `result` and return `EncodeValue(hash, 0)`.
 
 #### Integer encoding
 
 1. Convert `value` to string and set it as `result`. Use single `-` sign for negative values. Do not use leading zeros, unless `value` is zero, in which case it is converted to "0".
 2. If APPLY_HASH flag is not set, return `result`.
-3. Otherwise, calculate SHA-224 hash of `result` and return `EncodeValue(hash)`.
+3. Otherwise, calculate SHA-224 hash of `result` and return `EncodeValue(hash, 0)`.
 
 #### Enumeration encoding
 
@@ -549,27 +548,35 @@ We will describe encoding algorithm in terms of a function call `EncodeValue(val
 #### String encoding
 
 1. If `value` is empty, return `<empty>` reserved word.
-2. If APPLY_HASH flag is set, calculate SHA-224 hash of `value` and return `EncodeValue(hash)`.
-3. Otherwise, replace all prohibited/reserved characters (as defined by the message bus [specialization](#specializations)) in `value` with a triplets `<esc><hex><hex>` and return it as result. Here, `<esc>` is bus-specific escape character and `<hex><hex>` is a hexadecimal representation of the prohibited/reserved character. Use **only lowercase** `a-f` digits in `<hex>`.
+2. If APPLY_HASH flag is not set, replace all prohibited/reserved characters (as defined by the message bus [specialization](#specializations)) in `value` with a triplets `<esc><hex><hex>` and return it as result. Here, `<esc>` is bus-specific escape character and `<hex><hex>` is a hexadecimal representation of the prohibited/reserved character. Use **only lowercase** `a-f` digits in `<hex>`.
+3. Otherwise, calculate SHA-224 hash of `value` and return `EncodeValue(hash, 0)`.
 
 #### Byte sequence encoding
 
 1. If `value` is empty, return `<empty>` reserved word.
-2. If APPLY_HASH flag is set, calculate SHA-224 hash of `value` and return `EncodeValue(hash)`.
-3. Otherwise, convert every byte of a sequence to it's hexadecimal representation `<hex><hex>` and return the result of conversion. Use **only lowercase** `a-f` digits in `<hex>`.
+2. If APPLY_HASH flag is not set, convert every byte of a sequence to it's hexadecimal representation `<hex><hex>` and return the result of conversion. Use **only lowercase** `a-f` digits in `<hex>`.
+3. Otherwise, calculate SHA-224 hash of `value` and return `EncodeValue(hash, 0)`.
 
 #### Structure encoding
 
 1. If structure does not have fields, return `<empty>` reserved word.
-2. If APPLY_HASH is not set, then for each structure field in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers) perform the following:
-  2.1. If it is not a first field, append a special bus-specific character `<field-sep>` to the `result`.
-  2.2. Append `EncodeValue(field)` to the `result`.
-3. Otherwise:
-  i. For each structure field in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers) perform the following:
-    1. If field type is `string` or `bytes`, append field value to a byte sequence `tmp` as-is.
-    2. Otherwise, append `EncodeValue(field)` to the byte sequence `tmp`.
-  ii. Calculate SHA-224 hash of `tmp` and set `result` to `EncodeValue(hash)`.
-4. Return `result`.
+2. Create an empty `tmp` byte sequence to hold intermediate result.
+
+Next steps are performed for each structure field in the ascending order of [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers). These steps depend on the presence of the APPLY_HASH flag. We could express them as a single group, however found resulting algorithm confusing. So we decided to describe each case separately.
+
+APPLY_HASH flag is **not set**:
+3. If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
+4. Otherwise, append `EncodeValue(field_value)` to `tmp`.
+5. Finally, append bus-specific field separator represented by `<field-sep>` reserved character to `tmp`.
+
+APPLY_HASH flag is **set**:
+3. If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
+4. Otherwise, if field type is not `bytes` or `string`, append `EncodeValue(field_value)` to `tmp`.
+5. Otherwise, append `bytes`/`string` value to `tmp` (note, that value is added as-is, without additional encoding).
+
+Finally, the following steps are performed:
+6. If APPLY_HASH is not set, return `tmp` as a string
+7. Otherwise, calculate SHA-224 hash of `tmp` and return `EncodeValue(hash, 0)`.
 
 ### General algorithm
 
