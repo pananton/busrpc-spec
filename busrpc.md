@@ -607,7 +607,7 @@ This allows us to use the following characters and reserved words for the purpos
 
 Note, that characters reserved for `<esc>` and `<field-sep>` also need to be encoded, so the complete list of prohibited/reserved characters is: 0x00-0x31, `space`, `$`, `%`, `:`.
 
-First consider how various structures are encoded as strings, which can be subsequently safely used as endpoint components.
+First consider how various structures are encoded as strings that can be subsequently safely used as endpoint components.
 
 ```
 enum MyEnum {
