@@ -643,19 +643,19 @@ message S3 {
 | s3 = ()                                                              | APPLY_HASH | sha224("%null:")                                            |
 | s3 = ( "" )                                                          | 0          | "%empty:"                                                   |
 | s3 = ( "" )                                                          | APPLY_HASH | sha224("%empty:")                                           |
-| s3 = ( "$aaa. bbb%:" )                                               | 0          | %24aaa%2e%20bbb%25%3a"                                      |
+| s3 = ( "$aaa. bbb%:" )                                               | 0          | "%24aaa%2e%20bbb%25%3a"                                     |
 | s3 = ( "$aaa. bbb%:" )                                               | APPLY_HASH | sha224("$aaa. bbb%:")                                       |
 
-Notes:
-1. Encoding algorithm encodes null or empty values to the same string ("%null" or "%empty") whether APPLY_HASH is specified or not.
-2. Fields are encoded in the ascending order of their numbers, not in the declaration order! Also note, that field separator `:` must always be added, even for the last field. This allows to distinguish null/empty structure values from the values of structures that have one `string`/`bytes` field, whose value is null/empty (see below).
-3. Hash is calculated not for the string from the previous row, but for the following binary data (string and bytes encoding are not applied before hashing):
+Footnotes:
+1. Algorithm encodes null or empty values to the same string ("%null" or "%empty") whether APPLY_HASH is specified or not.
+2. Fields are encoded in the ascending order of their numbers, not in the declaration order! Also note, that field separator `:` must always be added, even for the last field. This allows to distinguish null/empty structure values from the values of structures that have one `string`/`bytes` field, whose value is null/empty.
+3. Hash is calculated not for the string from the previous row, but for the following binary data (`string`/`bytes` value are added as-is, without encoding):
 ```
- 0x10 0xaf 0xb5     0x24 0x61 0x61 0x61 0x2e 0x20 0x62 0x62 0x62 0x25 0x3a 0x37 0x2d 0x31 0x30 0x30 0x31 0x30 0x31
- <0x10, 0xaf, 0xb5> "$aaa. bbb%:"                                          "7"  "-10"          "0"  "10"      "1"
+0x10 0xaf 0xb5     0x24 0x61 0x61 0x61 0x2e 0x20 0x62 0x62 0x62 0x25 0x3a 0x37 0x2d 0x31 0x30 0x30 0x31 0x30 0x31
+<0x10, 0xaf, 0xb5> "$aaa. bbb%:"                                          "7"  "-10"          "0"  "10"      "1"
 ```
 
-Finally, consider example of obtaining endpoint for a method calls. We use class `user` and it's method `send_message` to demonstrate encoding algorithm, however, modify them in the following way (to support very long usernames):
+Finally, consider an example of obtaining endpoint for a method call. We use sligthly modified class `user` and it's method `send_message` to demonstrate encoding algorithm. Aforementioned modifications are introduced to remove limitation on a username size.
 
 ```
 // file ./api/chat/user/class.proto
@@ -683,7 +683,7 @@ message MethodDesc {
 }
 ```
 
-Now if user "Alice" sends message to user "Bob", the endpoint will look like this: `chat.user.send_message.<sha224("Alice")>.<sha224("Bob")>.%eof`. Orm if we expand the hash: `chat.user.send_message.6874ecdbdb214ee888e37c8c983e2f1c9c0ed16907b519704db42bb6.279f0aba2b90ee54755e3772e7f4bd5599e46400617a7c080b955b9c.%eof`.
+Now if user "Alice" sends message to user "Bob", the endpoint will look like this: `chat.user.send_message.<sha224("Alice")>.<sha224("Bob")>.%eof`. Or, if we expand the hash: `chat.user.send_message.6874ecdbdb214ee888e37c8c983e2f1c9c0ed16907b519704db42bb6.279f0aba2b90ee54755e3772e7f4bd5599e46400617a7c080b955b9c.%eof`.
 
 # Documentation commands
 
