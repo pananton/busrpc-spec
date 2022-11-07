@@ -35,8 +35,8 @@ This document contains general information for developers of busrpc microservice
       * [String encoding](#string-encoding)
       * [Byte sequence encoding](#byte-sequence-encoding)
       * [Structure encoding](#structure-encoding)
-    * [General algorithm](#general-algorithm)
-    * [Example](#example)
+    * [Algorithm](#algorithm)
+    * [Examples](#examples)
 * [Documentation commands](#documentation-commands)
 * [Specializations](#specializations)
 
@@ -521,13 +521,11 @@ As a hash function busrpc framework uses SHA-224, which is chosen for the follow
 
 ### Type encoding
 
-To describe endpoint encoding algorithm we first define an algorithm `EncodeValue`, which unambiguously converts a value of [encodable](#structure) protobuf type to a string.
-
-If we consider `EncodeValue` as a function, it's signature will be `string EncodeValue(value, flags)`. Here, `value` is a value to be encoded and `flags` are flags, controlling the encoding process.
+To describe endpoint encoding algorithm we first define a function `string EncodeValue(value, flags)`, which unambiguously converts a value of [encodable](#structure) protobuf type to a string. Here, `value` is a value to be encoded and `flags` are flags, controlling the encoding process.
 
 Specification currently defines only one flag APPLY_HASH, which tells algorithm to additionally apply SHA-224 hash to the `value`. This flag is frequently used together with `string`, `bytes` and structure types, because their values may have arbitrary length. However, it can also be applied to other types, though it usually makes no sense, because the result will occupy more space in the endpoint than the value, encoded without specifying this flag.
 
-Next subsections describe operations of an `EncodeValue(value, flags)` for all valid types of `value`.
+Next sections describe how `EncodeValue(value, flags)` is executed for all possible combinations of `value` and `flags`.
 
 #### Boolean encoding
 
@@ -564,11 +562,11 @@ Next subsections describe operations of an `EncodeValue(value, flags)` for all v
 3. For each structure field in the ascending order of [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers) do:
   * APPLY_HASH flag is **not set**:
     1. If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
-    2. Otherwise, append `EncodeValue(field_value)` to `tmp`.
+    2. Otherwise, append `EncodeValue(field_value, 0)` to `tmp`.
     3. Append bus-specific field separator character `<field-sep>` to `tmp`.
   * APPLY_HASH flag is **set**:
     1. If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
-    2. Otherwise, if field type is not `string` or `bytes`, append `EncodeValue(field_value)` to `tmp`.
+    2. Otherwise, if field type is not `string` or `bytes`, append `EncodeValue(field_value, 0)` to `tmp`.
     3. Otherwise, append `string`/`bytes` field value to `tmp` (note, that field value is appended as-is, without additional encoding).
 4. If APPLY_HASH flag is not set, return `tmp` as a string
 5. Otherwise, calculate SHA-224 hash of `tmp` and return `EncodeValue(hash, 0)`.
@@ -582,15 +580,15 @@ File [*busrpc.proto*](proto/busrpc.proto) contains definition of two options tha
 Call endpoint is created using the following algorithm (note, that creating result endpoint from the call endpoint is trivial):
 1. Fill `<namespace>`, `<class>` and `<method>` components with the namespace, class and method names correspondingly. Note, that this components may contain only alphanumeric symbols and underscores, thus do not require additional encoding.  
 2. If class is `static`, append `<null>` reserved word to the endpoint.
-3. Otherwise, depending on value of `hashed_struct` option for [`ObjectId`](#objectid) structure, append either `EncodeValue(object_id, 0)` (option is `false`) or `EncodeValue(object_id, APPLY_HASH)` (option is `true`). Here, `object_id` is an instance of `ObjectId` determining the object, for which method is called.
+3. Otherwise (let `object_id` be an instance of [`ObjectId`](#objectid) structure):
+  1. If `hashed_struct` is not set of `false` for `ObjectId`, append `EncodeValue(object_id, 0)` to the endpoint.
+  2. Otherwise, append `EncodeValue(object_id, APPLY_HASH)` to the endpoint.
 4. For each [observable parameter](#observable-parameters) in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers):
-    1. if `hashed` option is not set or `false` for parameter, append `EncodeValue(param_value, 0)`
-    2. otherwise, append `EncodeValue(param_value, APPLY_HASH)`
+  1. If `hashed` option is not set or `false` for parameter, append `EncodeValue(param_value, 0)` to the endpoint.
+  2. Otherwise, append `EncodeValue(param_value, APPLY_HASH)` to the endpoint.
 5. Append `<eof>` reserved word.
 
 ### Examples
-
-
 
 # Documentation commands
 
