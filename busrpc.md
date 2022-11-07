@@ -590,6 +590,49 @@ File [*busrpc.proto*](proto/busrpc.proto) contains definition of two options tha
 
 ### Examples
 
+To complete description of the `EncodeValue` function and endpoint encoding algorithm this section contains examples of their usage.
+
+In this section we assume that underlying message bus prohibits/reserves the following characters in it's topics:
+* all non-printable characters (0x00 - 0x31)
+* ` `, `$`, `.`
+
+This allows us to specify the following characters and reserved words for the purpose of encoding algorithm:
+
+| Token         | Value    |
+| ------------- | -------- | 
+| `<esc>`       | `%`      |
+| `<field-sep>` | `:`      |
+| `<null>`      | `%null`  |
+| `<empty>`     | `%empty` |
+
+Note, that characters reserved for `<esc>` and `<field-sep>` also need to be encoded, so the complete list of prohibited/reserved characters is: 0x00-0x31, ` `, `$`, `%`, `:`.
+
+First consider how various structures are encoded as strings, which can be subsequently used as endpoint components.
+
+```
+enum MyEnum {
+  MYENUM_VALUE_0 = 0;
+  MYENUM_VALUE_1 = 1;
+}
+
+message S1 { }
+
+message S2 {
+  bool f1 = 7;
+  int32 f2 = 6;
+  int32 f3 = 5;
+  int32 f4 = 4;
+  MyEnum f5 = 3;
+  string f6 = 2;
+  bytes f7 = 1;
+}
+
+message S3 {
+  optional string f1 = 1;
+}
+```
+
+
 # Documentation commands
 
 # Specializations
