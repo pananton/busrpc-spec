@@ -563,13 +563,13 @@ Next subsections describe operations of an `EncodeValue(value, flags)` for all v
 2. Create an empty `tmp` byte sequence to hold intermediate result.
 3. For each structure field in the ascending order of [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers) do:
   * APPLY_HASH flag is **not set**:
-      1. If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
-      2. Otherwise, append `EncodeValue(field_value)` to `tmp`.
-      3. Append bus-specific field separator character `<field-sep>` to `tmp`.
+    1. If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
+    2. Otherwise, append `EncodeValue(field_value)` to `tmp`.
+    3. Append bus-specific field separator character `<field-sep>` to `tmp`.
   * APPLY_HASH flag is **set**:
-      4. If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
-      5. Otherwise, if field type is not `string` or `bytes`, append `EncodeValue(field_value)` to `tmp`.
-      6. Otherwise, append `string`/`bytes` field value to `tmp` (note, that field value is appended as-is, without additional encoding).
+    1. If field is `optional` and is not set, append `<null>` reserved word to `tmp`.
+    2. Otherwise, if field type is not `string` or `bytes`, append `EncodeValue(field_value)` to `tmp`.
+    3. Otherwise, append `string`/`bytes` field value to `tmp` (note, that field value is appended as-is, without additional encoding).
 4. If APPLY_HASH flag is not set, return `tmp` as a string
 5. Otherwise, calculate SHA-224 hash of `tmp` and return `EncodeValue(hash, 0)`.
 
@@ -584,8 +584,8 @@ Call endpoint is created using the following algorithm (note, that creating resu
 2. If class is `static`, append `<null>` reserved word to the endpoint.
 3. Otherwise, depending on value of `hashed_struct` option for [`ObjectId`](#objectid) structure, append either `EncodeValue(object_id, 0)` (option is `false`) or `EncodeValue(object_id, APPLY_HASH)` (option is `true`). Here, `object_id` is an instance of `ObjectId` determining the object, for which method is called.
 4. For each [observable parameter](#observable-parameters) in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers):
-  1 if `hashed` option is not set or `false` for parameter, append `EncodeValue(param_value, 0)`
-  2 otherwise, append `EncodeValue(param_value, APPLY_HASH)`
+    1. if `hashed` option is not set or `false` for parameter, append `EncodeValue(param_value, 0)`
+    2. otherwise, append `EncodeValue(param_value, APPLY_HASH)`
 5. Append `<eof>` reserved word.
 
 ### Examples
