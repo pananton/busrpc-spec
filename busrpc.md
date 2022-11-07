@@ -594,9 +594,9 @@ To complete description of the `EncodeValue` function and endpoint encoding algo
 
 In this section we assume that underlying message bus prohibits/reserves the following characters in it's topics:
 * all non-printable characters (0x00 - 0x31)
-* ` `, `$`, `.`
+* `space`, `$`, `.`
 
-This allows us to specify the following characters and reserved words for the purpose of encoding algorithm:
+This allows us to use the following characters and reserved words for the purpose of encoding algorithm:
 
 | Token         | Value    |
 | ------------- | -------- | 
@@ -605,9 +605,9 @@ This allows us to specify the following characters and reserved words for the pu
 | `<null>`      | `%null`  |
 | `<empty>`     | `%empty` |
 
-Note, that characters reserved for `<esc>` and `<field-sep>` also need to be encoded, so the complete list of prohibited/reserved characters is: 0x00-0x31, ` `, `$`, `%`, `:`.
+Note, that characters reserved for `<esc>` and `<field-sep>` also need to be encoded, so the complete list of prohibited/reserved characters is: 0x00-0x31, `space`, `$`, `%`, `:`.
 
-First consider how various structures are encoded as strings, which can be subsequently used as endpoint components.
+First consider how various structures are encoded as strings, which can be subsequently safely used as endpoint components.
 
 ```
 enum MyEnum {
