@@ -604,15 +604,16 @@ This allows us to use the following characters and reserved words for the purpos
 | `<field-sep>` | `:`      |
 | `<null>`      | `%null`  |
 | `<empty>`     | `%empty` |
+| `<eof>`       | `%eof`   |
 
-Note, that characters reserved for `<esc>` and `<field-sep>` also need to be encoded, so the complete list of prohibited/reserved characters is: 0x00-0x31, `space`, `$`, `%`, `:`.
+Note, that characters reserved for `<esc>` and `<field-sep>` also need to be encoded, so the complete list of prohibited/reserved characters is: 0x00-0x1F, `space`, `$`, `%`, `:`.
 
 First consider how various structures are encoded as strings that can be subsequently safely used as endpoint components.
 
 ```
 enum MyEnum {
-  MYENUM_VALUE_0 = 0;
-  MYENUM_VALUE_1 = 1;
+  MYENUM_0 = 0;
+  MYENUM_1 = 7;
 }
 
 message S1 { }
@@ -632,6 +633,57 @@ message S3 {
 }
 ```
 
+| Value                                                                | Flags      | Result                                                      |
+| -------------------------------------------------------------------- | ---------- | ----------------------------------------------------------- | 
+| s1 = ()                                                              | 0          | "%empty"                                                    |
+| s1 = ()                                                              | APPLY_HASH | "%empty", see notes (1)                                     |
+| s2 = (true, 10, 0, -10, MYENUM_1, "$aaa. bbb%:", <0x10, 0xaf, 0xb5>) | 0          | "1:10:0:-10:7:%24aaa%2e%20bbb%25%3a:10afb5:", see notes (2) |
+| s2 = (true, 10, 0, -10, MYENUM_1, "$aaa. bbb%:", <0x10, 0xaf, 0xb5>) | APPLY_HASH | see notes (3)                                               |
+| s3 = ()                                                              | 0          | "%null:"                                                    |
+| s3 = ()                                                              | APPLY_HASH | sha224("%null:")                                            |
+| s3 = ( "" )                                                          | 0          | "%empty:"                                                   |
+| s3 = ( "" )                                                          | APPLY_HASH | sha224("%empty:")                                           |
+| s3 = ( "$aaa. bbb%:" )                                               | 0          | %24aaa%2e%20bbb%25%3a"                                      |
+| s3 = ( "$aaa. bbb%:" )                                               | APPLY_HASH | sha224("$aaa. bbb%:")                                       |
+
+Notes:
+1. Encoding algorithm encodes null or empty values to the same string ("%null" or "%empty") whether APPLY_HASH is specified or not.
+2. Field separator `:` must always be added, even for the last fields. This allows to distinguish null/empty structure values from the values of structures that have one `string`/`bytes` field, whose value is null/empty (see below).
+3. Hash is calculated not for the string from the previous row, but for the following binary data (string and bytes encoding are not applied before hashing):
+```
+0x31 0x31 0x30 0x30 0x2d 0x31 0x30 0x37 0x24 0x61 0x61 0x61 0x2e 0x20 0x62 0x62 0x62 0x25 0x3a 0x10 0xaf 0xb5
+"1"  "10"      "0"  "-10"          "7"  "$aaa. bbb%:"                                          <0x10, 0xaf, 0xb5>
+```
+
+Finally, consider example of obtaining endpoint for a method calls. We use class `user` and it's method `send_message` to demonstrate encoding algorithm, however, modify them in the following way (to support very long usernames):
+
+```
+// file ./api/chat/user/class.proto
+// ...
+
+message ClassDesc {
+  message ObjectId {
+    option (hashed_struct) = true;
+    string username = 1;
+  }
+}
+```
+
+```
+// file ./api/chat/user/send_message/method.proto
+// ...
+
+message MethodDesc {
+  message Params {
+    string receiver = 1 [(observable) = true, (hashed) = true];
+    string text = 2;
+  }
+
+  message Retval { }
+}
+```
+
+Now if user "Alice" sends message to user "Bob", the endpoint will look like this: `chat.user.send_message.<sha224("Alice")>.<sha224("Bob")>.%eof`. Orm if we expand the hash: `chat.user.send_message.6874ecdbdb214ee888e37c8c983e2f1c9c0ed16907b519704db42bb6.279f0aba2b90ee54755e3772e7f4bd5599e46400617a7c080b955b9c.%eof`.
 
 # Documentation commands
 
