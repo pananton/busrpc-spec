@@ -572,21 +572,25 @@ Next subsections describe operations of an `EncodeValue(value, flags)` for all v
     3. Otherwise, append `string`/`bytes` field value to `tmp` (note, that field value is appended as-is, without additional encoding).
 4. If APPLY_HASH flag is not set, return `tmp` as a string
 5. Otherwise, calculate SHA-224 hash of `tmp` and return `EncodeValue(hash, 0)`.
- 
-### General algorithm
+
+### Algorithm
 
 File [*busrpc.proto*](proto/busrpc.proto) contains definition of two options that control when APPLY_HASH flag is passed to the `EncodeValue` function:
 * structure option `hashed_struct`
 * structure field option `hashed`
 
-
 Call endpoint is created using the following algorithm (note, that creating result endpoint from the call endpoint is trivial):
 1. Fill `<namespace>`, `<class>` and `<method>` components with the namespace, class and method names correspondingly. Note, that this components may contain only alphanumeric symbols and underscores, thus do not require additional encoding.  
-2. For non-`static` class, encode [`ObjectId`](#objectid) structure as specified by the [structure encoding](#structure-encoding) rules and append result to the endpoint. For `static` class, append reserved `<null>` word to the endpoint.
-3. For each [observable parameter](#observable-parameters) in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers), encode the parameter as specified by the [field encoding](#type-encoding) rules and append it to the endpoint.
-4. Append `<eof>` reserved word.
+2. If class is `static`, append `<null>` reserved word to the endpoint.
+3. Otherwise, depending on value of `hashed_struct` option for [`ObjectId`](#objectid) structure, append either `EncodeValue(object_id, 0)` (option is `false`) or `EncodeValue(object_id, APPLY_HASH)` (option is `true`). Here, `object_id` is an instance of `ObjectId` determining the object, for which method is called.
+4. For each [observable parameter](#observable-parameters) in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers):
+  1 if `hashed` option is not set or `false` for parameter, append `EncodeValue(param_value, 0)`
+  2 otherwise, append `EncodeValue(param_value, APPLY_HASH)`
+5. Append `<eof>` reserved word.
 
-### Example
+### Examples
+
+
 
 # Documentation commands
 
