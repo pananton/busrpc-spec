@@ -577,7 +577,7 @@ File [*busrpc.proto*](proto/busrpc.proto) contains definition of two options tha
 * structure option `hashed_struct`
 * structure field option `hashed`
 
-Call endpoint is created using the following algorithm (note, that creating result endpoint from the call endpoint is trivial):
+[Call endpoint](#endpoint) is created using the following algorithm (note, that creating result endpoint from the call endpoint is trivial):
 1. Fill `<namespace>`, `<class>` and `<method>` components with the namespace, class and method names correspondingly. Note, that this components may contain only alphanumeric symbols and underscores, thus do not require additional encoding.  
 2. If class is `static`, append `<null>` reserved word to the endpoint.
 3. Otherwise (let `object_id` be an instance of [`ObjectId`](#objectid) structure):
