@@ -581,11 +581,11 @@ Call endpoint is created using the following algorithm (note, that creating resu
 1. Fill `<namespace>`, `<class>` and `<method>` components with the namespace, class and method names correspondingly. Note, that this components may contain only alphanumeric symbols and underscores, thus do not require additional encoding.  
 2. If class is `static`, append `<null>` reserved word to the endpoint.
 3. Otherwise (let `object_id` be an instance of [`ObjectId`](#objectid) structure):
-  1. If `hashed_struct` is not set of `false` for `ObjectId`, append `EncodeValue(object_id, 0)` to the endpoint.
-  2. Otherwise, append `EncodeValue(object_id, APPLY_HASH)` to the endpoint.
+    1. If `hashed_struct` is not set of `false` for `ObjectId`, append `EncodeValue(object_id, 0)` to the endpoint.
+    2. Otherwise, append `EncodeValue(object_id, APPLY_HASH)` to the endpoint.
 4. For each [observable parameter](#observable-parameters) in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers):
-  1. If `hashed` option is not set or `false` for parameter, append `EncodeValue(param_value, 0)` to the endpoint.
-  2. Otherwise, append `EncodeValue(param_value, APPLY_HASH)` to the endpoint.
+    1. If `hashed` option is not set or `false` for parameter, append `EncodeValue(param_value, 0)` to the endpoint.
+    2. Otherwise, append `EncodeValue(param_value, APPLY_HASH)` to the endpoint.
 5. Append `<eof>` reserved word.
 
 ### Examples
