@@ -691,7 +691,7 @@ Now if user "Alice" sends message to user "Bob", the endpoint will look like thi
 
 Useful and consistent documentation is a must for any API. The cornerstone of documentation of a busrpc-compliant API is "code as documentation" principle. By simply inspecting busrpc root directory developers can obtain information about:
 * API main entities (namespaces, classes, methods and structures)
-* endpoints (i.e., message bus topics), where API is available
+* endpoints, where API is available
 * system infrastructure:
   * services
   * their responsibilities (i.e., which methods are implemented or invoked by each service)
@@ -724,7 +724,7 @@ Next example contains two block comments: first consists of lines 1-3, second co
    Line 5... */
 ```
 
-To bind block comment to some protobuf entity, it should be placed right **before** the entity, i.e. no empty lines allowed between the block comment and bound entity. Also busrpc framework currently does not support trailing comments and ignores them, see next example. The first line of a bound block comment is treated as entity's brief description.
+To bind block comment to some protobuf entity, it should be placed right **before** the entity, i.e. no empty lines allowed between the block comment and the bound entity. Also busrpc framework currently does not support trailing comments and ignores them, see next example. The first line of a bound block comment is treated as entity's brief description.
 
 ```
 /* Brief description of MyEnum.
