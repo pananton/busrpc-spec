@@ -689,7 +689,7 @@ Now if user "Alice" sends message to user "Bob", the endpoint will look like thi
 
 # Documenting API
 
-Useful and consistent documentation is a must for any API. The cornerstone of documentaion of a busrpc-compliant API is "code as documentation" principle. By simply inspecting busrpc root directory developers can obtain information about:
+Useful and consistent documentation is a must for any API. The cornerstone of documentation of a busrpc-compliant API is "code as documentation" principle. By simply inspecting busrpc root directory developers can obtain information about:
 * API main entities (namespaces, classes, methods and structures)
 * endpoints (i.e., message bus topics), where API is available
 * system infrastructure:
@@ -697,13 +697,13 @@ Useful and consistent documentation is a must for any API. The cornerstone of do
   * their responsibilities (i.e., which methods are implemented or invoked by each service)
   * their configuration parameters
 
-Besides this, busrpc specification defines a mechanism to document individual API entity using protobuf comments and busrpc-specific [documentation commands](#documentation-commands). Later busrpc [development tool](https://github.com/pananton/busrpc-dev) can be used to parse protocol files and build an API documentation from them. Those who used [Doxygen](https://doxygen.nl/) project will found this approach very familiar.
+Besides this, busrpc specification defines a mechanism for documenting individual API entities using protobuf comments and busrpc-specific [documentation commands](#documentation-commands). Later busrpc [development tool](https://github.com/pananton/busrpc-dev) can be used to parse protocol files and build an API documentation from them. Those who used [Doxygen](https://doxygen.nl/) project will found this approach very familiar.
 
 ## Basic rules
 
 **Block comment** is a sequence of 1 or many protobuf comments without any gaps between them. Which format is used for comments does not matter (can be any combination of `//` and `/* ... */` comments).
 
-The following example contains a single block comment:
+The following example contains a single block comment.
 
 ```
 // Line 1
@@ -724,12 +724,13 @@ Next example contains two block comments: first consists of lines 1-3, second co
    Line 5... */
 ```
 
-To bind block comment to the entity (structure, enumeration or enumeration constant) it should be placed directly **before** it: no empty lines allowed between block comment and bound entity. Also busrpc framework currently does not support trailing comments and ignores them, see next example. The first line of a block comment bound to entity is treated as entity's brief description.
+To bind block comment to some protobuf entity, it should be placed right **before** the entity, i.e. no empty lines allowed between the block comment and bound entity. Also busrpc framework currently does not support trailing comments and ignores them, see next example. The first line of a bound block comment is treated as entity's brief description.
 
 ```
+/* Brief description of MyEnum.
+   Additional information about MyEnum. */
 enum MyEnum {
   // Brief description of MYENUM_VALUE_0.
-  // Additional information about MYENUM_VALUE_0. 
   MYENUM_VALUE_0 = 0;
 
   MYENUM_VALUE_1 = 1; // This comment is not bound!
@@ -737,9 +738,9 @@ enum MyEnum {
 ```
 
 Some block comments are treated specially by this specification:
-* block comment for [`ServiceDesc`](#servicedesc) is considered a service description
-* block comment for [`ClassDesc`](#classdesc) is considered a class description
-* block comment for [`MethodDesc`](#methoddesc) is considered a method description
+* block comment for `ServiceDesc` is considered a service description
+* block comment for `ClassDesc` is considered a class description
+* block comment for `MethodDesc` is considered a method description
 
 ## Documentation commands
 
