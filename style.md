@@ -93,5 +93,5 @@ Busrpc API should follow code as documentation principle, which implies that pro
 * Every non-predefined busrpc structure or enumeration should be documented with a comment describing it
 * Predefined structures may not be documented unless explicitly requested by the rules of this section
 * Every structure field or enumeration constant should be documented
-* Every service/class/method descriptor (`ServiceDesc`, `ClassDesc` or `MethodDesc`) should be documented with a comment describing service/class/method purpose
+* Every service/namespace/class/method descriptor (`ServiceDesc`, `NamespaceDesc`, `ClassDesc` or `MethodDesc`) should be documented with a comment describing service/namespace/class/method purpose
 * Every `import` statement for a method description file *method.proto* found in the service description file *service.proto* should be documented; documentation comment should contain information whether method is implemented or invoked by the service (see [service documentation commands](./busrpc.md#service-documentation-commands))
