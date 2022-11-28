@@ -750,11 +750,7 @@ enum MyEnum {
 }
 ```
 
-Some block comments are treated specially by this specification:
-* block comment for `ServiceDesc` is considered a service description
-* block comment for `NamespaceDesc` is considered a service description
-* block comment for `ClassDesc` is considered a class description
-* block comment for `MethodDesc` is considered a method description
+Block comment bound to the descriptor is considered as corresponding entity description. For example, block comment bound to `MethodDesc` provides method description.
 
 ## Documentation commands
 
