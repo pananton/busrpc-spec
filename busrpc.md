@@ -277,7 +277,7 @@ Busrpc directory layout determines the hierarchy of the protobuf [packages](http
 
 ## Namespace description file
 
-Namespace description file *namespace.proto* must always contain definition of the namespace descriptor `NamespaceDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the namespace by means of a nested types. Current version of the busrpc specification does not define any nested types with special meaning, however, namespace descriptor (probably - empty) still must be provided:
+Namespace description file *namespace.proto* must always contain definition of the namespace descriptor `NamespaceDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the namespace by means of a nested types. Current version of the busrpc specification does not define any nested types with special meaning, however, even empty namespace descriptor must be explicitly defined:
 
 ```
 // file ./api/chat/namespace.proto
