@@ -10,7 +10,7 @@ This document contains general information for developers of busrpc microservice
   * [Structure](#structure)
   * [Enumeration](#enumeration)
   * [Namespace](#namespace)
-  * [Exception](#exception)
+  * [Exceptions](#exceptions)
   * [Endpoint](#endpoint)
   * [Type visibility](#type-visibility)
 * [Protocol](#protocol)
@@ -23,12 +23,14 @@ This document contains general information for developers of busrpc microservice
     * [`Params` and `Retval`](#params-and-retval)
       * [Observable parameters](#observable-parameters)
     * [`Static`](#static)
+   * [API description file](#api-description-file)
+    * [`Errc`](#errc) 
+    * [`Exception`](#exception)
+    * [`CallMessage`](#callmessage)
+    * [`ResultMessage`](#resultmessage)
   * [Service description file](#service-description-file)
     * [`Config`](#config)
   * [Default field values](#default-field-values)
-  * [Network messages](#network-messages)
-    * [`CallMessage`](#callmessage)
-    * [`ResultMessage`](#resultmessage)
   * [Endpoint encoding](#endpoint-encoding)
     * [Type encoding](#type-encoding)
       * [Boolean encoding](#boolean-encoding)
@@ -91,7 +93,7 @@ Methods may be bound to a concrete object or to a class as a whole. The latter a
 
 **Method call** is represented as a network message containing method parameters and, optionally, identifier of the object for which method is called (not needed for static method calls) sent to the [call endpoint](#endpoint). Some method parameters can additionally be defined as **observable**, which means that their values not only sent as payload of the message but also added to the call endpoint providing implementors with an ability to cherry-pick a subset of calls having a concrete values of the observable parameters.
 
-**Method result** is represented as a network message containing either method return value or an [exception](#exception) sent to the [result endpoint](#endpoint). Method may be defined as a **one-way** - in that case it does not have any result or associated result endpoint. One-way methods are mostly used as event sinks, i.e. invoked to signal some events in the system.
+**Method result** is represented as a network message containing either method return value or an [exception](#exceptions) sent to the [result endpoint](#endpoint). Method may be defined as a **one-way** - in that case it does not have any result or associated result endpoint. One-way methods are mostly used as event sinks.
 
 ## Service
 
@@ -99,9 +101,9 @@ Methods may be bound to a concrete object or to a class as a whole. The latter a
 
 ## Structure
 
-Busrpc **structure** is an alternative term for a protobuf `message` introduced for consistency with OOP terminology. Structures are busrpc wire types, i.e. every busrpc network message is represented by some structure.
+Busrpc **structure** is an alternative term for a protobuf `message` introduced for consistency with OOP terminology.
 
-**Predefined structures** are structures which have special meaning determined by this specification. In particular, **descriptors** are predefined structures which provide busrpc client libraries with type information about busrpc entity (service, api, namespace, class, or method). Descriptors are usually never sent over the network - in fact, they even do not have any fields, only nested type definitions.
+**Predefined structures** are structures which have special meaning determined by this specification. In particular, **descriptors** are predefined structures which provide busrpc client libraries with type information about busrpc entity (service, namespace, class, method or API as a whole). Descriptors are usually never sent over the network - in fact, they even do not have any fields, only nested type definitions.
  
 Busrpc specification defines a concept of an **encodable type** - a protobuf type which can be encoded as specified in the [Type encoding](#type-encoding) section below. Encodable type can't be `repeated` and should be one the following:
 * [scalar](https://developers.google.com/protocol-buffers/docs/proto3#scalar) type except for floating-point types `float` and `double`
@@ -144,53 +146,23 @@ message NotEncodable {
 
 ## Enumeration
 
-Busrpc **enumeration** corresponds directly to a protobuf `enum`.
+Busrpc **enumeration** corresponds directly to a protobuf `enum`. **Predefined enumerations** are enumerations which have special meaning determined by this specification.
 
 ## Namespace
 
 **Namespace** is a group of related busrpc classes, structures and enumerations. Typically namespace contains part of the API that corresponds to a single application subdomain.
 
-## Exception
+## Exceptions
 
 Busrpc method result is either a method-specified return value or an **exception**, which indicates abnormal method completion.
 
-Busrpc exceptions are instances of a predefined structure `Exception`. Basic minimal `Exception` structure is defined in the [*api.proto*](proto/api.proto) file. It contains only error code information, represented as predefined `Errc` enumeration value. Third-party APIs may add more fields to the `Exception` structure and/or define new values for the `Errc` enumeration, however, type names itself must not be changed.
-
-```
-// Exception error code.
-enum Errc {
-  // Unexpected error.
-  ERRC_UNEXPECTED = 0;
-  
-  // Added by a third-party implementation.
-  
-  // Not authorized.
-  ERRC_NOT_AUTHORIZED = 1;
-  
-  // Connection to db failed.
-  ERRC_DB_CONN_FAILED = 2;
-}
-
-// Method exception.
-message Exception {
-  // Error code.
-  Errc code = 1;
-
-  // Added by a third-party implementation.
-
-  // Exception description.
-  string description = 2;
-  
-  // Service name.
-  string service_name = 3;
-}
-```
+Busrpc exceptions are instances of a predefined structure `Exception`, which at least contains an error code expressed as a value of predefined enumeration `Errc`. Third-party APIs may extend both `Exception` and `Errc` types, however, should not modify their names.
 
 By **throwing** an exception busrpc specification means sending an instance of `Exception` structure as the method result. By **catching** exception we mean handling (for example, using some fallback mechanism) the situation when caller receives `Exception` instance instead of the method return value.
 
 Whenever caller receives an exception which he does not know how to handle, he must forward exception to the upstream caller. Consider situation, when method `A` calls method `B`, method `B` calls method `C` and method `C` throws an exception. If method `B` does not know, how to handle occurred exception, then it should send it as it's own result to the method `A`. This mechanism is called **exception propagation** and can be found in many programming languages with OOP support.
 
-Busrpc method exceptions may be converted to a programming language exceptions by the client libraries. This may cause performance degrade and log/alert flooding if exceptions are used incorrectly. The main purpose of an exception is to report **exceptional** situations, which usually occur rarely and have no special handling (except for trivial logging) on the caller side. For example, network connection failure may be considered an exceptional situation in some APIs, while invalid user input is not.
+Busrpc method exceptions may be converted to a programming language exceptions by the client libraries. This may cause performance degrade and log/alert flooding if exceptions are used incorrectly. The main purpose of an exception is to report **exceptional** situations, which usually occur rarely and have no special handling (except for trivial logging) on the caller side. For example, network connection failure may be considered an exceptional situation by some APIs, while invalid user input almost never should be treated as exceptional situation.
 
 ## Endpoint
 
@@ -267,7 +239,7 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
  
 Components of this tree are:
 * root directory *\<busrpc-root-dir>/*, which contains two predefined directories: API root directory *api/* and services root directory *services/*
-* API description file [*api.proto*](proto/api.proto), whose template is provided by the framework; it contains important global definitions and should be included to any busrpc-compliant API
+* API description file *api.proto* (a [template](proto/api.proto) is provided by the framework), which contains definitions of basic busrpc types and custom protobuf options
 * namespace directory *\<namespace-dir>/*, which contains a separate subdirectory for each namespace class and a [namespace description file](#namespace-description-file) *namespace.proto*
 * class directory *\<class-dir>/*, which contains a separate subdirectory for each class method and a [class description file](#class-description-file) *class.proto*
 * method directory *\<method-dir>/*, which contains definition of a class method in the form of [method description file](#method-description-file) *method.proto*
@@ -298,11 +270,12 @@ Busrpc directory layout determines the hierarchy of the protobuf [packages](http
 Namespace description file *namespace.proto* must always contain definition of the namespace descriptor `NamespaceDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the namespace by means of a nested types. Current version of the busrpc specification does not define any nested types with special meaning, however, empty namespace descriptor still must be provided:
 
 ```
-// file ./api/chat/namespace.proto
-// ...
+// file api/chat/namespace.proto
 
 message NamespaceDesc { }
 ```
+
+Note, that it is not recommended to define any types inside `NamespaceDesc` because this may cause conflicts in the future versions of the busrpc specification.
 
 ## Class description file
 
@@ -315,8 +288,7 @@ Class description file *class.proto* must always contain definition of the class
 The following class represents a user of a Chat application. Every user is indentified by a unique username.
 
 ```
-// file ./api/chat/user/class.proto
-// ...
+// file api/chat/user/class.proto
 
 message ClassDesc {
   message ObjectId {
@@ -328,8 +300,7 @@ message ClassDesc {
 If `ClassDesc` does not contain a nested `ObjectId` type, then corresponding class is considered static. Static classes are commonly used to group "utility" methods. For example, static class `translator` provides methods for translating UI controls to a user language.
 
 ```
-// file ./api/chat/translator/class.proto
-// ...
+// file api/chat/translator/class.proto
 
 message ClassDesc { }
 ```
@@ -353,8 +324,7 @@ Consider two methods from a `user` class described in the previous section:
 * one-way method without parameters `on_signed_in` is invoked for signed in user to allow other services implement arbitrary actions for signed in user (for example, notify user contacts that he is online); in pseudocode method signature can be seen as `void user::on_signed_in()`
 
 ```
-// file ./api/chat/user/sign_in/method.proto
-// ...
+// file api/chat/user/sign_in/method.proto
 
 enum Result {
   RESULT_SUCCESS = 0;
@@ -375,7 +345,6 @@ message MethodDesc {
 
 ```
 // file ./api/chat/user/on_signed_in/method.proto
-// ...
 
 message MethodDesc { }
 ```
@@ -384,13 +353,12 @@ Note, that `Result` enumeration has method scope and can't be used outside the m
 
 #### Observable parameters
 
-[Observable](#class) method parameter is created using custom protobuf field option `observable`, defined in the [*busrpc.proto*](proto/busrpc.proto) file. This option can be applied only to those `Params` fields, which have [encodable type](#structure). Remember, that observable parameters (as described [earlier](#endpoint)) are also added to the call endpoint and provide implementors with an ability to cherry-pick calls with a desired value(s) of the observable parameter(s).
+[Observable](#class) method parameter is created using custom protobuf field option `observable`, defined by this specification. This option can be applied only to those `Params` fields, which have [encodable type](#structure). Remember, that observable parameters (as described [earlier](#endpoint)) are also added to the call endpoint and provide implementors with an ability to cherry-pick calls with a desired value(s) of the observable parameter(s).
 
 Consider method `user::send_message` from the Chat application API.
 
 ```
-// file ./api/chat/user/send_message/method.proto
-// ...
+// file api/chat/user/send_message/method.proto
 
 message MethodDesc {
   message Params {
@@ -413,8 +381,7 @@ This method may be used in the following way:
 `Static` is an empty predefined structure, which designates method as static. The following method is part of an Chat application API and is used to create new users. The method is defined as static to emphasize the fact that user (and corresponding object) does not exist at the moment the method is called.
 
 ```
-// ./api/chat/user/sign_up/method.proto
-// ...
+// file api/chat/user/sign_up/method.proto
 
 enum Result {
   RESULT_SUCCESS = 0;
@@ -438,78 +405,73 @@ message MethodDesc {
 
 Note, that all methods of a static class must be defined as static.
 
-## Service description file
+## API description file
 
-Service description file *service.proto* must always contain definition of the service descriptor `ServiceDesc` - a predefined busrpc structure, which provides information about the service by means of a nested types. Busrpc specification currently recognizes only `Config` structure, which describes service configuration parameters. Definitions of other types may also be nested inside `ServiceDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
+API description file *api.proto* must always contain definition of the API descriptor `ApiDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the API by means of a nested types. All this nested types are described in the subsections below. Definitions of other types may also be nested inside `MethodDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
 
-Additionally, service description file must import description files of all methods that service implements or invokes.
+Apart from descriptor, API description file also contains definitions of [custom](https://developers.google.com/protocol-buffers/docs/proto3#customoptions) protobuf options introduced by the busrpc framework. Refer to a [template](proto/api.proto) API description file for more information about custom options.
 
-Consider a service that sends welcome message to any user who signed in to the Chat application for the first time. Such service is pretty easy to implement using existing API: it needs to implement method `user::on_signed_in` to check whether user signs in for the first time, and if he is, call `user::send_message` method of some system-defined user account to send a welcome message to him. The fact that service uses two API methods is expressed in the service description file by importing corresponding *method.proto* files.
+### `Errc`
 
-```
-// file ./services/greeter/service.proto
-// ...
-
-import "api/chat/user/on_signed_in/method.proto";
-import "api/chat/user/send_message/method.proto";
-
-// ...
-```
-
-### `Config`
-
-`Config` is a predefined strucuture describing service configuration parameters. Note, that protobuf supports JSON serialization for it's `message` types, which means that service configuration can be easily read/written from/to the text file.
+`Errc` is a predefined enumeration, which contains system-wide error codes describing the reason of a busrpc [exception](#exceptions). Third-party implementations are free to add their own error codes to the `Errc` enumeration, however, they should not modify the name of the type. For example, `Errc` defined for some API may look like this:
 
 ```
-// file ./services/greeter/service.proto
-// ...
+// file api/api.proto
 
-message ServiceDesc {
-  message Config {
-    busrpc.services.ConfigBase general = 1;
-    string welcome_text = 2;
+message ApiDesc {
+  enum Errc {
+    // Unexpected error.
+    ERRC_UNEXPECTED = 0;
+  
+    // Custom codes.
+  
+    // Not authorized.
+    ERRC_NOT_AUTHORIZED = 1;
+  
+    // Can't connect to the database.
+    ERRC_DB_CONN_FAILED = 2;
   }
+  ...
 }
 ```
 
-## Default field values
+### `Exception`
 
-File *busrpc.proto* contains definitions of several options that allow to specify default values for structure fields (other than [those](https://developers.google.com/protocol-buffers/docs/proto3#default) defined by protobuf itself). Of course, protobuf compiler does not understand semantics of this options, however, [client libraries](README.md#libraries) are expected to respect them. This options are:
-* `default_bool` - default value for protobuf `bool` type
-* `default_int` - default value for protobuf integer types (`int32`, `fixed32`, `sint32`, `sfixed32`, `uint32`, `int64`, `fixed64`, `sint64`, `sfixed64`, `uint64`)
-* `default_double` - default value for protobuf floating-point types (`float`, `double`)
-* `default_string` - default value for protobuf `string` type
-
-This options are especially useful for describing method parameters and service configuration parameters.
+`Exception` is a predefined structure, which represents busrpc [exception](#exceptions). Third-party implementations are free to add more fields the `Exception` structure, however, they should not modify the the name of the type. For example, `Exception` for some API may look like this:
 
 ```
-// file ./services/greeter/service.proto
-// ...
+// file api/api.proto
 
-message ServiceDesc {
-  message Config {
-    services.ConfigBase general = 1;
-    string welcome_text = 2 [(default_string) = "Thank you for trying Chat!"];
+message ApiDesc {
+  message Exception {
+    // Error code.
+    Errc code = 1;
+
+    // Custom fields.
+
+    // Description.
+    string description = 2;
+  
+    // Service name.
+    string service_name = 3;
   }
+  ...
 }
 ```
-
-## Network messages
-
-Busrpc specification defines two protobuf `message` types which are directly used as a network format:
-1. `CallMessage` for transferring method call data (object identifier and parameters)
-2. `ResultMessage` for transferring method result (return value or exception)
-
-Both types can be found in the *busrpc.proto* file and must not be modified in any way by busrpc-compliant APIs.
 
 ### `CallMessage`
 
-`CallMessage` is defined as follows:
+`CallMessage` is a predefined structure, which determines format of a network packet used to transfer method call data. This structure should not be modified in any way by a third-party implementation, or some busrpc tools may stop working for it.
 
 ```
-message CallMessage {
-  optional bytes object_id = 1;
-  optional bytes params = 2;
+// file api/api.proto
+
+message ApiDesc {
+  message CallMessage {
+    optional bytes object_id = 1;
+    optional bytes params = 2;
+  }
+  ...
 }
 ```
 
@@ -519,20 +481,77 @@ Field `params` contains protobuf-serialized `Params` structure from the method d
 
 ### `ResultMessage`
 
-`ResultMessage` is defined as follows:
+`ResultMessage` is a predefined structure, which determines format of network packet used to transfer method result. This structure should not be modified in any way by a third-party implementation, or some busrpc tools may stop working for it.
 
 ```
-message ResultMessage {
-  oneof Result {
-    bytes retval = 1;
-    busrpc.Exception exception = 2;
+// file api/api.proto
+
+message ApiDesc {
+  message ResultMessage {
+    oneof Result {
+      bytes retval = 1;
+      api.Exception exception = 2;
+    }
+  }
+  ...
+}
+```
+
+Field `retval` contains protobuf-serialized `Retval` structure from the method descriptor and is set only if method did not throw an exception. Otherwise, thrown exception is transferred in the `exception` field.
+
+## Service description file
+
+Service description file *service.proto* must always contain definition of the service descriptor `ServiceDesc` - a predefined busrpc structure, which provides information about the service by means of a nested types. Busrpc specification currently recognizes only `Config` structure, which describes service configuration parameters. Definitions of other types may also be nested inside `ServiceDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
+
+Additionally, service description file must import description files of all methods that service implements or invokes.
+
+Consider a service that sends welcome message to any user who signed in to the Chat application for the first time. Such service is pretty easy to implement using existing API: it needs to implement method `user::on_signed_in` to check whether user signs in for the first time, and if he is, call `user::send_message` method of some system-defined user account to send a welcome message to him. The fact that service uses two API methods is expressed in the service description file by importing corresponding *method.proto* files.
+
+```
+// file services/greeter/service.proto
+...
+
+import "api/chat/user/on_signed_in/method.proto";
+import "api/chat/user/send_message/method.proto";
+```
+
+### `Config`
+
+`Config` is a predefined strucuture describing service configuration settings. Note, that protobuf supports JSON serialization for it's `message` types, which means that service configuration can be easily read/written from/to the text file.
+
+```
+// file services/greeter/service.proto
+
+message ServiceDesc {
+  message Config {
+    string bus_ip = 1;
+    uint32 bus_port = 2;
+    string welcome_text = 3;
   }
 }
 ```
 
-Field `retval` contains protobuf-serialized `Retval` structure from the method descriptor and is set only if method did not throw an exception.
+## Default field values
 
-Field `exception` contains global predefined [`Exception`](#exception) structure and is set if method threw an exception.
+Template file [*api.proto*](proto/api.proto) contains definitions of several options that allow to specify default values for structure fields (other than [those](https://developers.google.com/protocol-buffers/docs/proto3#default) defined by protobuf itself). Of course, protobuf compiler does not understand semantics of this options, however, [client libraries](README.md#libraries) are expected to respect them. This options are:
+* `default_bool` - default value for protobuf `bool` type
+* `default_int` - default value for protobuf integer types (`int32`, `sint32`, `sfixed32`, `uint32`, `fixed32`, `int64`, `sint64`, `sfixed64`, `uint64`, `fixed64`)
+* `default_double` - default value for protobuf floating-point types (`float`, `double`)
+* `default_string` - default value for protobuf `string` type
+
+This options are especially useful for describing method parameters and service configuration settings.
+
+```
+// file services/greeter/service.proto
+
+message ServiceDesc {
+  message Config {
+    string bus_ip = 1;
+    uint32 bus_port = 2 [(default_int) = 4222];
+    string welcome_text = 3 [(default_string) = "Thank you for trying Chat!"];
+  }
+}
+```
 
 ## Endpoint encoding
 
@@ -606,9 +625,9 @@ Next sections describe how `EncodeValue(value, flags)` is executed for all possi
 
 ### Algorithm
 
-File [*busrpc.proto*](proto/busrpc.proto) contains definition of two options that control when APPLY_HASH flag is passed to the `EncodeValue` function:
-* structure option `hashed_struct`
-* structure field option `hashed`
+Busrpc specification defines custom protobuf options that control when APPLY_HASH flag is passed to the `EncodeValue` function:
+* structure-level option `hashed_struct`
+* field-level option `hashed`
 
 [Call endpoint](#endpoint) is created using the following algorithm (note, that creating result endpoint from the call endpoint is trivial):
 1. Fill `<namespace>`, `<class>` and `<method>` components with the namespace, class and method names correspondingly. Note, that this components may contain only alphanumeric symbols and underscores, thus do not require additional encoding.  
