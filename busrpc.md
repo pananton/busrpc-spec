@@ -23,7 +23,7 @@ This document contains general information for developers of busrpc microservice
     * [`Params` and `Retval`](#params-and-retval)
       * [Observable parameters](#observable-parameters)
     * [`Static`](#static)
-   * [API description file](#api-description-file)
+  * [API description file](#api-description-file)
     * [`Errc`](#errc) 
     * [`Exception`](#exception)
     * [`CallMessage`](#callmessage)
