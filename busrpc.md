@@ -101,7 +101,7 @@ Methods may be bound to a concrete object or to a class as a whole. The latter a
 
 Busrpc **structure** is an alternative term for a protobuf `message` introduced for consistency with OOP terminology. Structures are busrpc wire types, i.e. every busrpc network message is represented by some structure.
 
-**Predefined structures** are structures which have special meaning determined by this specification. In particular, **descriptors** are predefined structures which provide busrpc client libraries with type information about busrpc entity (service, namespace, class, or method). Descriptors are usually never sent over the network - in fact, they even do not have any fields, only nested type definitions.
+**Predefined structures** are structures which have special meaning determined by this specification. In particular, **descriptors** are predefined structures which provide busrpc client libraries with type information about busrpc entity (service, api, namespace, class, or method). Descriptors are usually never sent over the network - in fact, they even do not have any fields, only nested type definitions.
  
 Busrpc specification defines a concept of an **encodable type** - a protobuf type which can be encoded as specified in the [Type encoding](#type-encoding) section below. Encodable type can't be `repeated` and should be one the following:
 * [scalar](https://developers.google.com/protocol-buffers/docs/proto3#scalar) type except for floating-point types `float` and `double`
