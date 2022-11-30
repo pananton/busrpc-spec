@@ -1,0 +1,77 @@
+// This file is provided by the busrpc framework and is a subject for futher customization by a third-party
+// implementations. It contains the following definitions:
+// 1. API descriptor type `ApiDesc` which is a parent for the following types:
+//   1.1 `Exception` type and `Errc` enumeration, which represent busrpc method exception and error code.
+//        Third-party APIs may extend this types, for example, add fields providing more information about
+//        exception to the `Exception` type and/or define API-specific error codes.
+//   1.2 `CallMessage` and `ResultMessage` types, which determine format of the network packet representing busrpc
+//        method call and result. Third-party APIs MUST NOT modify this types, because third-party tools rely on
+//        the described format.
+// 2. Protobuf options defined by the busrpc specification.
+
+syntax = "proto3";
+package busrpc.api;
+
+import "google/protobuf/descriptor.proto";
+
+// Busrpc API.
+message ApiDesc {
+  // Exception error code.
+  enum Errc {
+    // Unexpected error.
+    ERRC_UNEXPECTED = 0;
+  }
+
+  // Global exception type for busrpc methods.
+  message Exception {
+    // Error code.
+    Errc code = 1;
+  }
+
+  // Network message, which is sent to call a method.
+  message CallMessage {
+    // Serialized object identifier of a class (`ClassDesc.ObjectId`).
+    optional bytes object_id = 1;
+
+    // Serialized method parameters (`MethodDesc.Params`).
+    optional bytes params = 2;
+  }
+
+  // Network message, which is sent to deviver method result to caller.
+  message ResultMessage {
+    oneof Result {
+      // Serialized method return value (`MethodDesc.Retval`).
+      bytes retval = 1;
+
+      // Exception occurred while processing the method call.
+      Exception exception = 2;
+    }
+  }
+}
+
+// Busrpc structure options.
+extend google.protobuf.MessageOptions {
+  // Determines whether endpoint encoding algorithm should apply SHA-224 hashing for the structure.
+  optional bool hashed_struct = 10000;
+}
+
+// Busrpc structure field options.
+extend google.protobuf.FieldOptions {
+  // Determines whether method parameter (field of `Params` from the `MethodDesc`) is observable.
+  optional bool observable = 20001;
+
+  // Determines whether endpoint encoding algorithm should apply SHA-224 hashing for the field.
+  optional bool hashed = 20002;
+
+  // Determines default value for a bool field.
+  optional bool default_bool = 20003;
+
+  // Determines default value for an integer field.
+  optional int64 default_int = 20004;
+
+  // Determines default value for a floating-point field.
+  optional double default_double = 20005;
+
+  // Determines default value for a string field.
+  optional string default_string = 20006;
+}
