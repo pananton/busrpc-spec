@@ -152,27 +152,45 @@ Busrpc **enumeration** corresponds directly to a protobuf `enum`.
 
 ## Exception
 
-Busrpc method result is either a method-specified return value or an **exception**, which is an instance of a global `Exception` structure. Exception indicates abnormal method completion.
+Busrpc method result is either a method-specified return value or an **exception**, which indicates abnormal method completion.
 
-Basic minimal `Exception` structure is defined in the [*busrpc.proto*](proto/busrpc.proto) file. It contains only error code information, represented as `Errc` enumeration value. Third-party APIs may add more fields to the `Exception` structure and/or define new values for the `Errc` enumeration, however, type names (`Exception` and `Errc`) must not be changed.
+Busrpc exceptions are instances of a predefined structure `Exception`. Basic minimal `Exception` structure is defined in the [*api.proto*](proto/api.proto) file. It contains only error code information, represented as predefined `Errc` enumeration value. Third-party APIs may add more fields to the `Exception` structure and/or define new values for the `Errc` enumeration, however, type names itself must not be changed.
 
 ```
 // Exception error code.
 enum Errc {
   // Unexpected error.
   ERRC_UNEXPECTED = 0;
+  
+  // Added by a third-party implementation.
+  
+  // Not authorized.
+  ERRC_NOT_AUTHORIZED = 1;
+  
+  // Connection to db failed.
+  ERRC_DB_CONN_FAILED = 2;
 }
 
-// Global exception type for busrpc methods.
+// Method exception.
 message Exception {
   // Error code.
   Errc code = 1;
+
+  // Added by a third-party implementation.
+
+  // Exception description.
+  string description = 2;
+  
+  // Service name.
+  string service_name = 3;
 }
 ```
 
 By **throwing** an exception busrpc specification means sending an instance of `Exception` structure as the method result. By **catching** exception we mean handling (for example, using some fallback mechanism) the situation when caller receives `Exception` instance instead of the method return value.
 
 Whenever caller receives an exception which he does not know how to handle, he must forward exception to the upstream caller. Consider situation, when method `A` calls method `B`, method `B` calls method `C` and method `C` throws an exception. If method `B` does not know, how to handle occurred exception, then it should send it as it's own result to the method `A`. This mechanism is called **exception propagation** and can be found in many programming languages with OOP support.
+
+Busrpc method exceptions may be converted to a programming language exceptions by the client libraries. This may cause performance degrade and log/alert flooding if exceptions are used incorrectly. The main purpose of an exception is to report **exceptional** situations, which usually occur rarely and have no special handling (except for trivial logging) on the caller side. For example, network connection failure may be considered an exceptional situation in some APIs, while invalid user input is not.
 
 ## Endpoint
 
@@ -235,7 +253,7 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
 ```
 <busrpc-root-dir>/
 ├── api/
-|   ├── busrpc.proto
+|   ├── api.proto
 │   ├── <namespace-dir>/
 |       ├── namespace.proto 
 │       ├── <class-dir>/
@@ -249,7 +267,7 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
  
 Components of this tree are:
 * root directory *\<busrpc-root-dir>/*, which contains two predefined directories: API root directory *api/* and services root directory *services/*
-* file [*busrpc.proto*](proto/busrpc.proto), which is provided by the framework; it contains important busrpc-specific definitions and should be included to any busrpc-compliant API
+* API description file [*api.proto*](proto/api.proto), whose template is provided by the framework; it contains important global definitions and should be included to any busrpc-compliant API
 * namespace directory *\<namespace-dir>/*, which contains a separate subdirectory for each namespace class and a [namespace description file](#namespace-description-file) *namespace.proto*
 * class directory *\<class-dir>/*, which contains a separate subdirectory for each class method and a [class description file](#class-description-file) *class.proto*
 * method directory *\<method-dir>/*, which contains definition of a class method in the form of [method description file](#method-description-file) *method.proto*
@@ -273,7 +291,7 @@ Note, that visibility constraints are applied only inside API root directory. Fo
 
 Busrpc directory layout determines the hierarchy of the protobuf [packages](https://developers.google.com/protocol-buffers/docs/proto3#packages):
 * top-level package name is `busrpc`
-* other package names follow directory hierarchy, for example, content of the *api/busrpc.proto* file (as well as any other file in the API root directory) should be placed into `busrpc.api` package
+* other package names follow directory hierarchy, for example, content of the *api/api.proto* file (as well as any other file in the API root directory) should be placed into `busrpc.api` package
 
 ## Namespace description file
 
