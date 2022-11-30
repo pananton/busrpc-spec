@@ -407,9 +407,9 @@ Note, that all methods of a static class must be defined as static.
 
 ## API description file
 
-API description file *api.proto* must always contain definition of the API descriptor `ApiDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the API by means of a nested types. All this nested types are described in the subsections below. Definitions of other types may also be nested inside `MethodDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
+API description file *api.proto* must always contain definition of the API descriptor `ApiDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the API by means of a nested types. All this nested types are described in the subsections below. Definitions of other types may also be nested inside `ApiDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
 
-Apart from descriptor, API description file also contains definitions of [custom](https://developers.google.com/protocol-buffers/docs/proto3#customoptions) protobuf options introduced by the busrpc framework. Refer to a [template](proto/api.proto) API description file for more information about custom options.
+Apart from descriptor, API description file also contains definitions of [custom](https://developers.google.com/protocol-buffers/docs/proto3#customoptions) protobuf options introduced by the busrpc framework. Refer to the [template](proto/api.proto) API description file for more information about custom options.
 
 ### `Errc`
 
@@ -437,7 +437,7 @@ message ApiDesc {
 
 ### `Exception`
 
-`Exception` is a predefined structure, which represents busrpc [exception](#exceptions). Third-party implementations are free to add more fields the `Exception` structure, however, they should not modify the the name of the type. For example, `Exception` for some API may look like this:
+`Exception` is a predefined structure, which represents busrpc [exception](#exceptions). Third-party implementations are free to add more fields the `Exception` structure, however, they should not modify the name of the type. For example, `Exception` for some API may look like this:
 
 ```
 // file api/api.proto
@@ -517,7 +517,7 @@ import "api/chat/user/send_message/method.proto";
 
 ### `Config`
 
-`Config` is a predefined strucuture describing service configuration settings. Note, that protobuf supports JSON serialization for it's `message` types, which means that service configuration can be easily read/written from/to the text file.
+`Config` is a predefined structure describing service configuration settings. Note, that protobuf supports JSON serialization for it's `message` types, which means that service configuration can be easily read/written from/to the text file.
 
 ```
 // file services/greeter/service.proto
@@ -533,7 +533,7 @@ message ServiceDesc {
 
 ## Default field values
 
-Template file [*api.proto*](proto/api.proto) contains definitions of several options that allow to specify default values for structure fields (other than [those](https://developers.google.com/protocol-buffers/docs/proto3#default) defined by protobuf itself). Of course, protobuf compiler does not understand semantics of this options, however, [client libraries](README.md#libraries) are expected to respect them. This options are:
+Template [*api.proto*](proto/api.proto) file contains definitions of several options that allow to specify default values for structure fields. Of course, protobuf compiler does not understand semantics of this options, however, [client libraries](README.md#libraries) are expected to respect them. This options are:
 * `default_bool` - default value for protobuf `bool` type
 * `default_int` - default value for protobuf integer types (`int32`, `sint32`, `sfixed32`, `uint32`, `fixed32`, `int64`, `sint64`, `sfixed64`, `uint64`, `fixed64`)
 * `default_double` - default value for protobuf floating-point types (`float`, `double`)
@@ -632,7 +632,7 @@ Busrpc specification defines custom protobuf options that control when APPLY_HAS
 [Call endpoint](#endpoint) is created using the following algorithm (note, that creating result endpoint from the call endpoint is trivial):
 1. Fill `<namespace>`, `<class>` and `<method>` components with the namespace, class and method names correspondingly. Note, that this components may contain only alphanumeric symbols and underscores, thus do not require additional encoding.  
 2. If class is `static`, append `<null>` reserved word to the endpoint.
-3. Otherwise (let `object_id` be an instance of [`ObjectId`](#objectid) structure):
+3. Otherwise (let `object_id` be an instance of `ObjectId` structure:
     1. If `hashed_struct` is not set of `false` for `ObjectId`, append `EncodeValue(object_id, 0)` to the endpoint.
     2. Otherwise, append `EncodeValue(object_id, APPLY_HASH)` to the endpoint.
 4. For each [observable parameter](#observable-parameters) in the ascending order of their [field numbers](https://developers.google.com/protocol-buffers/docs/proto3#assigning_field_numbers):
@@ -711,7 +711,6 @@ Finally, consider an example of obtaining endpoint for a method call. We use sli
 
 ```
 // file ./api/chat/user/class.proto
-// ...
 
 message ClassDesc {
   message ObjectId {
@@ -723,7 +722,6 @@ message ClassDesc {
 
 ```
 // file ./api/chat/user/send_message/method.proto
-// ...
 
 message MethodDesc {
   message Params {
