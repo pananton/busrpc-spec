@@ -36,6 +36,6 @@ Any contributions are highly appreciated:
 
 If you want to discuss/suggest some feature, create an issue in this repository.
 
-If you want to contribute code to busprc [development tool](https://github.com/pananton/busrpc-devtool), fork it's repository, make your changes and create a pull request.
+If you want to contribute code to busprc [development tool](https://github.com/pananton/busrpc-devtool), fork it's repository and make your changes in a separate branch. When the changes are ready, create a pull request.
 
 If you have implemented new busrpc client or library, create an issue in this repository with a link to your project and I will add it to the list.
