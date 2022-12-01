@@ -71,7 +71,7 @@ enum Status {
 
 ## Imports
 
-* Use path relative to busrpc root directory  (the one which contains *api/* and *services/* directories) when importing protobuf files (for example, if file *dir1/dir2/file1.proto* should be imported in any other file (even in the same directory) do this with `import "dir1/dir2/some.proto";`)
+* Use path relative to busrpc project directory  (the one which contains *api/* and *services/* directories) when importing protobuf files (for example, if file *dir1/dir2/file1.proto* should be imported in any other file (even in the same directory) do this with `import "dir1/dir2/some.proto";`)
 * Service description file *service.proto* must import description files of all methods implemented or invoked by the service
 * Prefer to follow next recommendations to guarantee that generated source files will contain all necessary types:
   * import API description file *api.proto* in every namespace description file *namespace.proto*
@@ -94,5 +94,5 @@ Busrpc API should follow code as documentation principle, which implies that pro
 * Every non-predefined busrpc structure or enumeration should be documented with a comment describing it
 * Predefined structures may not be documented unless explicitly stated by the rules of this section
 * Every structure field or enumeration constant should be documented
-* Every descriptor (`ServiceDesc`, `ApiDesc`, `NamespaceDesc`, `ClassDesc` or `MethodDesc`) should be documented with a comment which is considered as corresponding entity description
+* Every descriptor (`ApiDesc`, `NamespaceDesc`, `ClassDesc`, `MethodDesc` or `ServiceDesc`) should be documented with a comment which is considered as corresponding entity description
 * Every `import` statement for a method description file *method.proto* found in the service description file *service.proto* should be documented; documentation comment should contain information whether method is implemented or invoked by the service (see [service documentation commands](./busrpc.md#service-documentation-commands))
