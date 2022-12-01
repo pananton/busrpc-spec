@@ -223,7 +223,7 @@ Most examples in this section are based on the busrpc API of a simple fictional 
 All busrpc protobuf files should be organized in the tree represented below. Names in angle brackets are placeholders which are assigned real names by specific API implementation. For simplicity, only a single namespace, class, method and service is presented. Of course, real API may contain arbitrary number of this entities structured in a similar way.
 
 ```
-<busrpc-project-dir>/
+<project-dir>/
 ├── api/
 |   ├── api.proto
 │   ├── <namespace-dir>/
@@ -238,7 +238,7 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
 ```
  
 Components of this tree are:
-* project directory *\<busrpc-project-dir>/*, which contains two predefined directories: API root directory *api/* and services root directory *services/*
+* project directory *\<project-dir>/*, which contains two predefined directories: API root directory *api/* and services root directory *services/*
 * API description file *api.proto* (a [template](proto/api.proto) is provided by the framework), which contains definitions of basic busrpc types and custom protobuf options
 * namespace directory *\<namespace-dir>/*, which contains a separate subdirectory for each namespace class and a [namespace description file](#namespace-description-file) *namespace.proto*
 * class directory *\<class-dir>/*, which contains a separate subdirectory for each class method and a [class description file](#class-description-file) *class.proto*
@@ -262,8 +262,8 @@ Note, that visibility constraints are applied **only** for API root directory an
 ## Protobuf package names
 
 Busrpc directory layout determines the hierarchy of the protobuf [packages](https://developers.google.com/protocol-buffers/docs/proto3#packages):
-* top-level package name is `busrpc`
-* other package names follow directory hierarchy, for example, content of the *api/api.proto* file (as well as any other file in the API root directory) should be placed into `busrpc.api` package
+* top-level package name is the same as the project directory name
+* other package names follow directory hierarchy, for example, content of the *my_project/api/api.proto* file (as well as any other file in the API root directory) should be placed into `my_project.api` package
 
 ## Namespace description file
 
