@@ -223,7 +223,7 @@ Most examples in this section are based on the busrpc API of a simple fictional 
 All busrpc protobuf files should be organized in the tree represented below. Names in angle brackets are placeholders which are assigned real names by specific API implementation. For simplicity, only a single namespace, class, method and service is presented. Of course, real API may contain arbitrary number of this entities structured in a similar way.
 
 ```
-<busrpc-root-dir>/
+<busrpc-project-dir>/
 ├── api/
 |   ├── api.proto
 │   ├── <namespace-dir>/
@@ -238,14 +238,14 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
 ```
  
 Components of this tree are:
-* root directory *\<busrpc-root-dir>/*, which contains two predefined directories: API root directory *api/* and services root directory *services/*
+* project directory *\<busrpc-project-dir>/*, which contains two predefined directories: API root directory *api/* and services root directory *services/*
 * API description file *api.proto* (a [template](proto/api.proto) is provided by the framework), which contains definitions of basic busrpc types and custom protobuf options
 * namespace directory *\<namespace-dir>/*, which contains a separate subdirectory for each namespace class and a [namespace description file](#namespace-description-file) *namespace.proto*
 * class directory *\<class-dir>/*, which contains a separate subdirectory for each class method and a [class description file](#class-description-file) *class.proto*
 * method directory *\<method-dir>/*, which contains definition of a class method in the form of [method description file](#method-description-file) *method.proto*
 * service directory *\<service-dir>/*, which contains definition of a service in the form of [service description file](#service-description-file) *service.proto*
 
-Busrpc [scopes](#type-visibility) and their hierarchy matches busrpc API directory layout:
+Busrpc [scopes](#type-visibility) and their hierarchy matches busrpc API root directory layout:
 * globally-scoped types are types defined in files in the API root directory
 * namespace-scoped types are types defined in files in the namespace directory
 * class-scoped types are types defined in files in the class directory
@@ -257,7 +257,7 @@ Note, that type visibility rules can be expressed in terms of files and director
 * file from the class directory can be imported by any file in the same class directory or nested method directory
 * file from the method directory can be imported by any file in the same method directory
 
-Note, that visibility constraints are applied only inside API root directory. For example, service description file can (and, in fact, is required to, see below) import necessary method description files despite the fact that service description file itself is not placed to the method directory.
+Note, that visibility constraints are applied **only** for API root directory and it's subdirectories. For example, service description file can (and, in fact, is required to) import necessary method description files despite the fact that service description file itself is not placed to the method directory.
 
 ## Protobuf package names
 
@@ -737,7 +737,7 @@ Now if user "Alice" sends message to user "Bob", the endpoint will look like thi
 
 # Documenting API
 
-Useful and consistent documentation is a must for any API. The cornerstone of documentation of a busrpc-compliant API is "code as documentation" principle. By simply inspecting busrpc root directory developers can obtain information about:
+Useful and consistent documentation is a must for any API. The cornerstone of documentation of a busrpc-compliant API is "code as documentation" principle. By simply inspecting busrpc project directory developers can obtain information about:
 * API main entities (namespaces, classes, methods and structures)
 * endpoints, where API is available
 * system infrastructure:
