@@ -30,8 +30,7 @@ All protobuf files must be structured in the following way:
 ## Protobuf entities naming
 
 * Name can only contain letters (a-zA-Z), digits (0-9) and underscores and must start with letter
-* Top-level protobuf package name must be *busrpc*
-* Package names must correspond to the directory hierarchy, for example types from the directory *dir1/dir2/dir3* must be placed to *busrpc.dir1.dir2.dir3* package
+* Package names must correspond to the directory hierarchy, for example types from the directory *dir1/dir2/dir3* must be placed to *dir1.dir2.dir3* package
 * Use CamelCase for protobuf `message` name
 * Use lower case underscore-separated names for protobuf `message` fields
 * Use pluralized names for `repeated` fields
@@ -39,7 +38,7 @@ All protobuf files must be structured in the following way:
 Example:
 ```
 syntax = "proto3";
-package busrpc.dir1.dir2.dir3;
+package dir1.dir2.dir3;
 
 message SomeMessage {
   int32 some_field_1 = 1;
@@ -71,7 +70,7 @@ enum Status {
 
 ## Imports
 
-* Use path relative to busrpc project directory  (the one which contains *api/* and *services/* directories) when importing protobuf files (for example, if file *dir1/dir2/file1.proto* should be imported in any other file (even in the same directory) do this with `import "dir1/dir2/some.proto";`)
+* Use path relative to busrpc project directory (the one which contains *api/* and *services/* directories) when importing protobuf files (for example, if file *dir1/dir2/file1.proto* should be imported in any other file (even in the same directory) do this with `import "dir1/dir2/some.proto";`)
 * Service description file *service.proto* must import description files of all methods implemented or invoked by the service
 * Prefer to follow next recommendations to guarantee that generated source files will contain all necessary types:
   * import API description file *api.proto* in every namespace description file *namespace.proto*
