@@ -30,7 +30,8 @@ All protobuf files must be structured in the following way:
 ## Protobuf entities naming
 
 * Name can only contain letters (a-zA-Z), digits (0-9) and underscores and must start with letter
-* Package names must correspond to the directory hierarchy, for example types from the directory *dir1/dir2/dir3* must be placed to *dir1.dir2.dir3* package
+* Top-level protobuf package name must be busrpc
+* Package names must correspond to the directory hierarchy, for example types from the directory *dir1/dir2/dir3* must be placed to *busrpc.dir1.dir2.dir3* package
 * Use CamelCase for protobuf `message` name
 * Use lower case underscore-separated names for protobuf `message` fields
 * Use pluralized names for `repeated` fields
@@ -38,7 +39,7 @@ All protobuf files must be structured in the following way:
 Example:
 ```
 syntax = "proto3";
-package dir1.dir2.dir3;
+package busrpc.dir1.dir2.dir3;
 
 message SomeMessage {
   int32 some_field_1 = 1;
