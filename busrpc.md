@@ -245,25 +245,18 @@ Components of this tree are:
 * method directory *\<method-dir>/*, which contains definition of a class method in the form of [method description file](#method-description-file) *method.proto*
 * service directory *\<service-dir>/*, which contains definition of a service in the form of [service description file](#service-description-file) *service.proto*
 
-Busrpc [scopes](#type-visibility) and their hierarchy matches busrpc API root directory layout:
-* globally-scoped types are types defined in files in the API root directory
-* namespace-scoped types are types defined in files in the namespace directory
-* class-scoped types are types defined in files in the class directory
-* method-scoped types are types defined in files in the method directory
-
-Note, that type visibility rules can be expressed in terms of files and directories in the following way:
-* file from the API root directory can be imported by any file
-* file from the namespace directory can be imported by any file in the same namespace directory or nested class/method directory
-* file from the class directory can be imported by any file in the same class directory or nested method directory
-* file from the method directory can be imported by any file in the same method directory
-
-Note, that visibility constraints are applied **only** for API root directory and it's subdirectories. For example, service description file can (and, in fact, is required to) import necessary method description files despite the fact that service description file itself is not placed to the method directory.
+Additionally, every directory in a tree can contain arbitrary number of protobuf files with definitions of general busrpc structures and enumerations. The place in the busrpc directory tree where protobuf file is located determines the [scope](#type-visibility) of all types defined in this file: 
+* files from the API root directory contain globally-scoped types
+* files from the namespace directory contain namespace-scoped types
+* files from the class directory contain class-scoped types
+* files from the method directory contain method-scoped types
+* files from the services root directory and it's subdirectories contain types that are not considered part of the API; this types can use any other types, however, are not visible by themselves for the API types because they are defined out of the API global scope
 
 ## Protobuf package names
 
 Busrpc directory layout determines the hierarchy of the protobuf [packages](https://developers.google.com/protocol-buffers/docs/proto3#packages):
-* top-level package name is the same as the project directory name
-* other package names follow directory hierarchy, for example, content of the *my_project/api/api.proto* file (as well as any other file in the API root directory) should be placed into `my_project.api` package
+* top-level package name should be `busrpc`
+* other package names follow directory hierarchy, for example, content of the *api/api.proto* file (as well as any other file in the API root directory) should be placed into `busrpc.api` package
 
 ## Namespace description file
 
@@ -710,7 +703,7 @@ Footnotes:
 Finally, consider an example of obtaining endpoint for a method call. We use sligthly modified class `user` and it's method `send_message` to demonstrate encoding algorithm. Aforementioned modifications are introduced to remove limitation on a username size.
 
 ```
-// file ./api/chat/user/class.proto
+// file api/chat/user/class.proto
 
 message ClassDesc {
   message ObjectId {
@@ -721,7 +714,7 @@ message ClassDesc {
 ```
 
 ```
-// file ./api/chat/user/send_message/method.proto
+// file api/chat/user/send_message/method.proto
 
 message MethodDesc {
   message Params {
