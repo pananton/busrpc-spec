@@ -404,7 +404,7 @@ File *busrpc.proto* must provide definition of the busrpc built-in types, which 
 
 ### `Errc`
 
-`Errc` is an enumeration, which contains system-wide error codes describing the reason of a busrpc [exception](#exceptions). Third-party implementations are allowed to add their own error codes to the `Errc` enumeration, however, they should not modify the name of the type. For example, `Errc` defined for some API may look like this:
+`Errc` is a predefined enumeration, which contains system-wide error codes describing the reason of a busrpc [exception](#exceptions). Third-party implementations are allowed to add custom error codes to the `Errc` enumeration, however, they should not modify the name of the type. For example, `Errc` defined for some API may look like this:
 
 ```
 // file api/busrpc.proto
@@ -425,7 +425,7 @@ enum Errc {
 
 ### `Exception`
 
-`Exception` is a structure representing busrpc [exception](#exceptions). Third-party implementations are allowed to add more fields the `Exception` structure, however, they should not modify the name of the type. For example, `Exception` for some API may look like this:
+`Exception` is a predefined structure representing busrpc [exception](#exceptions). Third-party implementations are allowed to add custom fields to the `Exception` structure, however, they should not modify the name of the type. For example, `Exception` for some API may look like this:
 
 ```
 // file api/busrpc.proto
@@ -446,7 +446,7 @@ message Exception {
 
 ### `CallMessage`
 
-`CallMessage` is a structure, which determines format of the network packet used to transfer method call data. This structure should not be modified in any way by a third-party implementation, or some busrpc tools may stop working.
+`CallMessage` is a predefined structure, which determines format of the network packet used to transfer method call data. This structure should not be modified in any way by a third-party implementation, or some busrpc tools may stop working.
 
 ```
 // file api/busrpc.proto
@@ -463,7 +463,7 @@ Field `params` contains protobuf-serialized `Params` structure from the method d
 
 ### `ResultMessage`
 
-`ResultMessage` is a structure, which determines format of the network packet used to transfer method result. This structure should not be modified in any way by a third-party implementation, or some busrpc tools may stop working.
+`ResultMessage` is a predefined structure, which determines format of the network packet used to transfer method result. This structure should not be modified in any way by a third-party implementation, or some busrpc tools may stop working.
 
 ```
 // file api/busrpc.proto
