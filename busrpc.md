@@ -239,7 +239,7 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
  
 Components of this tree are:
 * project directory *\<project-dir>/*, which contains two predefined directories: API root directory *api/* and services root directory *services/*
-* file *busrpc.proto*, which contains definitions of basic busrpc types and protobuf options (a [template](proto/busrpc.proto) of this file is provided by the framework)
+* file *busrpc.proto*, which contains definitions of the [built-in](#built-in-types) busrpc types and protobuf options
 * namespace directory *\<namespace-dir>/*, which contains a separate subdirectory for each namespace class and a [namespace description file](#namespace-description-file) *namespace.proto*
 * class directory *\<class-dir>/*, which contains a separate subdirectory for each class method and a [class description file](#class-description-file) *class.proto*
 * method directory *\<method-dir>/*, which contains definition of a class method in the form of [method description file](#method-description-file) *method.proto*
@@ -400,7 +400,7 @@ Note, that all methods of a static class must be defined as static.
 
 ## Built-in types
 
-File *busrpc.proto* must provide definition of the busrpc built-in types, which must have exactly the same name and format in all compliant third-party implementations. Apart from the built-in types, *busrpc.proto* also contains definitions of a [custom](https://developers.google.com/protocol-buffers/docs/proto3#customoptions) protobuf options introduced by the busrpc framework. Ready-to-use *busrpc.proto* file can be found [here](proto/busrpc.proto).
+File *busrpc.proto* must provide definitions of the busrpc built-in types, which must have exactly the same name and format in all compliant third-party implementations. Apart from the built-in types, *busrpc.proto* also contains definitions of a [custom](https://developers.google.com/protocol-buffers/docs/proto3#customoptions) protobuf options introduced by the busrpc framework. Ready-to-use *busrpc.proto* file can be found [here](proto/busrpc.proto).
 
 ### `Errc`
 
