@@ -23,13 +23,13 @@ This document contains general information for developers of busrpc microservice
     * [`Params` and `Retval`](#params-and-retval)
       * [Observable parameters](#observable-parameters)
     * [`Static`](#static)
+  * [Service description file](#service-description-file)
+    * [`Config`](#config)
   * [Built-in types](#built-in-types)
     * [`Errc`](#errc) 
     * [`Exception`](#exception)
     * [`CallMessage`](#callmessage)
     * [`ResultMessage`](#resultmessage)
-  * [Service description file](#service-description-file)
-    * [`Config`](#config)
   * [Default field values](#default-field-values)
   * [Endpoint encoding](#endpoint-encoding)
     * [Type encoding](#type-encoding)
@@ -398,6 +398,38 @@ message MethodDesc {
 
 Note, that all methods of a static class must be defined as static.
 
+## Service description file
+
+Service description file *service.proto* must always contain definition of the service descriptor `ServiceDesc` - a predefined busrpc structure, which provides information about the service by means of a predefined nested types. Busrpc specification currently recognizes only `Config` structure, which describes service configuration parameters. Definitions of other types may also be nested inside `ServiceDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
+
+Additionally, service description file must import description files of all methods that service implements or invokes.
+
+Consider a service that sends welcome message to any user who signed in to the Chat application for the first time. Such service is pretty easy to implement using existing API: it needs to implement method `user::on_signed_in` to check whether user signs in for the first time, and if he is, call `user::send_message` method of some system-defined user account to send a welcome message to him. The fact that service uses two API methods is expressed in the service description file by importing corresponding *method.proto* files.
+
+```
+// file services/greeter/service.proto
+...
+
+import "api/chat/user/on_signed_in/method.proto";
+import "api/chat/user/send_message/method.proto";
+```
+
+### `Config`
+
+`Config` is a predefined structure describing service configuration settings. Note, that protobuf supports JSON serialization for it's `message` types, which means that service configuration can be easily read/written from/to the text file.
+
+```
+// file services/greeter/service.proto
+
+message ServiceDesc {
+  message Config {
+    string bus_ip = 1;
+    uint32 bus_port = 2;
+    string welcome_text = 3;
+  }
+}
+```
+
 ## Built-in types
 
 File *busrpc.proto* must provide definitions of the busrpc built-in types, which must have exactly the same name and format in all compliant third-party implementations. Apart from the built-in types, *busrpc.proto* also contains definitions of a [custom](https://developers.google.com/protocol-buffers/docs/proto3#customoptions) protobuf options introduced by the busrpc framework. Ready-to-use *busrpc.proto* file can be found [here](proto/busrpc.proto).
@@ -477,38 +509,6 @@ message ResultMessage {
 ```
 
 Field `retval` contains protobuf-serialized `Retval` structure from the method descriptor and is set only if method did not throw an exception. Otherwise, thrown exception is transferred in the `exception` field.
-
-## Service description file
-
-Service description file *service.proto* must always contain definition of the service descriptor `ServiceDesc` - a predefined busrpc structure, which provides information about the service by means of a predefined nested types. Busrpc specification currently recognizes only `Config` structure, which describes service configuration parameters. Definitions of other types may also be nested inside `ServiceDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
-
-Additionally, service description file must import description files of all methods that service implements or invokes.
-
-Consider a service that sends welcome message to any user who signed in to the Chat application for the first time. Such service is pretty easy to implement using existing API: it needs to implement method `user::on_signed_in` to check whether user signs in for the first time, and if he is, call `user::send_message` method of some system-defined user account to send a welcome message to him. The fact that service uses two API methods is expressed in the service description file by importing corresponding *method.proto* files.
-
-```
-// file services/greeter/service.proto
-...
-
-import "api/chat/user/on_signed_in/method.proto";
-import "api/chat/user/send_message/method.proto";
-```
-
-### `Config`
-
-`Config` is a predefined structure describing service configuration settings. Note, that protobuf supports JSON serialization for it's `message` types, which means that service configuration can be easily read/written from/to the text file.
-
-```
-// file services/greeter/service.proto
-
-message ServiceDesc {
-  message Config {
-    string bus_ip = 1;
-    uint32 bus_port = 2;
-    string welcome_text = 3;
-  }
-}
-```
 
 ## Default field values
 
