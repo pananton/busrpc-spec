@@ -23,7 +23,7 @@ This document contains general information for developers of busrpc microservice
     * [`Params` and `Retval`](#params-and-retval)
       * [Observable parameters](#observable-parameters)
     * [`Static`](#static)
-  * [API description file](#api-description-file)
+  * [Built-in types](#built-in-types)
     * [`Errc`](#errc) 
     * [`Exception`](#exception)
     * [`CallMessage`](#callmessage)
@@ -103,7 +103,7 @@ Methods may be bound to a concrete object or to a class as a whole. The latter a
 
 Busrpc **structure** is an alternative term for a protobuf `message` introduced for consistency with OOP terminology.
 
-**Predefined structures** are structures which have special meaning determined by this specification. In particular, **descriptors** are predefined structures which provide busrpc client libraries with type information about busrpc entity (service, namespace, class, method or API as a whole). Descriptors are usually never sent over the network - in fact, they even do not have any fields, only nested type definitions.
+**Predefined structures** are structures which have special meaning determined by this specification. In particular, **descriptors** are predefined structures which provide busrpc client libraries with type information about busrpc entity (namespace, class, method or service). Descriptors are usually never sent on the network - in fact, they even do not have any fields, only nested type definitions.
  
 Busrpc specification defines a concept of an **encodable type** - a protobuf type which can be encoded as specified in the [Type encoding](#type-encoding) section below. Encodable type can't be `repeated` and should be one the following:
 * [scalar](https://developers.google.com/protocol-buffers/docs/proto3#scalar) type except for floating-point types `float` and `double`
@@ -225,7 +225,7 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
 ```
 <project-dir>/
 ├── api/
-|   ├── api.proto
+|   ├── busrpc.proto
 │   ├── <namespace-dir>/
 |       ├── namespace.proto 
 │       ├── <class-dir>/
@@ -239,7 +239,7 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
  
 Components of this tree are:
 * project directory *\<project-dir>/*, which contains two predefined directories: API root directory *api/* and services root directory *services/*
-* API description file *api.proto* (a [template](proto/api.proto) is provided by the framework), which contains definitions of basic busrpc types and custom protobuf options
+* file *busrpc.proto*, which contains definitions of basic busrpc types and protobuf options (a [template](proto/busrpc.proto) of this file is provided by the framework)
 * namespace directory *\<namespace-dir>/*, which contains a separate subdirectory for each namespace class and a [namespace description file](#namespace-description-file) *namespace.proto*
 * class directory *\<class-dir>/*, which contains a separate subdirectory for each class method and a [class description file](#class-description-file) *class.proto*
 * method directory *\<method-dir>/*, which contains definition of a class method in the form of [method description file](#method-description-file) *method.proto*
@@ -250,17 +250,17 @@ Additionally, every directory in a tree can contain arbitrary number of protobuf
 * files from the namespace directory contain namespace-scoped types
 * files from the class directory contain class-scoped types
 * files from the method directory contain method-scoped types
-* files from the services root directory and it's subdirectories contain types that are not considered part of the API; this types can use any other types, however, are not visible by themselves for the API types because they are defined out of the API global scope
+* files from the services root directory and it's subdirectories contain structures and enumerations that are not considered part of the public API and visibility rules do not apply to them
 
 ## Protobuf package names
 
 Busrpc directory layout determines the hierarchy of the protobuf [packages](https://developers.google.com/protocol-buffers/docs/proto3#packages):
 * top-level package name should be `busrpc`
-* other package names follow directory hierarchy, for example, content of the *api/api.proto* file (as well as any other file in the API root directory) should be placed into `busrpc.api` package
+* other package names follow directory hierarchy, for example, content of the *api/busrpc.proto* file (as well as any other file in the API root directory) should be placed into `busrpc.api` package
 
 ## Namespace description file
 
-Namespace description file *namespace.proto* must always contain definition of the namespace descriptor `NamespaceDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the namespace by means of a nested types. Current version of the busrpc specification does not define any nested types with special meaning, however, empty namespace descriptor still must be provided:
+Namespace description file *namespace.proto* must always contain definition of the namespace descriptor `NamespaceDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the namespace by means of a predefined nested types. Current version of the specification does not define any nested type with a special meaning, still empty descriptor still must be provided:
 
 ```
 // file api/chat/namespace.proto
@@ -272,7 +272,7 @@ Note, that it is not recommended to define any types inside `NamespaceDesc` beca
 
 ## Class description file
 
-Class description file *class.proto* must always contain definition of the class descriptor `ClassDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the class by means of a nested types. Busrpc specification currently recognizes only `ObjectId` structure, which describes class object identifier. Definitions of other types may also be nested inside `ClassDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
+Class description file *class.proto* must always contain definition of the class descriptor `ClassDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the class by means of a predefined nested types. Busrpc specification currently recognizes only `ObjectId` structure, which describes class object identifier. Definitions of other types may also be nested inside `ClassDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
 
 ### `ObjectId`
 
@@ -298,11 +298,11 @@ If `ClassDesc` does not contain a nested `ObjectId` type, then corresponding cla
 message ClassDesc { }
 ```
 
-Note, that empty `ObjectId` is not equivalent to a missing `ObjectId` - the first one does not make a class static. In fact, class with empty `ObjectId` may be treated as singleton - a class, for which only one object exists.
+Note, that empty `ObjectId` is not equivalent to a missing `ObjectId` - the first one does not define a static class. In fact, class with empty `ObjectId` may be treated as singleton - a class, for which only one object exists.
 
 ## Method description file
 
-Method description file *method.proto* must always contain definition of the method descriptor `MethodDesc` - a predefined busrpc structure, which provides information about the method by means of a nested types. All this nested types are described in the subsections below. Definitions of other types may also be nested inside `MethodDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
+Method description file *method.proto* must always contain definition of the method descriptor `MethodDesc` - a predefined busrpc structure, which provides information about the method by means of a predefined nested types. All predefined nested types are described in the subsections below. Definitions of other types may also be nested inside `MethodDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
 
 ### `Params` and `Retval`
 
@@ -398,73 +398,62 @@ message MethodDesc {
 
 Note, that all methods of a static class must be defined as static.
 
-## API description file
+## Built-in types
 
-API description file *api.proto* must always contain definition of the API descriptor `ApiDesc` - a special protobuf `message` (or predefined structure in terms of this specification), which provides information about the API by means of a nested types. All this nested types are described in the subsections below. Definitions of other types may also be nested inside `ApiDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
-
-Apart from descriptor, API description file also contains definitions of [custom](https://developers.google.com/protocol-buffers/docs/proto3#customoptions) protobuf options introduced by the busrpc framework. Refer to the [template](proto/api.proto) API description file for more information about custom options.
+File *busrpc.proto* must provide definition of the busrpc built-in types, which must have exactly the same name and format in all compliant third-party implementations. Apart from the built-in types, *busrpc.proto* also contains definitions of a [custom](https://developers.google.com/protocol-buffers/docs/proto3#customoptions) protobuf options introduced by the busrpc framework. Ready-to-use *busrpc.proto* file can be found [here](proto/busrpc.proto).
 
 ### `Errc`
 
-`Errc` is a predefined enumeration, which contains system-wide error codes describing the reason of a busrpc [exception](#exceptions). Third-party implementations are free to add their own error codes to the `Errc` enumeration, however, they should not modify the name of the type. For example, `Errc` defined for some API may look like this:
+`Errc` is an enumeration, which contains system-wide error codes describing the reason of a busrpc [exception](#exceptions). Third-party implementations are allowed to add their own error codes to the `Errc` enumeration, however, they should not modify the name of the type. For example, `Errc` defined for some API may look like this:
 
 ```
-// file api/api.proto
+// file api/busrpc.proto
 
-message ApiDesc {
-  enum Errc {
-    // Unexpected error.
-    ERRC_UNEXPECTED = 0;
+enum Errc {
+  // Unexpected error.
+  ERRC_UNEXPECTED = 0;
   
-    // Custom codes.
+  // Custom codes.
   
-    // Not authorized.
-    ERRC_NOT_AUTHORIZED = 1;
+  // Not authorized.
+  ERRC_NOT_AUTHORIZED = 1;
   
-    // Can't connect to the database.
-    ERRC_DB_CONN_FAILED = 2;
-  }
-  ...
+  // Can't connect to the database.
+  ERRC_DB_CONN_FAILED = 2;
 }
 ```
 
 ### `Exception`
 
-`Exception` is a predefined structure, which represents busrpc [exception](#exceptions). Third-party implementations are free to add more fields the `Exception` structure, however, they should not modify the name of the type. For example, `Exception` for some API may look like this:
+`Exception` is a structure representing busrpc [exception](#exceptions). Third-party implementations are allowed to add more fields the `Exception` structure, however, they should not modify the name of the type. For example, `Exception` for some API may look like this:
 
 ```
-// file api/api.proto
+// file api/busrpc.proto
 
-message ApiDesc {
-  message Exception {
-    // Error code.
-    Errc code = 1;
+message Exception {
+  // Error code.
+  Errc code = 1;
 
-    // Custom fields.
+  // Custom fields.
 
-    // Description.
-    string description = 2;
+  // Description.
+  string description = 2;
   
-    // Service name.
-    string service_name = 3;
-  }
-  ...
+  // Service name.
+  string service_name = 3;
 }
 ```
 
 ### `CallMessage`
 
-`CallMessage` is a predefined structure, which determines format of a network packet used to transfer method call data. This structure should not be modified in any way by a third-party implementation, or some busrpc tools may stop working for it.
+`CallMessage` is a structure, which determines format of the network packet used to transfer method call data. This structure should not be modified in any way by a third-party implementation, or some busrpc tools may stop working.
 
 ```
-// file api/api.proto
+// file api/busrpc.proto
 
-message ApiDesc {
-  message CallMessage {
-    optional bytes object_id = 1;
-    optional bytes params = 2;
-  }
-  ...
+message CallMessage {
+  optional bytes object_id = 1;
+  optional bytes params = 2;
 }
 ```
 
@@ -474,19 +463,16 @@ Field `params` contains protobuf-serialized `Params` structure from the method d
 
 ### `ResultMessage`
 
-`ResultMessage` is a predefined structure, which determines format of network packet used to transfer method result. This structure should not be modified in any way by a third-party implementation, or some busrpc tools may stop working for it.
+`ResultMessage` is a structure, which determines format of the network packet used to transfer method result. This structure should not be modified in any way by a third-party implementation, or some busrpc tools may stop working.
 
 ```
-// file api/api.proto
+// file api/busrpc.proto
 
-message ApiDesc {
-  message ResultMessage {
-    oneof Result {
-      bytes retval = 1;
-      api.Exception exception = 2;
-    }
+message ResultMessage {
+  oneof Result {
+    bytes retval = 1;
+    api.Exception exception = 2;
   }
-  ...
 }
 ```
 
@@ -494,7 +480,7 @@ Field `retval` contains protobuf-serialized `Retval` structure from the method d
 
 ## Service description file
 
-Service description file *service.proto* must always contain definition of the service descriptor `ServiceDesc` - a predefined busrpc structure, which provides information about the service by means of a nested types. Busrpc specification currently recognizes only `Config` structure, which describes service configuration parameters. Definitions of other types may also be nested inside `ServiceDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
+Service description file *service.proto* must always contain definition of the service descriptor `ServiceDesc` - a predefined busrpc structure, which provides information about the service by means of a predefined nested types. Busrpc specification currently recognizes only `Config` structure, which describes service configuration parameters. Definitions of other types may also be nested inside `ServiceDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
 
 Additionally, service description file must import description files of all methods that service implements or invokes.
 
@@ -526,7 +512,7 @@ message ServiceDesc {
 
 ## Default field values
 
-Template [*api.proto*](proto/api.proto) file contains definitions of several options that allow to specify default values for structure fields. Of course, protobuf compiler does not understand semantics of this options, however, [client libraries](README.md#libraries) are expected to respect them. This options are:
+File [*busrpc.proto*](proto/busrpc.proto) contains definitions of several options that allow to specify default values for structure fields. Of course, protobuf compiler does not understand semantics of this options, however, [client libraries](README.md#libraries) are expected to respect them. This options are:
 * `default_bool` - default value for protobuf `bool` type
 * `default_int` - default value for protobuf integer types (`int32`, `sint32`, `sfixed32`, `uint32`, `fixed32`, `int64`, `sint64`, `sfixed64`, `uint64`, `fixed64`)
 * `default_double` - default value for protobuf floating-point types (`float`, `double`)
