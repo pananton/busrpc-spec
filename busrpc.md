@@ -196,11 +196,14 @@ Message bus may prohibit the use of some characters in it's topics. That means e
 
 **Scope** is a part of a busrpc API where name of a structure or enumeration can be used to refer to the corresponding type. In that case we also say that busrpc structure/enumeration is **visible** in this scope.
 
-The scope of a type is determined by the place in the directory hierarchy where the protobuf file containing it's definition is located. Additionally, scopes form a hierarchy in which types visible in the parent scope are also visible in all child scopes. The following scopes are defined by the busrpc specification (in the order from parent to child):
+The scope of a type is determined by the place in the directory hierarchy where the protobuf file containing it's definition is located. Additionally, scopes form a hierarchy in which types visible in the parent scope are also visible in all child scopes. The following scopes are defined by the busrpc specification:
 1. a single **global scope**
-2. a **namespace scope** for each namespace
-3. a **class scope** for each class
-4. a **method scope** for each method
+2. a single **API scope** for all API types
+3. a **namespace scope** for each namespace
+4. a **class scope** for each class
+5. a **method scope** for each method
+6. a single **services scope** for types used internally by the services
+7. a **service scope** for each service
 
 Limiting the scope of busrpc structures and enumerations developers can easily control which parts of their API can be affected when some type is updated. For example, if some structure defined in the class `C` scope needs to be updated, only class `C` methods should be checked for compatability.
 
@@ -240,19 +243,15 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
 ```
  
 Components of this tree are:
-* project directory *\<project-dir>/*, which contains framework-provided *busrpc.proto* file and two predefined directories: API root directory *api/* and services root directory *services/*
-* file *busrpc.proto*, which contains definitions of the [built-in](#built-in-types) busrpc types and protobuf options
+* project directory *\<project-dir>/*, which contains framework-provided *busrpc.proto* file with definitions of the [built-in](#built-in-types) busrpc types 
+* API root directory *api/*
 * namespace directory *\<namespace-dir>/*, which contains a separate subdirectory for each namespace class and a [namespace description file](#namespace-description-file) *namespace.proto*
 * class directory *\<class-dir>/*, which contains a separate subdirectory for each class method and a [class description file](#class-description-file) *class.proto*
 * method directory *\<method-dir>/*, which contains definition of a class method in the form of [method description file](#method-description-file) *method.proto*
+* services root directory *services/*
 * service directory *\<service-dir>/*, which contains definition of a service in the form of [service description file](#service-description-file) *service.proto*
 
-Additionally, every directory in a tree (except for project directory, which should only contain *busrpc.proto*) can contain arbitrary number of protobuf files with definitions of general busrpc structures and enumerations. The place in the busrpc directory tree where protobuf file is located determines the [scope](#type-visibility) of all types defined in this file: 
-* files from the API root directory contain globally-scoped types
-* files from the namespace directory contain namespace-scoped types
-* files from the class directory contain class-scoped types
-* files from the method directory contain method-scoped types
-* files from the services root directory and it's subdirectories contain structures and enumerations that are not considered part of the public API and visibility rules do not apply to them
+Additionally, every directory in a tree can contain arbitrary number of protobuf files with definitions of general busrpc structures and enumerations. The place in the busrpc directory tree where protobuf file is located determines the [scope](#type-visibility) of all types defined in this file: types defined in the parent directory are visible in it's child directories, while types from the child directory are not visible in it's parent.
 
 ## Protobuf package names
 
@@ -424,6 +423,14 @@ message ServiceDesc {
 
 `Implements` is a predefined structure which is used to provide information about methods implemented by the service. For each implemented method, `Implements` should contain a field with arbitrary name and type set to method descriptor `MethodDesc` of the method.
 
+---
+
+**NOTE**
+
+Due to `Implements` nature, busrpc specification **allows** it to reference types which are formally outside of it's scope.
+
+---
+
 Consider a service that sends welcome message to any user who signed in to the Chat application for the first time. Such service needs to know when user signs in to check whether welcome message should be sent to him, so it implements method `user::on_signed_in`. This fact is expressed in the following way:
 
 ```
@@ -440,6 +447,14 @@ message ServiceDesc {
 ### `Invokes`
 
 `Invokes` is a predefined structure which is used to provide information about methods invoked by the service. For each invoked method, `Invokes` should contain a field with arbitrary name and type set to method descriptor `MethodDesc` of the method.
+
+---
+
+**NOTE**
+
+Due to `Invokes` nature, busrpc specification **allows** it to reference types which are formally outside of it's scope.
+
+---
 
 Consider a service that sends welcome message to any user who signed in to the Chat application for the first time. When service decides, that welcome message should be sent for the signed in user (see previous section), it invokes `user::send_message` on behalf of some system account to deliver the message. This fact is expressed in the following way:
 
