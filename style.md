@@ -71,21 +71,17 @@ enum Status {
 
 ## Imports
 
-* Use path relative to busrpc project directory (the one which contains *api/* and *services/* directories) when importing protobuf files (for example, if file *dir1/dir2/file1.proto* should be imported in any other file (even in the same directory) do this with `import "dir1/dir2/some.proto";`)
+* Use path relative to busrpc project directory (the one which contains *busrpc.proto* file) when importing protobuf files (for example, if file *dir1/dir2/file1.proto* should be imported in any other file (even in the same directory) do this with `import "dir1/dir2/some.proto";`)
 * Service description file *service.proto* must import description files of all methods implemented or invoked by the service
 * Prefer to follow next recommendations to guarantee that generated source files will contain all necessary types:
-  * import *busrpc.proto* file in every namespace description file *namespace.proto*
-  * import namespace description file *namespace.proto* in the description files *class.proto* of every class defined in the namespace
+  * import *busrpc.proto* file in every class description file *class.proto*
   * import class description file *class.proto* in the description files *method.proto* of every method of this class
 
 ### Import order
 
 * If several files are imported, prefer to order them by their nesting level: first files from the same directory, then from the parent directory, etc.
 * Prefer to order each group of imported files with the same nesting level alphabetically
-* Inside class/method description file first import parent description file *namespace.proto*/*class.proto*; other files are imported in the usual order
-* Inside the service description file prefer to import method description files in the following order:
-  1. description files for methods, implemented by the service
-  2. description files for methods, invoked by the service
+* Inside method description file first import class description file *class.proto*; other files are imported in the usual order
 
 ## Documenting
 
@@ -95,4 +91,4 @@ Busrpc API should follow code as documentation principle, which implies that pro
 * Predefined structures may not be documented unless explicitly stated by the rules of this section
 * Every structure field or enumeration constant should be documented
 * Every descriptor (`NamespaceDesc`, `ClassDesc`, `MethodDesc` or `ServiceDesc`) should be documented with a comment which is considered as corresponding entity description
-* Every `import` statement for a method description file *method.proto* found in the service description file *service.proto* should be documented; documentation comment should contain information whether method is implemented or invoked by the service (see [service documentation commands](./busrpc.md#service-documentation-commands))
+* Every field of the `Implements` or `Invokes` predefined structures, which are part of the service descriptor `ServiceDesc`, should be documented with a comment describing how service uses the method
