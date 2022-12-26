@@ -9,7 +9,7 @@
 // 3. Protobuf options defined by the busrpc specification.
 
 syntax = "proto3";
-package busrpc.api;
+package busrpc;
 
 import "google/protobuf/descriptor.proto";
 
@@ -60,15 +60,6 @@ extend google.protobuf.FieldOptions {
   // Determines whether endpoint encoding algorithm should apply SHA-224 hashing for the field.
   optional bool hashed = 20002;
 
-  // Determines default value for a bool field.
-  optional bool default_bool = 20003;
-
-  // Determines default value for an integer field.
-  optional int64 default_int = 20004;
-
-  // Determines default value for a floating-point field.
-  optional double default_double = 20005;
-
-  // Determines default value for a string field.
-  optional string default_string = 20006;
+  // Determines default field value.
+  optional string default_value = 20003;
 }

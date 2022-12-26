@@ -9,7 +9,7 @@
 // 3. Protobuf options defined by the busrpc specification.
 
 syntax = "proto3";
-package busrpc.api;
+package busrpc;
 
 import "google/protobuf/descriptor.proto";
 
