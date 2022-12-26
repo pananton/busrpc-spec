@@ -25,6 +25,8 @@ This document contains general information for developers of busrpc microservice
     * [`Static`](#static)
   * [Service description file](#service-description-file)
     * [`Config`](#config)
+    * [`Implements`](#implements)
+    * [`Invokes`](#invokes)
   * [Built-in types](#built-in-types)
     * [`Errc`](#errc) 
     * [`Exception`](#exception)
@@ -53,7 +55,7 @@ First of all, it is a form of a remote procedure call (RPC) technology (like [gr
 
 Secondly, it relies on a message bus/queue/broker component as a transport layer. Usual RPC implementations operate in a peer-to-peer manner which means that communicating parties need to connect directly to each other. This is probably ok for the systems with small number (1-5) of services, but does not suite well for microservice backends where number of services can easily surpass one hundred. Instead, microservice backends utilize a dedicated component (called message bus/queue/broker) as a central point of communication which is responsible for inter-service message delivery. This greatly simplifies system configuration (only message bus address is required to access any part of the system API), service deployment (because all services are loosely-coupled in this scheme) and administration.
 
-Busrpc framework global goal is to offer a turnkey solution for backend developers who apply microservice architecture for their projects. To acheive this, busrpc framework is designed with the following ideas in mind:
+Busrpc framework global goal is to offer a turnkey solution for backend developers who apply microservice architecture for their projects. To achieve this, busrpc framework is designed with the following ideas in mind:
 * framework should be applicable for a variety of message buses and programming languages
 * framework should establish unambiguous and intuitive terminology to facilitate framework learning
 * promoted API design should help to solve typical problems arising when designing custom backend API (how to extract API entities from the business domain, name and document them, etc.) 
@@ -224,8 +226,8 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
 
 ```
 <project-dir>/
+├── busrpc.proto
 ├── api/
-|   ├── busrpc.proto
 │   ├── <namespace-dir>/
 |       ├── namespace.proto 
 │       ├── <class-dir>/
@@ -238,14 +240,14 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
 ```
  
 Components of this tree are:
-* project directory *\<project-dir>/*, which contains two predefined directories: API root directory *api/* and services root directory *services/*
+* project directory *\<project-dir>/*, which contains framework-provided *busrpc.proto* file and two predefined directories: API root directory *api/* and services root directory *services/*
 * file *busrpc.proto*, which contains definitions of the [built-in](#built-in-types) busrpc types and protobuf options
 * namespace directory *\<namespace-dir>/*, which contains a separate subdirectory for each namespace class and a [namespace description file](#namespace-description-file) *namespace.proto*
 * class directory *\<class-dir>/*, which contains a separate subdirectory for each class method and a [class description file](#class-description-file) *class.proto*
 * method directory *\<method-dir>/*, which contains definition of a class method in the form of [method description file](#method-description-file) *method.proto*
 * service directory *\<service-dir>/*, which contains definition of a service in the form of [service description file](#service-description-file) *service.proto*
 
-Additionally, every directory in a tree can contain arbitrary number of protobuf files with definitions of general busrpc structures and enumerations. The place in the busrpc directory tree where protobuf file is located determines the [scope](#type-visibility) of all types defined in this file: 
+Additionally, every directory in a tree (except for project directory, which should only contain *busrpc.proto*) can contain arbitrary number of protobuf files with definitions of general busrpc structures and enumerations. The place in the busrpc directory tree where protobuf file is located determines the [scope](#type-visibility) of all types defined in this file: 
 * files from the API root directory contain globally-scoped types
 * files from the namespace directory contain namespace-scoped types
 * files from the class directory contain class-scoped types
@@ -256,7 +258,7 @@ Additionally, every directory in a tree can contain arbitrary number of protobuf
 
 Busrpc directory layout determines the hierarchy of the protobuf [packages](https://developers.google.com/protocol-buffers/docs/proto3#packages):
 * top-level package name should be `busrpc`
-* other package names follow directory hierarchy, for example, content of the *api/busrpc.proto* file (as well as any other file in the API root directory) should be placed into `busrpc.api` package
+* other package names follow directory hierarchy, for example, content of the *api/file.proto* file (as well as any other file in the API root directory) should be placed into `busrpc.api` package
 
 ## Namespace description file
 
@@ -337,7 +339,7 @@ message MethodDesc {
 ```
 
 ```
-// file ./api/chat/user/on_signed_in/method.proto
+// file api/chat/user/on_signed_in/method.proto
 
 message MethodDesc { }
 ```
@@ -400,19 +402,7 @@ Note, that all methods of a static class must be defined as static.
 
 ## Service description file
 
-Service description file *service.proto* must always contain definition of the service descriptor `ServiceDesc` - a predefined busrpc structure, which provides information about the service by means of a predefined nested types. Busrpc specification currently recognizes only `Config` structure, which describes service configuration parameters. Definitions of other types may also be nested inside `ServiceDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
-
-Additionally, service description file must import description files of all methods that service implements or invokes.
-
-Consider a service that sends welcome message to any user who signed in to the Chat application for the first time. Such service is pretty easy to implement using existing API: it needs to implement method `user::on_signed_in` to check whether user signs in for the first time, and if he is, call `user::send_message` method of some system-defined user account to send a welcome message to him. The fact that service uses two API methods is expressed in the service description file by importing corresponding *method.proto* files.
-
-```
-// file services/greeter/service.proto
-...
-
-import "api/chat/user/on_signed_in/method.proto";
-import "api/chat/user/send_message/method.proto";
-```
+Service description file *service.proto* must always contain definition of the service descriptor `ServiceDesc` - a predefined busrpc structure, which provides information about the service by means of a predefined nested types. All predefined nested types are described in the subsections below. Definitions of other types may also be nested inside `ServiceDesc`, however this may cause conflicts in the future versions of this specification and thus not recommended.
 
 ### `Config`
 
@@ -430,6 +420,40 @@ message ServiceDesc {
 }
 ```
 
+### `Implements`
+
+`Implements` is a predefined structure which is used to provide information about methods implemented by the service. For each implemented method, `Implements` should contain a field with arbitrary name and type set to method descriptor `MethodDesc` of the method.
+
+Consider a service that sends welcome message to any user who signed in to the Chat application for the first time. Such service needs to know when user signs in to check whether welcome message should be sent to him, so it implements method `user::on_signed_in`. This fact is expressed in the following way:
+
+```
+// file services/greeter/service.proto
+
+message ServiceDesc {
+  ...
+  message Implements {
+    busrpc.api.chat.user.on_signed_in.MethodDesc method1 = 1;
+  }
+}
+```
+
+### `Invokes`
+
+`Invokes` is a predefined structure which is used to provide information about methods invoked by the service. For each invoked method, `Invokes` should contain a field with arbitrary name and type set to method descriptor `MethodDesc` of the method.
+
+Consider a service that sends welcome message to any user who signed in to the Chat application for the first time. When service decides, that welcome message should be sent for the signed in user (see previous section), it invokes `user::send_message` on behalf of some system account to deliver the message. This fact is expressed in the following way:
+
+```
+// file services/greeter/service.proto
+
+message ServiceDesc {
+  ...
+  message Invokes {
+    busrpc.api.chat.user.send_message.MethodDesc method1 = 1;
+  }
+}
+```
+
 ## Built-in types
 
 File *busrpc.proto* must provide definitions of the busrpc built-in types, which must have exactly the same name and format in all compliant third-party implementations. Apart from the built-in types, *busrpc.proto* also contains definitions of a [custom](https://developers.google.com/protocol-buffers/docs/proto3#customoptions) protobuf options introduced by the busrpc framework. Ready-to-use *busrpc.proto* file can be found [here](proto/busrpc.proto).
@@ -439,7 +463,7 @@ File *busrpc.proto* must provide definitions of the busrpc built-in types, which
 `Errc` is a predefined enumeration, which contains system-wide error codes describing the reason of a busrpc [exception](#exceptions). Third-party implementations are allowed to add custom error codes to the `Errc` enumeration, however, they should not modify the name of the type. For example, `Errc` defined for some API may look like this:
 
 ```
-// file api/busrpc.proto
+// file busrpc.proto
 
 enum Errc {
   // Unexpected error.
@@ -460,7 +484,7 @@ enum Errc {
 `Exception` is a predefined structure representing busrpc [exception](#exceptions). Third-party implementations are allowed to add custom fields to the `Exception` structure, however, they should not modify the name of the type. For example, `Exception` for some API may look like this:
 
 ```
-// file api/busrpc.proto
+// file busrpc.proto
 
 message Exception {
   // Error code.
@@ -481,7 +505,7 @@ message Exception {
 `CallMessage` is a predefined structure, which determines format of the network packet used to transfer method call data. This structure should not be modified in any way by a third-party implementation, or some busrpc tools may stop working.
 
 ```
-// file api/busrpc.proto
+// file busrpc.proto
 
 message CallMessage {
   optional bytes object_id = 1;
@@ -498,12 +522,12 @@ Field `params` contains protobuf-serialized `Params` structure from the method d
 `ResultMessage` is a predefined structure, which determines format of the network packet used to transfer method result. This structure should not be modified in any way by a third-party implementation, or some busrpc tools may stop working.
 
 ```
-// file api/busrpc.proto
+// file busrpc.proto
 
 message ResultMessage {
   oneof Result {
     bytes retval = 1;
-    api.Exception exception = 2;
+    busrpc.Exception exception = 2;
   }
 }
 ```
@@ -512,13 +536,9 @@ Field `retval` contains protobuf-serialized `Retval` structure from the method d
 
 ## Default field values
 
-File [*busrpc.proto*](proto/busrpc.proto) contains definitions of several options that allow to specify default values for structure fields. Of course, protobuf compiler does not understand semantics of this options, however, [client libraries](README.md#libraries) are expected to respect them. This options are:
-* `default_bool` - default value for protobuf `bool` type
-* `default_int` - default value for protobuf integer types (`int32`, `sint32`, `sfixed32`, `uint32`, `fixed32`, `int64`, `sint64`, `sfixed64`, `uint64`, `fixed64`)
-* `default_double` - default value for protobuf floating-point types (`float`, `double`)
-* `default_string` - default value for protobuf `string` type
+File [*busrpc.proto*](proto/busrpc.proto) contains definition of a `default_value` option of a `string` type, which allows to specify default value for a scalar structure field. Of course, protobuf compiler does not understand semantics of this option, however, [client libraries](README.md#libraries) are expected to respect it. Note, that client libraries also need to perform conversion from the string value to a field type value.
 
-This options are especially useful for describing method parameters and service configuration settings.
+This option is especially useful for describing method parameters and service configuration settings.
 
 ```
 // file services/greeter/service.proto
@@ -526,8 +546,8 @@ This options are especially useful for describing method parameters and service 
 message ServiceDesc {
   message Config {
     string bus_ip = 1;
-    uint32 bus_port = 2 [(default_int) = 4222];
-    string welcome_text = 3 [(default_string) = "Thank you for trying Chat!"];
+    uint32 bus_port = 2 [(default_value) = "4222"];
+    string welcome_text = 3 [(default_value) = "Thank you for trying Chat!"];
   }
 }
 ```
@@ -760,7 +780,9 @@ enum MyEnum {
   // Brief description of MYENUM_VALUE_0.
   MYENUM_VALUE_0 = 0;
 
-  MYENUM_VALUE_1 = 1; // This comment is not bound!
+  // This comment is not bound!
+
+  MYENUM_VALUE_1 = 1;
 }
 ```
 
