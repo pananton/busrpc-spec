@@ -765,25 +765,15 @@ Besides this, busrpc specification defines a mechanism for documenting individua
 
 **Block comment** is a sequence of 1 or many protobuf comments without any gaps between them. Which format is used for comments does not matter (can be any combination of `//` and `/* ... */` comments).
 
-The following example contains a single block comment.
+The following example contains 2 block comments: first consists of lines 1-3, second consists of lines 6-7
 
 ```
 // Line 1
-/* Line2 */
-// Line 3
-/* Line 4...
-   Line 5... */
-```
-
-Next example contains two block comments: first consists of lines 1-3, second consists of lines 4-5.
-
-```
-// Line 1
-/* Line2 */
+// Line 2
 // Line 3
 
-/* Line 4...
-   Line 5... */
+/* Line 6
+   Line 7 */
 ```
 
 To bind block comment to some protobuf entity, it should be placed right **before** the entity, i.e. no empty lines allowed between the block comment and the bound entity. Also busrpc framework currently does not support trailing comments and ignores them, see next example. The first line of a bound block comment is treated as entity's brief description.
