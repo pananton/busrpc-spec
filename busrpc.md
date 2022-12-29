@@ -202,7 +202,7 @@ The scope of a type is determined by the place in the directory hierarchy where 
 3. a **namespace scope** for each namespace
 4. a **class scope** for each class
 5. a **method scope** for each method
-6. a single **services scope** for types used internally by the services
+6. a single **implementation scope** for types used internally by the services
 7. a **service scope** for each service
 
 Limiting the scope of busrpc structures and enumerations developers can easily control which parts of their API can be affected when some type is updated. For example, if some structure defined in the class `C` scope needs to be updated, only class `C` methods should be checked for compatability.
@@ -237,7 +237,7 @@ All busrpc protobuf files should be organized in the tree represented below. Nam
 │           ├── class.proto
 │           ├── <method-dir>/
 │               ├── method.proto
-├── services/
+├── implementation/
 │   ├── <service-dir>/
 |       ├── service.proto
 ```
@@ -248,7 +248,7 @@ Components of this tree are:
 * namespace directory *\<namespace-dir>/*, which contains a separate subdirectory for each namespace class and a [namespace description file](#namespace-description-file) *namespace.proto*
 * class directory *\<class-dir>/*, which contains a separate subdirectory for each class method and a [class description file](#class-description-file) *class.proto*
 * method directory *\<method-dir>/*, which contains definition of a class method in the form of [method description file](#method-description-file) *method.proto*
-* services root directory *services/*
+* implementation root directory *implementation/*
 * service directory *\<service-dir>/*, which contains definition of a service in the form of [service description file](#service-description-file) *service.proto*
 
 Additionally, every directory in a tree can contain arbitrary number of protobuf files with definitions of general busrpc structures and enumerations. The place in the busrpc directory tree where protobuf file is located determines the [scope](#type-visibility) of all types defined in this file: types defined in the parent directory are visible in it's child directories, while types from the child directory are not visible in it's parent.
@@ -408,7 +408,7 @@ Service description file *service.proto* must always contain definition of the s
 `Config` is a predefined structure describing service configuration settings. Note, that protobuf supports JSON serialization for it's `message` types, which means that service configuration can be easily read/written from/to the text file.
 
 ```
-// file services/greeter/service.proto
+// file implementation/greeter/service.proto
 
 message ServiceDesc {
   message Config {
@@ -434,7 +434,7 @@ Due to `Implements` nature, busrpc specification **allows** it to reference type
 Consider a service that sends welcome message to any user who signed in to the Chat application for the first time. Such service needs to know when user signs in to check whether welcome message should be sent to him, so it implements method `user::on_signed_in`. This fact is expressed in the following way:
 
 ```
-// file services/greeter/service.proto
+// file implementation/greeter/service.proto
 
 message ServiceDesc {
   ...
@@ -459,7 +459,7 @@ Due to `Invokes` nature, busrpc specification **allows** it to reference types w
 Consider a service that sends welcome message to any user who signed in to the Chat application for the first time. When service decides, that welcome message should be sent for the signed in user (see previous section), it invokes `user::send_message` on behalf of some system account to deliver the message. This fact is expressed in the following way:
 
 ```
-// file services/greeter/service.proto
+// file implementation/greeter/service.proto
 
 message ServiceDesc {
   ...
@@ -556,7 +556,7 @@ File [*busrpc.proto*](proto/busrpc.proto) contains definition of a `default_valu
 This option is especially useful for describing method parameters and service configuration settings.
 
 ```
-// file services/greeter/service.proto
+// file implementation/greeter/service.proto
 
 message ServiceDesc {
   message Config {
