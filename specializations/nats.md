@@ -22,6 +22,6 @@ Footnotes:
 
 # Reserved characters
 
-* non-printable charactets (ascii 0-31)
-* `<space>` (ascii 32), `$`, `%` (unless used in special token, see table above), `*`, `.`, `>`, `|`
-* `<del>` (ascii 127)
+* non-printable charactets (ASCII 0-31)
+* `<space>` (ASCII 32), `$`, `%` (unless used in special token, see table above), `*`, `.`, `>`, `|`
+* `<del>` (ASCII 127)
