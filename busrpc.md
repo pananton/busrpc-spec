@@ -408,13 +408,10 @@ Service description file *service.proto* must always contain definition of the s
 `Config` is a predefined structure describing service configuration settings. Note, that protobuf supports JSON serialization for it's `message` types, which means that service configuration can be easily read/written from/to the text file.
 
 ```
-// file implementation/greeter/service.proto
-
 message ServiceDesc {
   message Config {
     string bus_ip = 1;
     uint32 bus_port = 2;
-    string welcome_text = 3;
   }
 }
 ```
@@ -568,9 +565,8 @@ This option is especially useful for describing method parameters and service co
 
 message ServiceDesc {
   message Config {
-    string bus_ip = 1;
-    uint32 bus_port = 2 [(default_value) = "4222"];
-    string welcome_text = 3 [(default_value) = "Thank you for trying Chat!"];
+    busrpc.implementation.BusConfig bus = 1;
+    string welcome_text = 2 [(default_value) = "Thank you for trying Chat!"];
   }
 }
 ```
