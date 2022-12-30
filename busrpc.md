@@ -795,6 +795,22 @@ Block comment bound to the descriptor is considered as corresponding entity desc
 
 ## Documentation commands
 
+Documentation commands allow to specify important information related to busrpc entities (methods, services, etc.). Each command is specified as a single comment line `\name [value]` placed somewhere in the entity's block comment. Note, that commands may interleave with general description lines, however, we recommend to place them at the end of the block comment.
+
+Every command may be specified more than once with the same or disinct values. In that case command is called *multivalued*. How multiple values are interpreted depends on the command semantics. For example, they may be considered an error and only one (first or last) value will be taken, or may be merged in some way to represent complex information.
+
+Block comment in the next example represents the following documentation:
+* brief description is "Brief description"
+* full description is an array, consisting of lines "Brief description", "Line 1" and Line 2"
+* command "cmd1" has value "value1"
+* command "cmd2" has 3 values "" (empty string), "value2" and "value3"
+```
+/// Brief description line.
+/// \cmd1 value1
+/// \cmd2
+/// 
+```
+
 # Specializations
 
 Some aspects of the busrpc API design were intentionally left unspecified in this document to avoid dependency on a particular message bus/queue/broker implementation. This unspecified aspects are defined in a seperate bus-dependent documents called *specializations*.
