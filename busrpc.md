@@ -847,7 +847,7 @@ Specializations complete this specification by defining various parameters of th
 | `<esc>`                    | Escape character used by the endpoint encoding algorithm.                                                      |
 | `<field-sep>`              | Separator between structure fields when structure is converted to the endpoint word by the encoding algorithm. |
 
-Additionally, specializations may provide other useful information regarding it's message bus:
+Additionally, specialization may provide other useful information regarding it's message bus:
 * known issues
 * best practicies
 * etc.
