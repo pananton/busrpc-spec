@@ -22,6 +22,9 @@ Footnotes:
 
 # Reserved characters
 
-* non-printable charactets (ASCII 0-31)
-* `<space>` (ASCII 32), `$`, `%` (unless used in special token, see table above), `*`, `.`, `>`, `|`
-* `<del>` (ASCII 127)
+Below are characters that should be hex-encoded when used in the endpoint as specified in the endpoint encoding algorithm. Other characters should be used as-is and should not be affected by the encoding algorithm.
+
+* non-printable charactets (0-31)
+* non-ASCII characters (128-255)
+* `<space>` (32), `$`, `%` (unless used in special token, see table above), `*`, `.`, `>`, `|`
+* `<del>` (27)
