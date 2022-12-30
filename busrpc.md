@@ -822,8 +822,8 @@ Block comment in the next example represents the following documentation:
 
 Table below contains alphabetically sorted list of supported documentation commands along with information about their applicability (i.e., protobuf entities they can be applied to) and value semantics.
 
-| Name   | Applicability       | Value                                                                                              |
-| -------|---------------------|--------------------------------------------------------------------------------------------------- | 
+| Name   | Applicability       | Value                                                                                             |
+| ------ | ------------------- | ------------------------------------------------------------------------------------------------- | 
 | accept | `Implements` fields | Pair `paramName acceptedValueDescription`. Indicates that service accepts only calls with specific values of observable parameter(s). If `paramName` is `@object_id`, then command relates to object identifier. Can be multivalued. |
 | author | `ServiceDesc`       | Service author (a person or a team).                                                               |
 | email  | `ServiceDesc`       | Service author contact email.                                                                      |
@@ -833,7 +833,23 @@ Table below contains alphabetically sorted list of supported documentation comma
 
 # Specializations
 
-Some aspects of the busrpc API design were intentionally left unspecified in this document to avoid dependency on a particular message bus/queue/broker implementation. This unspecified aspects are defined in a seperate bus-dependent documents called *specializations*.
+Specializations complete this specification by defining various parameters of the framework for a specific message bus implementation. At the very least, every specialization should define concrete values for special tokens used throughout the specification and a complete list of reserved characters that should be hex-encoded by the endpoint encoding algorithm.
 
-Currently the following specializations exist (more to be added):
-* NATS [specialization](./docs/specializations/nats-busrpc.md)
+| Token                      | Description                                                                                                    |
+| ---------------------------|--------------------------------------------------------------------------------------------------------------- |
+| `<topic-word-sep>`         | Character used to separate words in a message bus topic.                                                       |
+| `<topic-wildcard-any1>`    | Wildcard character representing a single arbitrary word in a message bus topic.                                |
+| `<topic-wildcard-anyN>`    | Wildcard character representing a 1 to many or 0 to many arbitrary words in a message bus topic.               |
+| `<result-endpoint-prefix>` | Common prefix for endpoints to which messages representing method result are sent.                             | 
+| `<eof>`                    | Reserved word indicating last word in the endpoint.                                                            |
+| `<empty>`                  | Reserved word indicating empty value of the endpoint word.                                                     |
+| `<null>`                   | Reserved word indicating absent value for the endpoint word.                                                   |
+| `<esc>`                    | Escape character used by the endpoint encoding algorithm.                                                      |
+| `<field-sep>`              | Separator between structure fields when structure is converted to the endpoint word by the encoding algorithm. |
+
+Additionally, specializations may provide other useful information regarding it's message bus:
+* known issues
+* best practicies
+* etc.
+
+Available specializations can be found in [*specializations/*](specializations) directory.
