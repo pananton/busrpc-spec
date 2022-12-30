@@ -15,7 +15,7 @@
 | `<empty>`                  | `%empty`                              |
 | `<null>`                   | `%null`                               |
 | `<esc>`                    | `%`                                   |
-| `<field-sep>`              | &#124;                                |
+| `<field-sep>`              | <code>&#124;</code>                   |
 
 Footnotes:
 1. `_INBOX.<guid>` part of the result endpoint prefix are provided by NATS client library; `<request-id>` should be filled by the busrpc method caller
