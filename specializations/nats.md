@@ -5,20 +5,20 @@
 
 # Busrpc token definitions
 
-| Token                      | Value                        |
-| -------------------------- | ---------------------------- |
-| `<topic-word-sep>`         | `.`                          |
-| `<topic-wildcard-any1>`    | `*`                          |
-| `<topic-wildcard-anyN>`    | `>`                          |
-| `<result-endpoint-prefix>` | `_INBOX.<guid>.<request-id>` | 
-| `<eof>`                    | `%eof`                       |
-| `<empty>`                  | `%empty`                     |
-| `<null>`                   | `%null`                      |
-| `<esc>`                    | `%`                          |
-| `<field-sep>`              | `|`                          |
+| Token                      | Value                                 |
+| -------------------------- | ------------------------------------- |
+| `<topic-word-sep>`         | `.`                                   |
+| `<topic-wildcard-any1>`    | `*`                                   |
+| `<topic-wildcard-anyN>`    | `>`                                   |
+| `<result-endpoint-prefix>` | `_INBOX.<guid>.<request-id>`, see (1) | 
+| `<eof>`                    | `%eof`                                |
+| `<empty>`                  | `%empty`                              |
+| `<null>`                   | `%null`                               |
+| `<esc>`                    | `%`                                   |
+| `<field-sep>`              | &#124;                                |
 
 Footnotes:
-* `_INBOX.<guid>` part of the result endpoint prefix are provided by NATS client library; `<request-id>` should be filled by the busrpc method caller
+1. `_INBOX.<guid>` part of the result endpoint prefix are provided by NATS client library; `<request-id>` should be filled by the busrpc method caller
 
 # Reserved characters
 
