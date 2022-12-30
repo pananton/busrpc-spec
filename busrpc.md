@@ -776,11 +776,11 @@ The following example contains 2 block comments: first consists of lines 1-3, se
    Line 7 */
 ```
 
-To bind block comment to some protobuf entity, it should be placed right **before** the entity, i.e. no empty lines allowed between the block comment and the bound entity. Also busrpc framework currently does not support trailing comments and ignores them, see next example. The first line of a bound block comment is treated as entity's brief description.
+To bind block comment to some protobuf entity, it should be placed right **before** the entity, i.e. no empty lines allowed between the block comment and the bound entity. The first line of a bound block comment is treated as entity's **brief** description. First line together with all other block lines (except those containing documentation command, see next section) represent **full** entity description (or simply description).
 
 ```
-/* Brief description of MyEnum.
-   Additional information about MyEnum. */
+/// Brief description of MyEnum.
+/// Additional information about MyEnum.
 enum MyEnum {
   // Brief description of MYENUM_VALUE_0.
   MYENUM_VALUE_0 = 0;
@@ -793,22 +793,28 @@ enum MyEnum {
 
 Block comment bound to the descriptor is considered as corresponding entity description. For example, block comment bound to `MethodDesc` provides method description.
 
+It is important to note that when busrpc [development tool](https://github.com/pananton/busrpc-dev) generates documentation for the busrpc project, it **preserves** all whitespaces in the comment lines, which are included in the documentation. This is done to allow third-parties to use various documentation formats inside block comments, including those using indentation as a control sequences (for example, markdown).
+
 ## Documentation commands
 
-Documentation commands allow to specify important information related to busrpc entities (methods, services, etc.). Each command is specified as a single comment line `\name [value]` placed somewhere in the entity's block comment. Note, that commands may interleave with general description lines, however, we recommend to place them at the end of the block comment.
+Documentation commands allow to specify important information related to busrpc entities (methods, services, etc.). Each command is specified as a single comment line `\name [value]` placed somewhere in the entity's block comment. Note, that commands may interleave with general description lines, however, better to place them at the end of the block comment.
 
 Every command may be specified more than once with the same or disinct values. In that case command is called *multivalued*. How multiple values are interpreted depends on the command semantics. For example, they may be considered an error and only one (first or last) value will be taken, or may be merged in some way to represent complex information.
 
 Block comment in the next example represents the following documentation:
-* brief description is "Brief description"
-* full description is an array, consisting of lines "Brief description", "Line 1" and Line 2"
+* brief description is " Brief description" (note, that leading space is preserved)
+* full description is an array, consisting of lines " Brief description", " Line 1" and " Line 2"
 * command "cmd1" has value "value1"
-* command "cmd2" has 3 values "" (empty string), "value2" and "value3"
+* command "cmd2" has 3 values "" (empty string), "value2" and "hello world"
+
 ```
-/// Brief description line.
-/// \cmd1 value1
 /// \cmd2
-/// 
+/// Brief description
+/// \cmd1 value1
+/// Line 1
+/// \cmd2 value2
+/// Line 2
+/// \cmd2 hello world
 ```
 
 # Specializations
