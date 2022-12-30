@@ -45,6 +45,7 @@ This document contains general information for developers of busrpc microservice
 * [Documenting API](#documenting-api)
   * [Basic rules](#basic-rules)
   * [Documentation commands](#documentation-commands)
+    * [Reference](#documentation-command-reference) 
 * [Specializations](#specializations)
 
 # Introduction
@@ -819,16 +820,16 @@ Block comment in the next example represents the following documentation:
 
 ### Documentation command reference
 
-Table below contains alphabetically sorted list of supported documentation commands along with information about their applicability (i.e., to which protobuf structure they may be applied) and semantics.
+Table below contains alphabetically sorted list of supported documentation commands along with information about their applicability (i.e., protobuf entities they can be applied to) and value semantics.
 
-| Name   | Applicability       | Value                                                                                             |
-| -------|---------------------|-------------------------------------------------------------------------------------------------- | 
+| Name   | Applicability       | Value                                                                                              |
+| -------|---------------------|--------------------------------------------------------------------------------------------------- | 
 | accept | `Implements` fields | Pair `paramName acceptedValueDescription`. Indicates that service accepts only calls with specific values of observable parameter(s). If `paramName` is `@object_id`, then command relates to object identifier. Can be multivalued. |
-| author | `ServiceDesc`       | Service author (a person or a team)                                                               |
-| email  | `ServiceDesc`       | Service author contact email                                                                      |
-| post   | `MethodDesc`        | String describing in some way postcondition of a method call                                      |
-| pre    | `MethodDesc`        | String describing in some way precondition of a method call                                       |
-| url    | `ServiceDesc`       | Service sources URL                                                                               |
+| author | `ServiceDesc`       | Service author (a person or a team).                                                               |
+| email  | `ServiceDesc`       | Service author contact email.                                                                      |
+| post   | `MethodDesc`        | String describing in some way postcondition of a method call.                                      |
+| pre    | `MethodDesc`        | String describing in some way precondition of a method call.                                       |
+| url    | `ServiceDesc`       | Service sources URL.                                                                               |
 
 # Specializations
 
