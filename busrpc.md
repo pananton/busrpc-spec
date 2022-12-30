@@ -817,6 +817,19 @@ Block comment in the next example represents the following documentation:
 /// \cmd2 hello world
 ```
 
+### Documentation command reference
+
+Table below contains alphabetically sorted list of supported documentation commands along with information about their applicability (i.e., to which protobuf structure they may be applied) and semantics.
+
+| Name   | Applicability       | Value                                                                                             |
+| -------|---------------------|-------------------------------------------------------------------------------------------------- | 
+| accept | `Implements` fields | Pair `paramName acceptedValueDescription`. Indicates that service accepts only calls with specific values of observable parameter(s). If `paramName` is `@object_id`, then command relates to object identifier. Can be multivalued. |
+| author | `ServiceDesc`       | Service author (a person or a team)                                                               |
+| email  | `ServiceDesc`       | Service author contact email                                                                      |
+| post   | `MethodDesc`        | String describing in some way postcondition of a method call                                      |
+| pre    | `MethodDesc`        | String describing in some way precondition of a method call                                       |
+| url    | `ServiceDesc`       | Service sources URL                                                                               |
+
 # Specializations
 
 Some aspects of the busrpc API design were intentionally left unspecified in this document to avoid dependency on a particular message bus/queue/broker implementation. This unspecified aspects are defined in a seperate bus-dependent documents called *specializations*.
