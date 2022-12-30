@@ -323,8 +323,7 @@ Consider two methods from a `user` class described in the previous section:
 
 enum Result {
   RESULT_SUCCESS = 0;
-  RESULT_UNKNOWN_USERNAME = 1;
-  RESULT_INVALID_PASSWORD = 2;
+  RESULT_INVALID_PASSWORD = 1;
 }
 
 message MethodDesc {
@@ -484,14 +483,15 @@ File *busrpc.proto* must provide definitions of the busrpc built-in types, which
 enum Errc {
   // Unexpected error.
   ERRC_UNEXPECTED = 0;
-  
-  // Custom codes.
-  
-  // Not authorized.
-  ERRC_NOT_AUTHORIZED = 1;
-  
-  // Can't connect to the database.
-  ERRC_DB_CONN_FAILED = 2;
+
+  // Method failed because it called another method and no service accepted it.
+  ERRC_NOT_AVAILABLE = 1;
+
+  // Method failed because it called another method and the call timed out.
+  ERRC_TIMED_OUT = 2;
+
+  // Database query failed.
+  ERRC_DB_QUERY_FAILED = 5;
 }
 ```
 
@@ -506,13 +506,20 @@ message Exception {
   // Error code.
   Errc code = 1;
 
-  // Custom fields.
+  // Error description.
+  optional string description = 2;
 
-  // Description.
-  string description = 2;
-  
-  // Service name.
-  string service_name = 3;
+  // Name of the service which encountered an exceptional situation.
+  optional string service_name = 3;
+
+  // Namespace name.
+  optional string class_name = 4;
+
+  // Class name.
+  optional string class_name = 5;
+
+  // Method name.
+  optional string method_name = 6;
 }
 ```
 
