@@ -1,0 +1,13 @@
+syntax = "proto3";
+package busrpc.implementation;
+
+import "busrpc.proto";
+
+// Message bus configuration.
+message BusConfig {
+  // Message bus IP address.
+  string ip = 1;
+
+  // Default message bus port.
+  uint32 port = 2 [(default_value) = "4222"];
+}

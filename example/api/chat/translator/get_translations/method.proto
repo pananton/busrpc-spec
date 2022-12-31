@@ -1,0 +1,20 @@
+syntax = "proto3";
+package busrpc.api.chat.translator.get_translations;
+
+// Return UI control translations.
+message MethodDesc {
+  message Params {
+    // 2-character target language.
+    string lang = 1;
+
+    // Keys assigned to UI control strings.
+    repeated string keys = 2;
+  }
+
+  message Retval {
+    // Translations ordered by key.
+    map<string, string> translations = 1;
+  }
+
+  message Static {}
+}

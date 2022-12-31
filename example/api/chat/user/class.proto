@@ -1,0 +1,10 @@
+syntax = "proto3";
+package busrpc.api.chat.user;
+
+// Chat application user.
+message ClassDesc {
+  message ObjectId {
+    // Username, which uniquelly identifies a user.
+    string username = 1;
+  }
+}

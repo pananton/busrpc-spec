@@ -1,0 +1,12 @@
+syntax = "proto3";
+package busrpc.api.chat.profile.get;
+
+import "api/chat/user_profile.proto";
+
+// Return user profile.
+message MethodDesc {
+  message Retval {
+    // User profile.
+    busrpc.api.chat.UserProfile profile = 1;
+  }
+}

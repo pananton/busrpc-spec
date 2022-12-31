@@ -1,0 +1,14 @@
+syntax = "proto3";
+package busrpc;
+
+// Date.
+message Date {
+  // Day.
+  uint32 day = 1;
+
+  // Month.
+  uint32 month = 2;
+
+  // Year.
+  uint32 year = 3;
+}

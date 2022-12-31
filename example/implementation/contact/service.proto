@@ -1,0 +1,28 @@
+syntax = "proto3";
+package busrpc.implementation.contact;
+
+import "busrpc.proto";
+import "implementation/bus_config.proto";
+import "api/chat/contact_list/class.proto";
+import "api/chat/contact_list/add/method.proto";
+import "api/chat/contact_list/get/method.proto";
+import "api/chat/contact_list/remove/method.proto";
+
+// Manages user contact list.
+message ServiceDesc {
+  message Config {
+    // Message bus connection configuration.
+    busrpc.implementation.BusConfig bus = 1;
+  }
+
+  message Implements {
+    // Adds new contact.
+    busrpc.api.chat.contact_list.add.MethodDesc method1 = 1;
+
+    // Returns user contact list.
+    busrpc.api.chat.contact_list.get.MethodDesc method2 = 2;
+
+    // Removes existing contact.
+    busrpc.api.chat.contact_list.remove.MethodDesc method3 = 3;
+  }
+}

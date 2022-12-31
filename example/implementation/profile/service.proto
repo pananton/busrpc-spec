@@ -1,0 +1,28 @@
+syntax = "proto3";
+package busrpc.implementation.profile;
+
+import "busrpc.proto";
+import "implementation/bus_config.proto";
+import "api/chat/profile/class.proto";
+import "api/chat/profile/get/method.proto";
+import "api/chat/profile/on_updated/method.proto";
+import "api/chat/profile/update/method.proto";
+
+// Manages user profile.
+message ServiceDesc {
+  message Config {
+    // Message bus connection configuration.
+    busrpc.implementation.BusConfig bus = 1;
+  }
+
+  message Implements {
+    // Returns user profile.
+    busrpc.api.chat.profile.get.MethodDesc method1 = 1;
+
+    // Notifies system that user profile is updated.
+    busrpc.api.chat.profile.on_updated.MethodDesc method2 = 2;
+
+    // Updates user profile.
+    busrpc.api.chat.profile.update.MethodDesc method3 = 3;
+  }
+}

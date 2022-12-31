@@ -1,0 +1,11 @@
+syntax = "proto3";
+package busrpc.api.chat.email.get_owner;
+
+// Return email owner username.
+message MethodDesc {
+  message Retval {
+    // Owner username.
+    // Not set if email was not verified.
+    optional string owner_username = 1;
+  }
+}

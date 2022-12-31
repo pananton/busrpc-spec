@@ -1,0 +1,33 @@
+syntax = "proto3";
+package busrpc.api.chat.user.sign_up;
+
+// Method result code.
+enum Result {
+  // Success.
+  RESULT_SUCCESS = 0;
+
+  // Specified username is already taken.
+  RESULT_USERNAME_ALREADY_TAKEN = 1;
+
+  // Specified password is too weak.
+  RESULT_PASSWORD_TOO_WEAK = 2;
+}
+
+// Sign-up user for Chat application.
+// \post Method busrpc.api.chat.user.on_signed_up is called if user successfully signed up.
+message MethodDesc {
+  message Params {
+    // Username.
+    string username = 1;
+
+    // Password.
+    string password = 2;
+  }
+
+  message Retval {
+    // Result code.
+    Result result = 1;
+  }
+
+  message Static {}
+}

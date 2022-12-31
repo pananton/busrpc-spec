@@ -1,0 +1,5 @@
+syntax = "proto3";
+package busrpc.api.chat.translator;
+
+// Provides translations for user UI controls.
+message ClassDesc { }

@@ -1,0 +1,29 @@
+syntax = "proto3";
+package busrpc.api.chat.user.send_message;
+
+import "busrpc.proto";
+
+// Method status code.
+enum Status {
+  // Unspecified.
+  STATUS_UNSPECIFIED = 0;
+
+  // Success.
+  STATUS_SUCCESS = 1;
+
+  // Password is invalid.
+  STATUS_INVALID_PASSWORD = 2;
+}
+
+// Send message to another user.
+message MethodDesc {
+  message Params {
+    // Receiver's username.
+    string receiver = 1 [(observable) = true];
+
+    // Message text.
+    string text = 2;
+  }
+
+  message Retval { }
+}

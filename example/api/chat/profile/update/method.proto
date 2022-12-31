@@ -1,0 +1,24 @@
+syntax = "proto3";
+package busrpc.api.chat.profile.update;
+
+import "date.proto";
+
+// Update user profile.
+// \post Method busrpc.api.chat.profile.on_updated is called.
+message MethodDesc {
+  message Params {
+    // New email.
+    optional string email = 1;
+
+    // New first name.
+    optional string first_name = 2;
+
+    // New last name.
+    optional string last_name = 3;
+
+    // New birth date.
+    optional busrpc.Date birth_date = 4;
+  }
+
+  message Retval {}
+}

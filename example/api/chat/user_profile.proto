@@ -1,0 +1,19 @@
+syntax = "proto3";
+package busrpc.api.chat;
+
+import "date.proto";
+
+// User profile information.
+message UserProfile {
+  // Email address.
+  string email = 1;
+
+  // First name.
+  string first_name = 2;
+
+  // Last name.
+  string last_name = 3;
+
+  // Birth date.
+  busrpc.Date birth_date = 4;
+}

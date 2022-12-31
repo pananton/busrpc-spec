@@ -1,0 +1,10 @@
+syntax = "proto3";
+package busrpc.api.chat.contact_list.get;
+
+// Return contact list.
+message MethodDesc {
+  message Retval {
+    // Usernames of users added to contact list.
+    repeated string usernames = 1;
+  }
+}

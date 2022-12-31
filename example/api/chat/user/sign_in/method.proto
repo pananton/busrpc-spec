@@ -1,0 +1,25 @@
+syntax = "proto3";
+package busrpc.api.chat.user.sign_in;
+
+// Method result code.
+enum Result {
+  // Success.
+  RESULT_SUCCESS = 0;
+
+  // Invalid password.
+  RESULT_INVALID_PASSWORD = 1;
+}
+
+// Sign-in user for Chat application.
+// \post Method busrpc.api.chat.user.on_signed_in is called if user successfully signed in.
+message MethodDesc {
+  message Params {
+    // Password.
+    string password = 1;
+  }
+
+  message Retval {
+    // Result code.
+    Result result = 1;
+  }
+}

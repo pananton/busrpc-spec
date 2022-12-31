@@ -1,0 +1,29 @@
+syntax = "proto3";
+package busrpc.implementation.greeter;
+
+import "busrpc.proto";
+import "implementation/bus_config.proto";
+import "api/chat/user/class.proto";
+import "api/chat/user/on_signed_in/method.proto";
+import "api/chat/user/send_message/method.proto";
+
+// Sends welcome message to any user who signed in to the Chat application for the first time.
+message ServiceDesc {
+  message Config {
+    // Message bus connection configuration.
+    busrpc.implementation.BusConfig bus = 1;
+
+    // Welcome text.
+    string welcome_text = 2 [(default_value) = "Thank you for trying Chat!"];
+  }
+
+  message Implements {
+    // Determines whether user signed in for the first time and sends welcome message if necessary.
+    busrpc.api.chat.user.on_signed_in.MethodDesc method1 = 1;
+  }
+
+  message Invokes {
+    // Sends welcome message to the user who signed in for the first time on behalf of system account.
+    busrpc.api.chat.user.send_message.MethodDesc method2 = 2;
+  }
+}

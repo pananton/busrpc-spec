@@ -1,0 +1,5 @@
+syntax = "proto3";
+package busrpc.api.chat.user.on_signed_in;
+
+// Called when user is signed in.
+message MethodDesc { }

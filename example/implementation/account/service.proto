@@ -1,0 +1,34 @@
+syntax = "proto3";
+package busrpc.implementation.account;
+
+import "busrpc.proto";
+import "implementation/bus_config.proto";
+import "api/chat/user/class.proto";
+import "api/chat/user/on_signed_in/method.proto";
+import "api/chat/user/on_signed_up/method.proto";
+import "api/chat/user/sign_in/method.proto";
+import "api/chat/user/sign_up/method.proto";
+
+// Manages user account.
+message ServiceDesc {
+  message Config {
+    // Message bus connection configuration.
+    busrpc.implementation.BusConfig bus = 1;
+  }
+
+  message Implements {
+    // Checks user password and signs in user to system if password is valid.
+    busrpc.api.chat.user.sign_in.MethodDesc method1 = 1;
+
+    // Registers new user.
+    busrpc.api.chat.user.sign_up.MethodDesc method2 = 2;
+  }
+
+  message Invokes {
+    // Notifies system that user signed in.
+    busrpc.api.chat.user.on_signed_in.MethodDesc method1 = 1;
+
+    // Notifies system that new user is registered.
+    busrpc.api.chat.user.on_signed_up.MethodDesc method2 = 2;
+  }
+}

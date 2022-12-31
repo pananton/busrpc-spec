@@ -1,0 +1,65 @@
+syntax = "proto3";
+package busrpc.implementation.presence;
+
+import "busrpc.proto";
+import "implementation/bus_config.proto";
+import "api/chat/contact_list/class.proto";
+import "api/chat/profile/class.proto";
+import "api/chat/translator/class.proto";
+import "api/chat/user/class.proto";
+import "api/chat/contact_list/add/method.proto";
+import "api/chat/contact_list/get/method.proto";
+import "api/chat/contact_list/remove/method.proto";
+import "api/chat/profile/get/method.proto";
+import "api/chat/profile/update/method.proto";
+import "api/chat/translator/get_translations/method.proto";
+import "api/chat/user/on_signed_out/method.proto";
+import "api/chat/user/send_message/method.proto";
+import "api/chat/user/sign_in/method.proto";
+import "api/chat/user/sign_up/method.proto";
+
+// Holds connection with user application.
+message ServiceDesc {
+  message Config {
+    // Message bus connection configuration.
+    busrpc.implementation.BusConfig bus = 1;
+  }
+
+  message Implements {
+    // Notifies system that user signed out (connection with him is lost).
+    busrpc.api.chat.user.on_signed_out.MethodDesc method1 = 1;
+
+    // Receives message for user.
+    // \accept receiver name of online user
+    busrpc.api.chat.user.send_message.MethodDesc method3 = 3;
+  }
+
+  message Invokes {
+    // Signs up user to system.
+    busrpc.api.chat.user.sign_up.MethodDesc method1 = 1;
+
+    // Signs in user to system.
+    busrpc.api.chat.user.sign_in.MethodDesc method2 = 2;
+
+    // Sends message to user.
+    busrpc.api.chat.user.send_message.MethodDesc method3 = 3;
+
+    // Returns UI control strings translation to user application.
+    busrpc.api.chat.translator.get_translations.MethodDesc method4 = 4;
+
+    // Obtains user profile.
+    busrpc.api.chat.profile.get.MethodDesc method5 = 5;
+
+    // Updates user profile.
+    busrpc.api.chat.profile.update.MethodDesc method6 = 6;
+
+    // Obtains user contact list.
+    busrpc.api.chat.contact_list.get.MethodDesc method7 = 7;
+
+    // Adds new contact to user contact list.
+    busrpc.api.chat.contact_list.add.MethodDesc method8 = 8;
+
+    // Removes contact from user contact list.
+    busrpc.api.chat.contact_list.remove.MethodDesc method9 = 9;
+  }
+}

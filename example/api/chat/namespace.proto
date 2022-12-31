@@ -1,0 +1,5 @@
+syntax = "proto3";
+package busrpc.api.chat;
+
+// Chat application namespace.
+message NamespaceDesc {}

@@ -1,0 +1,10 @@
+syntax = "proto3";
+package busrpc.api.chat.contact_list;
+
+// User contact list.
+message ClassDesc {
+  message ObjectId {
+    // Username of the contact list owner.
+    string username = 1;
+  }
+}

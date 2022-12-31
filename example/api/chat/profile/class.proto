@@ -1,0 +1,10 @@
+syntax = "proto3";
+package busrpc.api.chat.profile;
+
+// User profile.
+message ClassDesc {
+  message ObjectId {
+    // Username of profile owner.
+    string username = 1;
+  }
+}

@@ -18,12 +18,36 @@ import "google/protobuf/descriptor.proto";
 enum Errc {
   // Unexpected error.
   ERRC_UNEXPECTED = 0;
+
+  // Method failed because it called another method and no service accepted it.
+  ERRC_NOT_AVAILABLE = 1;
+
+  // Method failed because it called another method and the call timed out.
+  ERRC_TIMED_OUT = 2;
+
+  // Database query failed.
+  ERRC_DB_QUERY_FAILED = 3;
 }
 
 // Global exception type for busrpc methods.
 message Exception {
   // Error code.
   Errc code = 1;
+
+  // Error description.
+  optional string description = 2;
+
+  // Name of the service which encountered an exceptional situation.
+  optional string service_name = 3;
+
+  // Namespace name.
+  optional string namespace_name = 4;
+
+  // Class name.
+  optional string class_name = 5;
+
+  // Method name.
+  optional string method_name = 6;
 }
 
 // Network message, which is sent to call a method.

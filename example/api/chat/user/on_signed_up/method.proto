@@ -1,0 +1,5 @@
+syntax = "proto3";
+package busrpc.api.chat.user.on_signed_up;
+
+// Called when new user is registered.
+message MethodDesc { }

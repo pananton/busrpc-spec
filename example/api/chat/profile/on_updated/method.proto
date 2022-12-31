@@ -1,0 +1,16 @@
+syntax = "proto3";
+package busrpc.api.chat.profile.on_updated;
+
+import "busrpc.proto";
+import "api/chat/user_profile.proto";
+
+// Called when user profile is updated.
+message MethodDesc {
+  message Params {
+    // New profile.
+    busrpc.api.chat.UserProfile profile = 1;
+
+    // True if email was updated.
+    bool is_email_updated = 2 [(observable) = true];
+  }
+}

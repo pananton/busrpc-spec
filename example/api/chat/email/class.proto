@@ -1,0 +1,14 @@
+syntax = "proto3";
+package busrpc.api.chat.email;
+
+import "busrpc.proto";
+
+// Email.
+message ClassDesc {
+  option (hashed_struct) = true;
+
+  message ObjectId {
+    // Email.
+    string email = 1;
+  }
+}

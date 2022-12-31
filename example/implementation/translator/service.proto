@@ -1,0 +1,20 @@
+syntax = "proto3";
+package busrpc.implementation.translator;
+
+import "busrpc.proto";
+import "implementation/bus_config.proto";
+import "api/chat/translator/class.proto";
+import "api/chat/translator/get_translations/method.proto";
+
+// Provides UI control translations.
+message ServiceDesc {
+  message Config {
+    // Message bus connection configuration.
+    busrpc.implementation.BusConfig bus = 1;
+  }
+
+  message Implements {
+    // Returns UI control translations.
+    busrpc.api.chat.translator.get_translations.MethodDesc method1 = 1;
+  }
+}

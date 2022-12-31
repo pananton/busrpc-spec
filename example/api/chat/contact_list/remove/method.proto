@@ -1,0 +1,13 @@
+syntax = "proto3";
+package busrpc.api.chat.contact_list.remove;
+
+// Remove user from the contact list.
+// Does nothing if user does not exist in the contact list.
+message MethodDesc {
+  message Params {
+    // Username of the user to be removed.
+    string username = 2;
+  }
+
+  message Retval {}
+}

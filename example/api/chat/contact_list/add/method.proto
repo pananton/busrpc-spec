@@ -1,0 +1,24 @@
+syntax = "proto3";
+package busrpc.api.chat.contact_list.add;
+
+// Method result code.
+enum Result {
+  // Success.
+  RESULT_SUCCESS = 0;
+
+  // User with the specified name already exist in the contact list.
+  RESULT_ALREADY_EXISTS = 2;
+}
+
+// Add user to contact list.
+message MethodDesc {
+  message Params {
+    // Username of user to be added.
+    string username = 1;
+  }
+
+  message Retval {
+    // Result code.
+    Result result = 1;
+  }
+}
