@@ -5,7 +5,7 @@ package busrpc.api.chat.contact_list.remove;
 // Does nothing if user does not exist in the contact list.
 message MethodDesc {
   message Params {
-    // Username of the user to be removed.
+    // User to be removed from the contact list.
     string username = 2;
   }
 

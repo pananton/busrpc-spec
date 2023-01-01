@@ -7,13 +7,13 @@ enum Result {
   RESULT_SUCCESS = 0;
 
   // User with the specified name already exist in the contact list.
-  RESULT_ALREADY_EXISTS = 2;
+  RESULT_ALREADY_EXISTS = 1;
 }
 
 // Add user to contact list.
 message MethodDesc {
   message Params {
-    // Username of user to be added.
+    // User to be added to the contact list.
     string username = 1;
   }
 

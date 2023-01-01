@@ -1,0 +1,11 @@
+syntax = "proto3";
+package busrpc.api.chat.email.on_verified;
+
+// Called when user has proved that he owns an email.
+// To prove ownership user must follow the link from the verification email sent by the system.
+message MethodDesc {
+  message Params {
+    // Username of the email owner.
+    string owner = 1;
+  }
+}

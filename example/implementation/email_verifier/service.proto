@@ -5,10 +5,10 @@ import "busrpc.proto";
 import "implementation/bus_config.proto";
 import "api/chat/email/class.proto";
 import "api/chat/profile/class.proto";
-import "api/chat/email/get_owner/method.proto";
+import "api/chat/email/on_verified/method.proto";
 import "api/chat/profile/on_updated/method.proto";
 
-// Service that sends verification emails and tracks answers to them.
+// Sends verification email and tracks when user follows it to notify system that email is verified.
 message ServiceDesc {
   message Config {
     // Message bus connection configuration.
@@ -16,11 +16,13 @@ message ServiceDesc {
   }
 
   message Implements {
-    // Sends verification email for new user email.
+    // Sends verification email for new email set in user profile.
     // \accept is_email_updated true
     busrpc.api.chat.profile.on_updated.MethodDesc method1 = 1;
+  }
 
-    // Returns email owner username.
-    busrpc.api.chat.email.get_owner.MethodDesc method2 = 2;
+  message Invokes {
+    // Notifies system that user has proved email ownership.
+    busrpc.api.chat.email.on_verified.MethodDesc method1 = 1;
   }
 }

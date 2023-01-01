@@ -3,6 +3,7 @@ package busrpc.implementation.profile;
 
 import "busrpc.proto";
 import "implementation/bus_config.proto";
+import "api/chat/email/on_verified/method.proto";
 import "api/chat/profile/class.proto";
 import "api/chat/profile/get/method.proto";
 import "api/chat/profile/on_updated/method.proto";
@@ -16,13 +17,16 @@ message ServiceDesc {
   }
 
   message Implements {
+    // Sets flag indicating that email is verified in user profile.
+    busrpc.api.chat.email.on_verified.MethodDesc method1 = 1;
+
     // Returns user profile.
-    busrpc.api.chat.profile.get.MethodDesc method1 = 1;
+    busrpc.api.chat.profile.get.MethodDesc method2 = 2;
 
     // Notifies system that user profile is updated.
-    busrpc.api.chat.profile.on_updated.MethodDesc method2 = 2;
+    busrpc.api.chat.profile.on_updated.MethodDesc method3 = 3;
 
     // Updates user profile.
-    busrpc.api.chat.profile.update.MethodDesc method3 = 3;
+    busrpc.api.chat.profile.update.MethodDesc method4 = 4;
   }
 }

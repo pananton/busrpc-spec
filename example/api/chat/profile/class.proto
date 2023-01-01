@@ -4,7 +4,7 @@ package busrpc.api.chat.profile;
 // User profile.
 message ClassDesc {
   message ObjectId {
-    // Username of profile owner.
+    // User owning the profile.
     string username = 1;
   }
 }
