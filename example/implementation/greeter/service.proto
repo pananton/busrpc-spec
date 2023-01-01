@@ -8,6 +8,9 @@ import "api/chat/user/on_signed_in/method.proto";
 import "api/chat/user/send_message/method.proto";
 
 // Sends welcome message to any user who signed in to the Chat application for the first time.
+// \author John Doe
+// \email johndoe@company.com
+// \url https://company.com/johndoe/greeter-service
 message ServiceDesc {
   message Config {
     // Message bus connection configuration.

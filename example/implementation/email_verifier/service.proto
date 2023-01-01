@@ -9,6 +9,9 @@ import "api/chat/email/on_verified/method.proto";
 import "api/chat/profile/on_updated/method.proto";
 
 // Sends verification email and tracks when user follows it to notify system that email is verified.
+// \author John Doe
+// \email johndoe@company.com
+// \url https://company.com/johndoe/email-verifier-service
 message ServiceDesc {
   message Config {
     // Message bus connection configuration.

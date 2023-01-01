@@ -19,6 +19,9 @@ import "api/chat/user/sign_in/method.proto";
 import "api/chat/user/sign_up/method.proto";
 
 // Holds connection with user application.
+// \author John Doe
+// \email johndoe@company.com
+// \url https://company.com/johndoe/presence-service
 message ServiceDesc {
   message Config {
     // Message bus connection configuration.

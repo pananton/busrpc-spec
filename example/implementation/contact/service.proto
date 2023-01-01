@@ -9,6 +9,9 @@ import "api/chat/contact_list/get/method.proto";
 import "api/chat/contact_list/remove/method.proto";
 
 // Manages user contact list.
+// \author John Doe
+// \email johndoe@company.com
+// \url https://company.com/johndoe/contact-service
 message ServiceDesc {
   message Config {
     // Message bus connection configuration.

@@ -10,6 +10,9 @@ import "api/chat/profile/on_updated/method.proto";
 import "api/chat/profile/update/method.proto";
 
 // Manages user profile.
+// \author John Doe
+// \email johndoe@company.com
+// \url https://company.com/johndoe/profile-service
 message ServiceDesc {
   message Config {
     // Message bus connection configuration.

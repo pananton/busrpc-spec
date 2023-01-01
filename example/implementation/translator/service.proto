@@ -7,6 +7,9 @@ import "api/chat/translator/class.proto";
 import "api/chat/translator/get_translations/method.proto";
 
 // Provides UI control translations.
+// \author John Doe
+// \email johndoe@company.com
+// \url https://company.com/johndoe/translator-service
 message ServiceDesc {
   message Config {
     // Message bus connection configuration.
