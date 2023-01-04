@@ -783,13 +783,15 @@ The following example contains 2 block comments: first consists of lines 1-3, se
 To bind block comment to some protobuf entity, it should be placed right **before** the entity, i.e. no empty lines allowed between the block comment and the bound entity. The first line of a bound block comment is treated as entity's **brief** description. First line together with all other block lines (except those containing documentation command, see next section) represent **full** entity description (or simply description).
 
 ```
-/// Brief description of MyEnum.
-/// Additional information about MyEnum.
+// Brief description of MyEnum.
+// Additional information about MyEnum.
 enum MyEnum {
   // Brief description of MYENUM_VALUE_0.
+  // Additional information about MYENUM_VALUE_0.
   MYENUM_VALUE_0 = 0;
 
   // This comment is not bound!
+  // MYENUM_VALUE_1 is not documented.
 
   MYENUM_VALUE_1 = 1;
 }
@@ -812,13 +814,13 @@ Block comment in the next example represents the following documentation:
 * command "cmd2" has 3 values "" (empty string), "value2" and "hello world"
 
 ```
-/// \cmd2
-/// Brief description
-/// \cmd1 value1
-/// Line 1
-/// \cmd2 value2
-/// Line 2
-/// \cmd2 hello world
+// \cmd2
+// Brief description
+// \cmd1 value1
+// Line 1
+// \cmd2 value2
+// Line 2
+// \cmd2 hello world
 ```
 
 ### Documentation command reference
