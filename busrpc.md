@@ -111,7 +111,7 @@ Busrpc **structure** is an alternative term for a protobuf `message` introduced 
 Busrpc specification defines a concept of an **encodable type** - a protobuf type which can be encoded as specified in the [Type encoding](#type-encoding) section below. Encodable type can't be `repeated` and should be one the following:
 * [scalar](https://developers.google.com/protocol-buffers/docs/proto3#scalar) type except for floating-point types `float` and `double`
 * [enumeration](https://developers.google.com/protocol-buffers/docs/proto3#enum) type
-* **encodable structure** type, which contains only fields of encodable scalar/enumeration types (structure without fields is also encodable)
+* structure type, which contains only fields of encodable scalar/enumeration types (structure without fields is also encodable)
 
 Some examples of encodable and not encodable structure types:
 
