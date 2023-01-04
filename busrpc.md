@@ -181,7 +181,7 @@ Busrpc method exceptions may be converted to a programming language exceptions b
 
 Note, that result endpoint is not defined for one-way methods.
 
-Some message bus topic formats, commonly used for subscribing for method calls, are also mapped to a named endpoints to establish common terminology. This mapping is provided in the following table.
+Some message bus topic formats, commonly used for subscribing, are also mapped to a named endpoints to establish common terminology. This mapping is provided in the following table.
 
 | Topic                                                                                          | Endpoint  | Description                                       |
 | ---------------------------------------------------------------------------------------------- | --------- | ------------------------------------------------- |
