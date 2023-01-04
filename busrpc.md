@@ -82,7 +82,7 @@ Note that core publish/subscribe mechanism implies one-way message flow (from pu
 
 # Design
 
-Busrpc API design is based on the concepts from object-oriented programming. This allows busrpc to re-use well-known OOP terminology and stay familiar for newcomers (note hovewer that same terms from busrpc API design and object-oriented design may differ in some aspects and should not be treated as exactly equivalent). Moreover, we believe that many well-established and time-tested object-oriented design principles and decomposition strategies can also be applied for a good microservice backend API, which means that developers' OOP experience might come in handy in the context of the busrpc framework.
+Busrpc API design is based on the concepts from object-oriented programming. This allows busrpc to re-use well-known OOP terminology and stay familiar for newcomers (note however that same terms from busrpc API design and object-oriented design may differ in some aspects and should not be treated as exactly equivalent). Moreover, we believe that many well-established and time-tested object-oriented design principles and decomposition strategies can also be applied for a good microservice backend API, which means that developers' OOP experience might come in handy in the context of the busrpc framework.
 
 Busrpc uses Google's [protocol buffers](https://developers.google.com/protocol-buffers) as a format of network messages, but the details will be left for a separate [Protocol](#protocol) section. Here we focus on the concepts and terminology of the busrpc framework.
 
