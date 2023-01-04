@@ -772,12 +772,12 @@ Besides this, busrpc specification defines a mechanism for documenting individua
 The following example contains 2 block comments: first consists of lines 1-3, second consists of lines 6-7
 
 ```
-// Line 1
-// Line 2
-// Line 3
+// block 1, line 1
+// block 1, line 2
+// block 1, line 3
 
-/* Line 6
-   Line 7 */
+/* block 2, line 1
+   block 2, line 2 */
 ```
 
 To bind block comment to some protobuf entity, it should be placed right **before** the entity, i.e. no empty lines allowed between the block comment and the bound entity. The first line of a bound block comment is treated as entity's **brief** description. First line together with all other block lines (except those containing documentation command, see next section) represent **full** entity description (or simply description).
