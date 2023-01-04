@@ -78,7 +78,7 @@ Words constituiting a topic usually form a hierarchy, for example: `time.us`, `t
 * `<topic-wildcard-any1>` - matches a single word, for example `time.<topic-wildcard-any1>.east` matches `time.us.east` and `time.eu.east`
 * `<topic-wildcard-anyN>` - matches 1 to many or 0 to many words at the end of a topic, for example `time.us.<topic-wildcard-anyN>` matches `time.us.east`, `time.us.east.atlanta` and may or may not match `time.us` (makes no difference for busrpc specification)
 
-Note that core publish/subscribe mechanism implies one-way message flow (from publisher to subscriber). To enable request/response two-way message flow, `PUBLISH` operation provides optional `replyTo` parameter containing topic on which publisher expects to receive a response for his request. In that case subscriber will call `PUBLISH(replyTo, response)` to send the response.
+Note that core publish/subscribe mechanism implies one-way message flow (from publisher to subscriber). To enable request/reply two-way message flow, `PUBLISH` operation provides optional `replyTo` parameter containing topic on which publisher expects to receive a reply for his request. In that case subscriber will call `PUBLISH(replyTo, reply)` to send the reply.
 
 # Design
 
