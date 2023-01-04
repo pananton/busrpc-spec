@@ -510,7 +510,7 @@ message Exception {
   optional string service_name = 3;
 
   // Namespace name.
-  optional string class_name = 4;
+  optional string namespace_name = 4;
 
   // Class name.
   optional string class_name = 5;
