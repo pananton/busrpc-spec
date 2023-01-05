@@ -767,7 +767,7 @@ Besides this, busrpc specification defines a mechanism for documenting individua
 
 ## Basic rules
 
-**Block comment** is a sequence of 1 or many protobuf comments without any gaps between them. Which format is used for comments does not matter (can be any combination of `//` and `/* ... */` comments).
+**Block comment** is a sequence of 1 or many protobuf comments without any gaps between them. Which format is used for comments does not matter (can be `//` or `/* ... */` comments).
 
 The following example contains 2 block comments: first consists of lines 1-3, second consists of lines 6-7
 
